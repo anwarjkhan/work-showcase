@@ -1,0 +1,40 @@
+# Python virtual environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+dist/
+build/
+*.egg-info/
+
+# IDE and operating-system state
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# JavaScript dependencies and build artifacts
+node_modules/
+.next/
+.vercel/
+coverage/
+
+# Environment variables, credentials and local certificates
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+
+# Local datasets, outputs and logs
+data/private/
+outputs/
+*.log
