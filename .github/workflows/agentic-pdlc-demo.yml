@@ -1,0 +1,37 @@
+name: Agentic PDLC demo checks
+
+on:
+  pull_request:
+    paths:
+      - 'prototypes/agentic-pdlc-demo/**'
+      - '.github/workflows/agentic-pdlc-demo.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'prototypes/agentic-pdlc-demo/**'
+      - '.github/workflows/agentic-pdlc-demo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Execute pipeline regression tests
+        working-directory: prototypes/agentic-pdlc-demo
+        run: python -m unittest -v test_pipeline.py
+      - name: Run demonstration end to end
+        working-directory: prototypes/agentic-pdlc-demo
+        run: |
+          python pdlc.py run --request example_request.json --output out
+          python pdlc.py status --output out
+          python pdlc.py approve --output out --reviewer "CI Synthetic Reviewer" --decision approve
+          python -c "import json; assert json.load(open('out/release.json'))['status'] == 'APPROVED_FOR_DEMO'"
