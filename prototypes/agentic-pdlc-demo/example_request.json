@@ -1,0 +1,18 @@
+{
+  "feature_id": "DEMO-001",
+  "title": "Synthetic delivery risk indicator",
+  "description": "Classify fictional work items using invented risk scores.",
+  "data_classification": "SYNTHETIC",
+  "thresholds": {
+    "amber": 40,
+    "red": 75
+  },
+  "examples": [
+    {"score": 0, "expected": "GREEN"},
+    {"score": 39, "expected": "GREEN"},
+    {"score": 40, "expected": "AMBER"},
+    {"score": 74, "expected": "AMBER"},
+    {"score": 75, "expected": "RED"},
+    {"score": 100, "expected": "RED"}
+  ]
+}
