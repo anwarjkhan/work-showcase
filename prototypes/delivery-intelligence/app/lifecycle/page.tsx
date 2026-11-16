@@ -1,9 +1,8 @@
-// PLACEHOLDER — replaced by the screen deliverable that owns this route (see lib/config/routes.ts, builtBy).
 import { routeMetadata } from '@/components/shell/metadata';
-import { RoutePlaceholder } from '@/components/shell/RoutePlaceholder';
+import { LifecycleScreen } from '@/components/lifecycle/LifecycleScreen';
 
 export const metadata = routeMetadata('lifecycle');
 
 export default function Page() {
-  return <RoutePlaceholder routeId="lifecycle" />;
+  return <LifecycleScreen />;
 }

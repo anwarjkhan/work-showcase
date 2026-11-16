@@ -1,11 +1,11 @@
 'use client';
 
-import { CheckCircle2, CircleDashed, Hourglass, Undo2, Undo, GitBranch } from 'lucide-react';
+import { CheckCircle2, CircleDashed, Hourglass, Undo2, Undo, GitBranch, GitCompareArrows } from 'lucide-react';
 import Link from 'next/link';
 import { hrefs } from '@/lib/config/routes';
 import { stageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
-import { Badge, cx, RagPair, ReadinessPill } from '@/components/ui';
+import { Badge, cx, RagPill, ReadinessPill } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { useDeliverableMeasures, useDeliverableRag } from '@/lib/store';
 import type { CardModel, StageReviewSummary } from './stage-model';
@@ -66,7 +66,14 @@ export function DeliverableCard({ model, compact }: { model: CardModel; compact:
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5">
-        {rag ? <RagPair reported={rag.reported} evidence={rag.evidence} disagrees={rag.disagrees} size="sm" /> : null}
+        {rag ? (
+          <span className="inline-flex flex-wrap items-center gap-1" title={`${terms.ragKinds.reported} / ${terms.ragKinds.evidence}`}>
+            <RagPill status={rag.reported} size="sm" />
+            <span aria-hidden className="text-fg-subtle">/</span>
+            <RagPill status={rag.evidence} size="sm" />
+          </span>
+        ) : null}
+        {rag?.disagrees ? <Badge size="sm" tone="amber" icon={<GitCompareArrows />}>Disagreement</Badge> : null}
         <Badge size="sm" tone="neutral">{terms.riskTiers[d.riskTier].split(' ')[0]}</Badge>
         {model.standalone ? (
           <Badge size="sm" tone="accent" icon={<GitBranch />} title={terms.routes.standalone}>Standalone</Badge>

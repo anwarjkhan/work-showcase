@@ -131,7 +131,7 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
         result,
         source: KIND_SOURCE[kind],
         sourceRef: kind === 'test-result' ? `RUN-${(runCounter += dr.int(1, 4))}` : `${KIND_PREFIX[kind]}-${(docCounter += dr.int(3, 19))}`,
-        observedAt: when.stamp ?? stampOn(when.date, dr),
+        observedAt: when.stamp ?? stamp(when.date, 18, dr.int(0, 59)),
         recordedById: role ? (deliverable.reviewers[role] ?? null) : null,
         provenance: 'sample',
       };
@@ -170,7 +170,7 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
     let latestTest: Evidence | null = null;
     if (stageIndex >= 3) {
       const finished = spec.stage === 'delivery-launch';
-      const count = Math.max(5, Math.min(16, Math.round(done.length * 0.3) + (finished ? 3 : 0)));
+      const count = Math.max(5, Math.min(22, Math.round(done.length * 0.5) + (finished ? 3 : 0)));
       const staleTest = (flags.staleEvidence ?? 0) >= 1;
       const lastDate = staleTest ? addDays(TODAY, -7) : flags.failingTest ? addDays(TODAY, -2) : addDays(TODAY, -dr.int(1, 3));
       const firstDate = at(0.55);
@@ -182,7 +182,6 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
       dates.forEach((date, i) => {
         const isLast = i === count - 1;
         let result: Evidence['result'] = 'pass';
-        if (!isLast && i < count * 0.6 && dr.chance(0.15)) result = 'fail';
         if (isLast && flags.failingTest) result = 'fail';
         else if (isLast && !finished && !staleTest && dr.chance(0.35)) result = 'pending';
         const a = anchor(date, isLast && staleTest);

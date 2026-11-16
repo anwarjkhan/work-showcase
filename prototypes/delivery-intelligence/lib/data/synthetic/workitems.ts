@@ -18,7 +18,8 @@ import type { OutcomePlan } from './outcomes';
 import type { Rng } from './random';
 import type { Reference } from './reference';
 
-const DAY_BEFORE_TODAY = addDays(TODAY, -1);
+/** Latest day work can be closed, so evidence and acceptance can follow on the day before the demo clock. */
+const DAY_BEFORE_TODAY = addDays(TODAY, -2);
 
 interface Draft {
   epicIndex: number;

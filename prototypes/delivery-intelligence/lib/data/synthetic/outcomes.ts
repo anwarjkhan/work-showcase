@@ -4,7 +4,7 @@
  */
 import type { AcceptanceCriterion, Outcome, WorkItem } from '@/lib/types';
 import { CRITERIA_TEMPLATES, REPORTED_ON_TRACK } from './catalogue';
-import { addDays, clampDate, dateAtFraction, dateOf, minDate, stampOn, TODAY } from './dates';
+import { addDays, clampDate, dateAtFraction, dateOf, minDate, stamp, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
 import type { Rng } from './random';
 
@@ -115,7 +115,7 @@ export function finalizeAcceptance(root: Rng, plan: OutcomePlan, hierarchy: Hier
       let when = clampDate(addDays(lastResolved, rng.int(1, 4)), '2027-01-05', addDays(TODAY, -1));
       for (const c of mine) {
         if (c.state !== 'accepted') continue;
-        c.acceptedAt = stampOn(when, rng);
+        c.acceptedAt = stamp(when, 18, rng.int(0, 59));
         when = minDate(addDays(when, rng.int(0, 1)), addDays(TODAY, -1));
         const prior = byOutcome.get(outcome.id);
         if (!prior || c.acceptedAt > prior) byOutcome.set(outcome.id, c.acceptedAt);

@@ -1,9 +1,8 @@
-// PLACEHOLDER — replaced by the screen deliverable that owns this route (see lib/config/routes.ts, builtBy).
 import { routeMetadata } from '@/components/shell/metadata';
-import { RoutePlaceholder } from '@/components/shell/RoutePlaceholder';
+import { PortfolioScreen } from '@/components/portfolio/PortfolioScreen';
 
 export const metadata = routeMetadata('portfolio');
 
 export default function Page() {
-  return <RoutePlaceholder routeId="portfolio" />;
+  return <PortfolioScreen />;
 }

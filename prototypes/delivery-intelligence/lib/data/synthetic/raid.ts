@@ -193,7 +193,7 @@ export function buildRaidAndDependencies(root: Rng, hierarchy: Hierarchy, ref: R
       const pool = kind === 'risk' ? RISKS : kind === 'assumption' ? ASSUMPTIONS : ISSUES;
       addRaid(spec, kind, fill(dr.pick(pool), object), { ...flagged, closed: healthyLaunch && dr.chance(0.6) });
     }
-    if (spec.tier === 'T3' || spec.tier === 'T4') {
+    if (spec.tier === 'T4' || (spec.tier === 'T3' && spec.n % 2 === 0)) {
       const second = dr.pick([...RISKS, ...ASSUMPTIONS]);
       addRaid(spec, RISKS.includes(second) ? 'risk' : 'assumption', fill(second, spec.objects[1] ?? object), { closed: healthyLaunch });
     }
