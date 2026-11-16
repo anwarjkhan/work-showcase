@@ -42,6 +42,9 @@ describe('PDLC workflow: the workflow-story deliverable from first stage to read
     const blockedForward = a.moveStage(TD, 'forward', ME);
     expect(blockedForward.ok).toBe(false);
     if (!blockedForward.ok) expect(blockedForward.reason).toMatch(/needs the requirements owner review/);
+    const tooEarly = a.simulateWorkClosed(TD, ME);
+    expect(tooEarly.ok).toBe(false);
+    if (!tooEarly.ok) expect(tooEarly.reason).toMatch(/only from Build, Test & Validate onwards/);
 
     // --- 1. Ideation & Requirements: agent drafts stories; a named person approves them.
     const run1 = must(a.runStageAgent(TD));
@@ -64,18 +67,38 @@ describe('PDLC workflow: the workflow-story deliverable from first stage to read
     must(a.approveReview(TD, 'design-specifications', 'design-reviewer', ME));
     must(a.moveStage(TD, 'forward', ME));
     expectStage('risk-control-compliance');
+    expect(measures(s())).toEqual({ work: `0/${8 + added}`, accepted: '0/1', readiness: 'unknown' });
 
     // --- 3. Risk, Control & Compliance.
     must(a.runStageAgent(TD));
     must(a.approveReview(TD, 'risk-control-compliance', 'control-owner', ME));
     must(a.moveStage(TD, 'forward', ME));
     expectStage('build-test-validate');
+    expect(measures(s())).toEqual({ work: `0/${8 + added}`, accepted: '0/1', readiness: 'unknown' });
 
-    // --- 4. Build, Test & Validate: the simulated test fails.
+    // --- 4. Build, Test & Validate: work is closed (simulated, in two clicks), then the simulated test fails.
     must(a.runStageAgent(TD));
+    const T = 8 + added;
+    const buildStep = describeWorkflow(s().data, s().results, TD)!.stages.find((x) => x.definition.id === 'build-test-validate')!.simulatedSteps[0]!;
+    expect(buildStep).toMatchObject({ id: 'simulate-work-closed', enabled: true });
+    expect(a.simulateWorkClosed(TD, s().data.agentIdentities[0]!.id).ok).toBe(false); // never an agent
+    const half = must(a.simulateWorkClosed(TD, ME, { share: 0.5 }));
+    expect(half.closedKeys.length).toBeGreaterThan(0);
+    const mid = measures(s());
+    const midClosed = Number(mid.work.split('/')[0]);
+    expect(midClosed).toBeGreaterThan(0);
+    expect(midClosed).toBeLessThan(T);
+    expect(mid).toEqual({ work: `${midClosed}/${T}`, accepted: '0/1', readiness: 'unknown' });
+    expect(s().audit.at(-1)).toMatchObject({ action: 'evidence.simulated', details: { simulated: true, simulation: 'work-closed' } });
+    must(a.simulateWorkClosed(TD, ME));
+    expect(measures(s())).toEqual({ work: `${T}/${T}`, accepted: '0/1', readiness: 'unknown' });
+    expect(s().data.workItems.filter((w) => w.epicKey === 'LIM-10' || w.parentKey === 'LIM-10').every((w) => w.statusCategory === 'done' && w.resolved !== null)).toBe(true);
+    const nothingLeft = a.simulateWorkClosed(TD, ME);
+    expect(nothingLeft.ok).toBe(false);
+    if (!nothingLeft.ok) expect(nothingLeft.reason).toMatch(/already closed/);
     const failId = must(a.recordEvidence({ deliverableId: TD, kind: 'test-result', result: 'fail', title: 'Filter regression suite', recordedById: ME, simulated: true })).evidenceId;
     expect(s().data.evidence.find((e) => e.id === failId)?.provenance).toBe('simulated');
-    expect(measures(s())).toEqual({ work: `0/${8 + added}`, accepted: '0/1', readiness: 'not-ready' });
+    expect(measures(s())).toEqual({ work: `${T}/${T}`, accepted: '0/1', readiness: 'not-ready' });
     const validatorRefused = a.approveReview(TD, 'build-test-validate', 'independent-validator', ME);
     expect(validatorRefused.ok).toBe(false);
     if (!validatorRefused.ok) expect(validatorRefused.reason).toMatch(/failing/);
@@ -96,7 +119,7 @@ describe('PDLC workflow: the workflow-story deliverable from first stage to read
 
     // Passing rerun clears the failure; readiness is still unknown (acceptance and checklist missing).
     must(a.recordEvidence({ deliverableId: TD, kind: 'test-result', result: 'pass', title: 'Filter regression suite (rerun)', recordedById: ME, simulated: true }));
-    expect(measures(s())).toEqual({ work: `0/${8 + added}`, accepted: '0/1', readiness: 'unknown' });
+    expect(measures(s())).toEqual({ work: `${T}/${T}`, accepted: '0/1', readiness: 'unknown' });
     expect(describeWorkflow(s().data, s().results, TD)!.backSuggestion.offer).toBe(false);
     must(a.approveReview(TD, 'build-test-validate', 'independent-validator', ME));
     must(a.moveStage(TD, 'forward', ME));
@@ -110,13 +133,16 @@ describe('PDLC workflow: the workflow-story deliverable from first stage to read
     must(a.acceptCriterion('ac-oc-2001-1-2', ME));
     expect(measures(s()).accepted).toBe('0/1'); // criteria alone do not accept the outcome
     must(a.recordEvidence({ deliverableId: TD, kind: 'business-acceptance', result: 'pass', title: 'Desk heads accept the filters', outcomeId: 'oc-2001-1', recordedById: ME, simulated: false }));
-    expect(measures(s())).toEqual({ work: `0/${8 + added}`, accepted: '1/1', readiness: 'unknown' });
+    expect(measures(s())).toEqual({ work: `${T}/${T}`, accepted: '1/1', readiness: 'unknown' });
     must(a.approveReview(TD, 'delivery-launch', 'business-owner', ME));
     must(a.recordEvidence({ deliverableId: TD, kind: 'release-checklist', result: 'pass', title: 'Release checklist complete', recordedById: ME, simulated: false }));
     must(a.approveReview(TD, 'delivery-launch', 'release-owner', ME));
 
-    // Ready. Work completion stays independent of readiness and acceptance.
-    expect(measures(s())).toEqual({ work: `0/${8 + added}`, accepted: '1/1', readiness: 'ready' });
+    // Ready: 100% of work closed, every outcome accepted, readiness ready.
+    expect(measures(s())).toEqual({ work: `${T}/${T}`, accepted: '1/1', readiness: 'ready' });
+    const final = s().results.deliverables[TD]!;
+    expect(final.workCompletion.computable && final.workCompletion.value.percent).toBe(100);
+    expect(final.acceptedOutcomes.computable && final.acceptedOutcomes.value.percent).toBe(100);
     const last = a.moveStage(TD, 'forward', ME);
     expect(last.ok).toBe(false);
     expectStage('delivery-launch');
@@ -127,6 +153,7 @@ describe('PDLC workflow: the workflow-story deliverable from first stage to read
     for (const action of ['pdlc.stage-agent-run', 'pdlc.review-approved', 'pdlc.moved-forward', 'pdlc.moved-back', 'evidence.recorded', 'evidence.simulated', 'criterion.accepted', 'proposal.approved', 'proposal.auto-applied'] as const) {
       expect(log).toContain(action);
     }
+    expect(s().audit.some((e) => e.details.simulation === 'work-closed')).toBe(true);
     expect(s().audit.map((e) => e.seq)).toEqual(s().audit.map((_, i) => i + 1));
     expect(s().data.deliverables.find((d) => d.id === TD)!.reportedRag).toBe(s().seed.deliverables.find((d) => d.id === TD)!.reportedRag);
   });
@@ -145,6 +172,19 @@ describe('PDLC workflow: the workflow-story deliverable from first stage to read
     const actions = store.getState().audit.map((e) => e.action);
     expect(actions).toContain('pdlc.review-returned');
     expect(actions.at(-1)).toBe('pdlc.moved-back');
+  });
+
+  it('closing work after evidence was recorded makes that evidence stale, by the engine rule', () => {
+    const store = createDemoStore();
+    const a = createDemoActions(store);
+    for (const [stage, role] of [['ideation-requirements', 'requirements-owner'], ['design-specifications', 'design-reviewer'], ['risk-control-compliance', 'control-owner']] as const) {
+      must(a.approveReview(TD, stage, role, ME));
+      must(a.moveStage(TD, 'forward', ME));
+    }
+    must(a.recordEvidence({ deliverableId: TD, kind: 'test-result', result: 'pass', title: 'Desk filter test', workItemKey: 'LIM-11', recordedById: ME, simulated: true }));
+    expect(store.getState().results.deliverables[TD]!.readiness.held.find((h) => h.kind === 'test-result')?.state).toBe('passing');
+    must(a.simulateWorkClosed(TD, ME));
+    expect(store.getState().results.deliverables[TD]!.readiness.held.find((h) => h.kind === 'test-result')?.state).toBe('stale');
   });
 
   it('only the named reviewer can decide a review, and only for the current stage', () => {

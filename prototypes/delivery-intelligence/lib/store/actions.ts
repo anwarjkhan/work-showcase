@@ -28,7 +28,7 @@ import {
   type ScriptedAgentRun,
 } from '@/lib/agents';
 import { activeProvider } from '@/lib/agents/provider';
-import { AGENT_WORK_PRODUCT, EVIDENCE_WORK_PRODUCT, latestEvidence, producingStage, setWorkProduct, updateStage } from '@/lib/agents/workflow';
+import { AGENT_WORK_PRODUCT, checkSimulateWorkClosed, EVIDENCE_WORK_PRODUCT, latestEvidence, producingStage, setWorkProduct, updateStage } from '@/lib/agents/workflow';
 import { neighbourStage, stageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
 import { canMoveBack, canMoveForward } from '@/lib/engine';
@@ -100,6 +100,13 @@ export interface DemoActions {
   acceptCriterion(criterionId: string, personId: string): ActionResult;
   /** Rejects an acceptance criterion with a reason, as the acceptance owner. */
   rejectCriterion(criterionId: string, personId: string, reason: string): ActionResult;
+  /**
+   * Simulated demo step: closes the deliverable's open story-level items (and their
+   * sub-tasks), all of them or a `share` (0..1, rounded up, in key order). Allowed from
+   * Build, Test & Validate onwards, by a named person. Closing work changes `updated`
+   * and `resolved`, so evidence already held for that work can go stale (by design).
+   */
+  simulateWorkClosed(deliverableId: string, actorId: string, options?: { share?: number }): ActionResult<{ closedKeys: string[] }>;
   /** Moves to the neighbouring stage. Forward needs the stage's reviews approved; back needs a reason. */
   moveStage(deliverableId: string, direction: 'forward' | 'back', byPersonId: string, reason?: string): ActionResult<{ to: PdlcStageId }>;
 
@@ -521,6 +528,45 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
     rejectCriterion(criterionId, personId, reason) {
       if (!reason || reason.trim().length === 0) return fail('Rejecting a criterion needs a reason.');
       return decideCriterion(criterionId, personId, 'rejected', reason.trim());
+    },
+
+    simulateWorkClosed(deliverableId, actorId, options) {
+      const d = indexPortfolio(data()).deliverables.get(deliverableId);
+      if (!d) return fail(`Deliverable ${deliverableId} does not exist.`);
+      const subject: EntityRef = { kind: 'deliverable', id: d.id };
+      const who = requirePerson(data(), actorId, 'close work');
+      if (!who.ok) return blocked(who, actorId, subject);
+      const check = checkSimulateWorkClosed(data(), deliverableId);
+      if (!check.enabled) return fail(check.reason);
+      const share = options?.share ?? 1;
+      if (!(share > 0 && share <= 1)) return fail('The share of work to close must be more than 0 and at most 1.');
+      const chosen = new Set(check.openItems.slice(0, Math.max(1, Math.ceil(check.openItems.length * share))));
+      // Sub-tasks under the chosen items close with them.
+      for (const w of data().workItems) if (w.parentKey && chosen.has(w.parentKey) && w.statusCategory !== 'done') chosen.add(w.key);
+      const at = store.now();
+      const closedKeys = [...chosen];
+      store.updateData((current) => {
+        let next: PortfolioData = {
+          ...current,
+          workItems: current.workItems.map((w) => (chosen.has(w.key) ? { ...w, status: 'Done', statusCategory: 'done' as const, resolved: at, updated: at } : w)),
+        };
+        const remaining = checkSimulateWorkClosed(next, deliverableId).openItems.length;
+        const live = next.pdlcRuns.find((r) => r.deliverableId === deliverableId);
+        if (live && remaining === 0) next = withRun(next, updateStage(live, 'build-test-validate', (st) => setWorkProduct(st, 'build', 'complete', subject)));
+        return next;
+      });
+      const remaining = checkSimulateWorkClosed(data(), deliverableId).openItems.length;
+      store.appendAudit({
+        at,
+        actor: { kind: 'human', personId: actorId },
+        // The shared AuditAction union has no work action; simulated steps are logged as evidence.simulated.
+        action: 'evidence.simulated',
+        subject,
+        summary: `Simulated: ${personName(actorId)} closed ${closedKeys.length} work item${closedKeys.length === 1 ? '' : 's'} of ${d.ref}; ${remaining} story-level item${remaining === 1 ? '' : 's'} still open.`,
+        refs: [subject, ...closedKeys.slice(0, 20).map((k) => ({ kind: 'work-item' as const, id: k }))],
+        details: { simulated: true, simulation: 'work-closed', closed: closedKeys.length, remaining, share },
+      });
+      return ok({ closedKeys });
     },
 
     moveStage(deliverableId, direction, byPersonId, reason) {

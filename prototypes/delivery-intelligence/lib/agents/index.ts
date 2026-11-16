@@ -12,6 +12,6 @@ export { applyPatch, isEditable, EDITABLE_FIELDS, type PatchResult } from './pat
 export { playbackAt, playbackDuration, stepTimeline, type PlaybackView, type PlayState, type StepTiming } from './playback';
 export { scriptedProvider, activeProvider } from './provider';
 export { resolveRef, unresolvedRefs, type ResolvedRef } from './refs';
-export { describeWorkflow, latestEvidence, producingStage, type StageView, type WorkflowView } from './workflow';
+export { checkSimulateWorkClosed, describeWorkflow, latestEvidence, producingStage, SIMULATE_WORK_FROM, type SimulatedStep, type StageView, type WorkflowView } from './workflow';
 export { scopeLabel, STEP_DURATION_MS } from './kit';
 export type { AgentRunScope, AgentScopeKind, ProgrammeScope, ScriptedAgent, ScriptedAgentInput, ScriptedAgentRun } from './types';

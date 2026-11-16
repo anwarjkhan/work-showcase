@@ -2,8 +2,8 @@
  * PDLC workflow helpers: immutable updates to a `PdlcRun`, and a read model
  * that gives the workflow screen everything per stage in one call.
  */
-import { PDLC_STAGES, stageDefinition, type PdlcStageDefinition } from '@/lib/config/pdlc';
-import { canMoveBack, canMoveForward, moveBackSuggestion, type TransitionCheck } from '@/lib/engine';
+import { PDLC_STAGE_IDS, PDLC_STAGES, stageDefinition, type PdlcStageDefinition } from '@/lib/config/pdlc';
+import { buildContext, canMoveBack, canMoveForward, isClosed, moveBackSuggestion, type TransitionCheck } from '@/lib/engine';
 import type {
   AgentId,
   EngineResult,
@@ -70,6 +70,40 @@ export interface StageView {
   reviews: (PdlcStageState['reviews'][number] & { next: boolean })[];
   /** Evidence the stage should leave, with the latest record of each kind. */
   evidence: { kind: EvidenceKind; latest: Evidence | null; result: Evidence['result'] | 'missing' }[];
+  /** Simulated demo steps offered in this stage (Build, Test & Validate: "simulate work closed"). Label them as simulated. */
+  simulatedSteps: SimulatedStep[];
+}
+
+export interface SimulatedStep {
+  id: 'simulate-work-closed';
+  label: string;
+  /** Call `actions.simulateWorkClosed(deliverableId, actorId, { share })` when enabled. */
+  enabled: boolean;
+  /** Why it is enabled or disabled, for the UI. */
+  reason: string;
+  /** Open story-level items it would close (sub-tasks under them close too). */
+  openItems: string[];
+}
+
+/** First stage from which work may be closed by the simulation. */
+export const SIMULATE_WORK_FROM: PdlcStageId = 'build-test-validate';
+
+/** Whether "simulate work closed" is allowed now for a deliverable, and which items it would close. */
+export function checkSimulateWorkClosed(data: PortfolioData, deliverableId: string): SimulatedStep {
+  const run = data.pdlcRuns.find((r) => r.deliverableId === deliverableId);
+  const d = data.deliverables.find((x) => x.id === deliverableId);
+  const base = { id: 'simulate-work-closed' as const, label: 'Simulate work closed' };
+  if (!run || !d) return { ...base, enabled: false, reason: `Deliverable ${deliverableId} has no PDLC workflow.`, openItems: [] };
+  const clock = { today: data.meta.asOf, now: `${data.meta.asOf}T00:00:00.000Z`, timeZone: 'UTC' };
+  const open = (buildContext(data, clock).storiesByDeliverable.get(d.id) ?? [])
+    .filter((w) => !isClosed(w))
+    .map((w) => w.key)
+    .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+  if (PDLC_STAGE_IDS.indexOf(run.currentStage) < PDLC_STAGE_IDS.indexOf(SIMULATE_WORK_FROM)) {
+    return { ...base, enabled: false, reason: `Work can be closed only from ${stageDefinition(SIMULATE_WORK_FROM).name} onwards; ${d.ref} is in ${stageDefinition(run.currentStage).name}.`, openItems: open };
+  }
+  if (open.length === 0) return { ...base, enabled: false, reason: `All story-level work of ${d.ref} is already closed.`, openItems: [] };
+  return { ...base, enabled: true, reason: `Closes ${open.length} open story-level item${open.length === 1 ? '' : 's'} of ${d.ref} as a simulated step.`, openItems: open };
 }
 
 export interface WorkflowView {
@@ -87,6 +121,7 @@ export function describeWorkflow(data: PortfolioData, results: EngineResult, del
   const run = data.pdlcRuns.find((r) => r.deliverableId === deliverableId);
   const measures = results.deliverables[deliverableId];
   if (!run) return null;
+  const simulate = checkSimulateWorkClosed(data, deliverableId);
   const stages = PDLC_STAGES.map((def) => {
     const state = run.stages[def.id];
     const firstOpen = state.reviews.findIndex((r) => r.state !== 'approved');
@@ -100,6 +135,7 @@ export function describeWorkflow(data: PortfolioData, results: EngineResult, del
         const latest = latestEvidence(data, deliverableId, kind);
         return { kind, latest, result: latest ? latest.result : ('missing' as const) };
       }),
+      simulatedSteps: def.id === SIMULATE_WORK_FROM ? [simulate] : [],
     };
   });
   return {
