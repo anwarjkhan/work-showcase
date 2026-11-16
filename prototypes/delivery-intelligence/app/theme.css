@@ -1,0 +1,279 @@
+/*
+ * Delivery Intelligence — theme tokens.
+ *
+ * Every colour, radius, shadow, font and motion value in the app is defined
+ * here as a `--di-*` custom property. Tailwind utilities are mapped onto these
+ * tokens in globals.css (e.g. `bg-surface`, `text-heading`, `border-line`), and
+ * Tailwind's default palette is switched off, so nothing else can sneak in.
+ *
+ * Themes: `<html data-theme="light|dark">`. The shell sets it before first paint
+ * and remembers the choice. To apply brand values after import inside the firm,
+ * change the values below only (design section 8).
+ *
+ * Naming:
+ *   surfaces   --di-canvas, --di-surface, --di-surface-2, --di-inset, --di-overlay
+ *   lines      --di-line, --di-line-strong
+ *   text       --di-fg, --di-fg-muted, --di-fg-subtle, --di-title, --di-heading
+ *   accent     --di-accent, --di-accent-strong, --di-accent-soft, --di-on-accent
+ *   status     --di-status-{red|amber|green|unknown}[-soft|-fg|-line]   (never the accent)
+ *   provenance --di-prov-{sample|computed|scripted|reported|planned|simulated}[-soft]
+ *   charts     --di-chart-1..6, --di-chart-grid, --di-chart-axis
+ *   map        --di-map-water, --di-map-land, --di-map-land-line, --di-map-graticule, --di-map-arc
+ *   shell      --di-nav-*, --di-topbar-*
+ */
+
+:root {
+  /* ---- Typography ------------------------------------------------------- */
+  --di-font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --di-font-display: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--di-font-sans);
+  --di-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* ---- Shape ------------------------------------------------------------ */
+  --di-radius-xs: 4px;
+  --di-radius-sm: 6px;
+  --di-radius-md: 8px;
+  --di-radius-lg: 12px;
+  --di-radius-xl: 16px;
+  --di-radius-2xl: 22px;
+  --di-radius-pill: 999px;
+  --di-border-width: 1px;
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --di-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --di-ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
+  --di-duration-fast: 120ms;
+  --di-duration-base: 200ms;
+  --di-duration-slow: 360ms;
+
+  /* ---- Layout ----------------------------------------------------------- */
+  --di-nav-width: 264px;
+  --di-topbar-height: 72px;
+  --di-content-max: 1680px;
+  --di-gutter: 32px;
+}
+
+/* Usable at 1366 wide: a slightly narrower frame. */
+@media (max-width: 1535px) {
+  :root {
+    --di-nav-width: 232px;
+    --di-topbar-height: 68px;
+    --di-gutter: 24px;
+  }
+}
+
+/* ======================================================================== */
+/* Light theme (default when nothing is set)                                */
+/* ======================================================================== */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces */
+  --di-canvas: #f3f5f9;
+  --di-canvas-glow-1: rgba(26, 92, 255, 0.07);
+  --di-canvas-glow-2: rgba(10, 33, 77, 0.05);
+  --di-surface: #ffffff;
+  --di-surface-2: #f8fafd;
+  --di-inset: #eef2f8;
+  --di-overlay: rgba(6, 16, 36, 0.42);
+  --di-hover: rgba(10, 33, 77, 0.04);
+  --di-selected: rgba(26, 92, 255, 0.07);
+
+  /* Lines */
+  --di-line: #e0e6ef;
+  --di-line-strong: #c9d3e1;
+
+  /* Text */
+  --di-fg: #0b1a33;
+  --di-fg-muted: #46577a;
+  --di-fg-subtle: #7a889f;
+  --di-title: #0a1b3d;
+  --di-heading: #1450d8;
+
+  /* Accent (bright confident blue) */
+  --di-accent: #1a5cff;
+  --di-accent-strong: #0f47d6;
+  --di-accent-soft: rgba(26, 92, 255, 0.09);
+  --di-accent-line: rgba(26, 92, 255, 0.32);
+  --di-on-accent: #ffffff;
+  --di-focus: #1a5cff;
+
+  /* Status — separate from the accent */
+  --di-status-red: #d1343d;
+  --di-status-red-soft: #fdeeee;
+  --di-status-red-fg: #9f1d26;
+  --di-status-red-line: #f3c2c5;
+  --di-status-amber: #e09a0b;
+  --di-status-amber-soft: #fdf5e3;
+  --di-status-amber-fg: #8a5600;
+  --di-status-amber-line: #f1d79c;
+  --di-status-green: #13875f;
+  --di-status-green-soft: #e8f6ef;
+  --di-status-green-fg: #0b6446;
+  --di-status-green-line: #b6e2cd;
+  --di-status-unknown: #74819a;
+  --di-status-unknown-soft: #eef1f5;
+  --di-status-unknown-fg: #4a5568;
+  --di-status-unknown-line: #d3d9e3;
+
+  /* Provenance */
+  --di-prov-sample: #0b7a85;
+  --di-prov-sample-soft: #e6f4f5;
+  --di-prov-computed: #1450d8;
+  --di-prov-computed-soft: #e9effe;
+  --di-prov-scripted: #6a4ce0;
+  --di-prov-scripted-soft: #f0ecfd;
+  --di-prov-reported: #2f4670;
+  --di-prov-reported-soft: #eaeef5;
+  --di-prov-planned: #5f6c84;
+  --di-prov-planned-soft: transparent;
+  --di-prov-simulated: #a63e8f;
+  --di-prov-simulated-soft: #f9ebf5;
+
+  /* Charts */
+  --di-chart-1: #1a5cff;
+  --di-chart-2: #0b7a85;
+  --di-chart-3: #6a4ce0;
+  --di-chart-4: #3aa0ff;
+  --di-chart-5: #2f4670;
+  --di-chart-6: #9aa8c0;
+  --di-chart-grid: #e8edf4;
+  --di-chart-axis: #8a97ad;
+
+  /* Map */
+  --di-map-water: #eef3fa;
+  --di-map-land: #dde5f0;
+  --di-map-land-line: #ffffff;
+  --di-map-graticule: rgba(10, 33, 77, 0.06);
+  --di-map-arc: #1a5cff;
+
+  /* Shell */
+  --di-nav-bg: #0a1730;
+  --di-nav-bg-2: #0d1d3c;
+  --di-nav-fg: #a9b9d4;
+  --di-nav-fg-strong: #ffffff;
+  --di-nav-muted: #6c7fa3;
+  --di-nav-line: rgba(255, 255, 255, 0.08);
+  --di-nav-hover: rgba(255, 255, 255, 0.05);
+  --di-nav-active-bg: rgba(58, 130, 255, 0.16);
+  --di-nav-indicator: #4d8dff;
+  --di-topbar-bg: rgba(255, 255, 255, 0.86);
+  --di-topbar-line: #e0e6ef;
+
+  /* Elevation */
+  --di-shadow-card: 0 1px 2px rgba(11, 26, 51, 0.04), 0 1px 1px rgba(11, 26, 51, 0.02);
+  --di-shadow-raised: 0 10px 28px -12px rgba(11, 26, 51, 0.18), 0 2px 6px -2px rgba(11, 26, 51, 0.06);
+  --di-shadow-overlay: 0 28px 72px -20px rgba(11, 26, 51, 0.32), 0 4px 12px -4px rgba(11, 26, 51, 0.1);
+  --di-shadow-focus: 0 0 0 3px rgba(26, 92, 255, 0.28);
+
+  --di-skeleton: #e9eef5;
+  --di-skeleton-shine: rgba(255, 255, 255, 0.75);
+}
+
+/* ======================================================================== */
+/* Dark theme                                                               */
+/* ======================================================================== */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --di-canvas: #060d1b;
+  --di-canvas-glow-1: rgba(48, 120, 255, 0.13);
+  --di-canvas-glow-2: rgba(70, 40, 200, 0.07);
+  --di-surface: #0b1629;
+  --di-surface-2: #0f1d35;
+  --di-inset: #081122;
+  --di-overlay: rgba(1, 5, 14, 0.66);
+  --di-hover: rgba(148, 178, 230, 0.05);
+  --di-selected: rgba(59, 139, 255, 0.12);
+
+  /* Lines */
+  --di-line: #1a2944;
+  --di-line-strong: #283c5f;
+
+  /* Text */
+  --di-fg: #e7edf7;
+  --di-fg-muted: #a1b0ca;
+  --di-fg-subtle: #6e7e9b;
+  --di-title: #f4f7fc;
+  --di-heading: #8cbcff;
+
+  /* Accent */
+  --di-accent: #3b8bff;
+  --di-accent-strong: #66a6ff;
+  --di-accent-soft: rgba(59, 139, 255, 0.14);
+  --di-accent-line: rgba(102, 166, 255, 0.38);
+  --di-on-accent: #ffffff;
+  --di-focus: #7db3ff;
+
+  /* Status */
+  --di-status-red: #ff6b6b;
+  --di-status-red-soft: rgba(255, 107, 107, 0.13);
+  --di-status-red-fg: #ffa8a8;
+  --di-status-red-line: rgba(255, 107, 107, 0.34);
+  --di-status-amber: #f5b841;
+  --di-status-amber-soft: rgba(245, 184, 65, 0.13);
+  --di-status-amber-fg: #ffd37f;
+  --di-status-amber-line: rgba(245, 184, 65, 0.34);
+  --di-status-green: #34d399;
+  --di-status-green-soft: rgba(52, 211, 153, 0.12);
+  --di-status-green-fg: #86ebc4;
+  --di-status-green-line: rgba(52, 211, 153, 0.32);
+  --di-status-unknown: #8e9bb3;
+  --di-status-unknown-soft: rgba(142, 155, 179, 0.14);
+  --di-status-unknown-fg: #c3ccdb;
+  --di-status-unknown-line: rgba(142, 155, 179, 0.32);
+
+  /* Provenance */
+  --di-prov-sample: #57d0da;
+  --di-prov-sample-soft: rgba(87, 208, 218, 0.12);
+  --di-prov-computed: #7fb2ff;
+  --di-prov-computed-soft: rgba(59, 139, 255, 0.14);
+  --di-prov-scripted: #ab98ff;
+  --di-prov-scripted-soft: rgba(140, 115, 255, 0.15);
+  --di-prov-reported: #a9bbd9;
+  --di-prov-reported-soft: rgba(169, 187, 217, 0.12);
+  --di-prov-planned: #8e9bb3;
+  --di-prov-planned-soft: transparent;
+  --di-prov-simulated: #f294dc;
+  --di-prov-simulated-soft: rgba(242, 148, 220, 0.13);
+
+  /* Charts */
+  --di-chart-1: #3b8bff;
+  --di-chart-2: #3cc6d1;
+  --di-chart-3: #9b85ff;
+  --di-chart-4: #79c2ff;
+  --di-chart-5: #5d77a6;
+  --di-chart-6: #3a4b6b;
+  --di-chart-grid: #15233c;
+  --di-chart-axis: #5f7090;
+
+  /* Map */
+  --di-map-water: #071022;
+  --di-map-land: #132341;
+  --di-map-land-line: #0a1529;
+  --di-map-graticule: rgba(148, 178, 230, 0.05);
+  --di-map-arc: #66a6ff;
+
+  /* Shell */
+  --di-nav-bg: #040a16;
+  --di-nav-bg-2: #07112a;
+  --di-nav-fg: #a1b0ca;
+  --di-nav-fg-strong: #ffffff;
+  --di-nav-muted: #5d6e8e;
+  --di-nav-line: rgba(148, 178, 230, 0.09);
+  --di-nav-hover: rgba(148, 178, 230, 0.06);
+  --di-nav-active-bg: rgba(59, 139, 255, 0.16);
+  --di-nav-indicator: #3b8bff;
+  --di-topbar-bg: rgba(6, 13, 27, 0.78);
+  --di-topbar-line: #15233c;
+
+  /* Elevation */
+  --di-shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --di-shadow-raised: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 32px -14px rgba(0, 0, 0, 0.7);
+  --di-shadow-overlay: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 30px 80px -20px rgba(0, 0, 0, 0.85);
+  --di-shadow-focus: 0 0 0 3px rgba(125, 179, 255, 0.35);
+
+  --di-skeleton: #111f38;
+  --di-skeleton-shine: rgba(148, 178, 230, 0.08);
+}

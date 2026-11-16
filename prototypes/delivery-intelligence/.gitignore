@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Next.js build output and static export
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Test output
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# Local, firm-internal terminology override (never commit)
+lib/config/terminology.local.ts
+
+# Misc
+.DS_Store
+*.log
+.env*.local

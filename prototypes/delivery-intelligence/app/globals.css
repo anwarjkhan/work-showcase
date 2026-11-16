@@ -1,0 +1,255 @@
+@import 'tailwindcss';
+@import './theme.css';
+
+/* Theme switching is attribute-based, not media-query based. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+ * Tailwind utilities mapped onto theme tokens. Tailwind's default colour palette,
+ * fonts, radii and shadows are cleared so only theme tokens exist:
+ *   bg-canvas bg-surface bg-surface-2 bg-inset bg-hover bg-selected
+ *   border-line border-line-strong
+ *   text-fg text-fg-muted text-fg-subtle text-title text-heading
+ *   bg-accent text-accent bg-accent-soft border-accent-line text-on-accent
+ *   bg-status-red / text-status-red-fg / bg-status-red-soft / border-status-red-line  (amber, green, unknown alike)
+ *   text-prov-computed bg-prov-computed-soft ...
+ *   font-sans font-display font-mono   rounded-xs..2xl rounded-pill   shadow-card shadow-raised shadow-overlay
+ */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+}
+
+@theme inline {
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-canvas: var(--di-canvas);
+  --color-surface: var(--di-surface);
+  --color-surface-2: var(--di-surface-2);
+  --color-inset: var(--di-inset);
+  --color-overlay: var(--di-overlay);
+  --color-hover: var(--di-hover);
+  --color-selected: var(--di-selected);
+
+  --color-line: var(--di-line);
+  --color-line-strong: var(--di-line-strong);
+
+  --color-fg: var(--di-fg);
+  --color-fg-muted: var(--di-fg-muted);
+  --color-fg-subtle: var(--di-fg-subtle);
+  --color-title: var(--di-title);
+  --color-heading: var(--di-heading);
+
+  --color-accent: var(--di-accent);
+  --color-accent-strong: var(--di-accent-strong);
+  --color-accent-soft: var(--di-accent-soft);
+  --color-accent-line: var(--di-accent-line);
+  --color-on-accent: var(--di-on-accent);
+  --color-focus: var(--di-focus);
+
+  --color-status-red: var(--di-status-red);
+  --color-status-red-soft: var(--di-status-red-soft);
+  --color-status-red-fg: var(--di-status-red-fg);
+  --color-status-red-line: var(--di-status-red-line);
+  --color-status-amber: var(--di-status-amber);
+  --color-status-amber-soft: var(--di-status-amber-soft);
+  --color-status-amber-fg: var(--di-status-amber-fg);
+  --color-status-amber-line: var(--di-status-amber-line);
+  --color-status-green: var(--di-status-green);
+  --color-status-green-soft: var(--di-status-green-soft);
+  --color-status-green-fg: var(--di-status-green-fg);
+  --color-status-green-line: var(--di-status-green-line);
+  --color-status-unknown: var(--di-status-unknown);
+  --color-status-unknown-soft: var(--di-status-unknown-soft);
+  --color-status-unknown-fg: var(--di-status-unknown-fg);
+  --color-status-unknown-line: var(--di-status-unknown-line);
+
+  --color-prov-sample: var(--di-prov-sample);
+  --color-prov-sample-soft: var(--di-prov-sample-soft);
+  --color-prov-computed: var(--di-prov-computed);
+  --color-prov-computed-soft: var(--di-prov-computed-soft);
+  --color-prov-scripted: var(--di-prov-scripted);
+  --color-prov-scripted-soft: var(--di-prov-scripted-soft);
+  --color-prov-reported: var(--di-prov-reported);
+  --color-prov-reported-soft: var(--di-prov-reported-soft);
+  --color-prov-planned: var(--di-prov-planned);
+  --color-prov-planned-soft: var(--di-prov-planned-soft);
+  --color-prov-simulated: var(--di-prov-simulated);
+  --color-prov-simulated-soft: var(--di-prov-simulated-soft);
+
+  --color-chart-1: var(--di-chart-1);
+  --color-chart-2: var(--di-chart-2);
+  --color-chart-3: var(--di-chart-3);
+  --color-chart-4: var(--di-chart-4);
+  --color-chart-5: var(--di-chart-5);
+  --color-chart-6: var(--di-chart-6);
+  --color-chart-grid: var(--di-chart-grid);
+  --color-chart-axis: var(--di-chart-axis);
+
+  --color-map-water: var(--di-map-water);
+  --color-map-land: var(--di-map-land);
+  --color-map-land-line: var(--di-map-land-line);
+  --color-map-graticule: var(--di-map-graticule);
+  --color-map-arc: var(--di-map-arc);
+
+  --color-nav: var(--di-nav-bg);
+  --color-nav-2: var(--di-nav-bg-2);
+  --color-nav-fg: var(--di-nav-fg);
+  --color-nav-fg-strong: var(--di-nav-fg-strong);
+  --color-nav-muted: var(--di-nav-muted);
+  --color-nav-line: var(--di-nav-line);
+  --color-nav-hover: var(--di-nav-hover);
+  --color-nav-active: var(--di-nav-active-bg);
+  --color-nav-indicator: var(--di-nav-indicator);
+  --color-topbar: var(--di-topbar-bg);
+  --color-topbar-line: var(--di-topbar-line);
+
+  --color-skeleton: var(--di-skeleton);
+
+  --font-sans: var(--di-font-sans);
+  --font-display: var(--di-font-display);
+  --font-mono: var(--di-font-mono);
+
+  --radius-xs: var(--di-radius-xs);
+  --radius-sm: var(--di-radius-sm);
+  --radius-md: var(--di-radius-md);
+  --radius-lg: var(--di-radius-lg);
+  --radius-xl: var(--di-radius-xl);
+  --radius-2xl: var(--di-radius-2xl);
+  --radius-pill: var(--di-radius-pill);
+
+  --shadow-card: var(--di-shadow-card);
+  --shadow-raised: var(--di-shadow-raised);
+  --shadow-overlay: var(--di-shadow-overlay);
+  --shadow-focus: var(--di-shadow-focus);
+
+  --ease-standard: var(--di-ease-standard);
+  --ease-emphasis: var(--di-ease-emphasis);
+}
+
+/* ---- Base ------------------------------------------------------------------ */
+@layer base {
+  html {
+    font-family: var(--di-font-sans);
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--di-fg);
+    background-color: var(--di-canvas);
+    background-image:
+      radial-gradient(1200px 600px at 12% -10%, var(--di-canvas-glow-1), transparent 70%),
+      radial-gradient(900px 500px at 100% 0%, var(--di-canvas-glow-2), transparent 70%);
+    background-attachment: fixed;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--di-line);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--di-font-display);
+    letter-spacing: -0.015em;
+  }
+
+  /* Visible keyboard focus everywhere (D4 acceptance). */
+  :focus-visible {
+    outline: 2px solid var(--di-focus);
+    outline-offset: 2px;
+    border-radius: var(--di-radius-xs);
+  }
+
+  ::selection {
+    background: var(--di-accent-soft);
+    color: var(--di-fg);
+  }
+
+  /* Figures line up in tables and stat tiles. */
+  .tabular,
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--di-line-strong) transparent;
+  }
+}
+
+/* ---- Small shared helpers (components/ui builds the real primitives) ------- */
+@layer components {
+  /* Thin outlined card. */
+  .di-card {
+    background: var(--di-surface);
+    border: var(--di-border-width) solid var(--di-line);
+    border-radius: var(--di-radius-lg);
+    box-shadow: var(--di-shadow-card);
+  }
+
+  /* Small uppercase label above titles. */
+  .di-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--di-fg-subtle);
+  }
+
+  .di-skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--di-skeleton);
+    border-radius: var(--di-radius-sm);
+  }
+
+  .di-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--di-skeleton-shine), transparent);
+    animation: di-shimmer 2.4s var(--di-ease-standard) infinite;
+  }
+}
+
+@keyframes di-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Theme changes cross-fade instead of flashing; disabled for reduced motion. */
+html.di-theme-transition,
+html.di-theme-transition * {
+  transition:
+    background-color var(--di-duration-slow) var(--di-ease-standard),
+    border-color var(--di-duration-slow) var(--di-ease-standard),
+    color var(--di-duration-slow) var(--di-ease-standard),
+    fill var(--di-duration-slow) var(--di-ease-standard) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
