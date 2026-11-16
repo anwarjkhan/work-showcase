@@ -186,7 +186,7 @@ export class AgentKit {
   /** A cited sentence. Every sentence must cite at least one record; `fallback` is cited when `refs` is empty. */
   sentence(text: string, refs: EntityRef[], fallback?: EntityRef): DraftSentence {
     this.sentenceCount += 1;
-    let citations = dedupeRefs(refs);
+    let citations = dedupeRefs(this.records(refs));
     if (citations.length === 0 && fallback) citations = [fallback];
     if (citations.length === 0) throw new Error(`Uncited sentence: ${text}`);
     return { id: `s${this.sentenceCount}`, text, citations: citations.slice(0, 12) };
@@ -194,6 +194,22 @@ export class AgentKit {
 
   section(heading: string, sentences: DraftSentence[]): void {
     if (sentences.length > 0) this.sections.push({ heading, sentences });
+  }
+
+  private findingIndex: Map<string, Finding> | null = null;
+
+  /**
+   * Replaces references to engine findings with the records behind them, so a
+   * citation always opens a record rather than a computed finding.
+   */
+  records(refs: EntityRef[]): EntityRef[] {
+    if (!refs.some((r) => r.kind === 'finding')) return refs;
+    if (!this.findingIndex) this.findingIndex = new Map(this.results.findings.map((f) => [f.id, f]));
+    return refs.flatMap((r) => {
+      if (r.kind !== 'finding') return [r];
+      const f = this.findingIndex?.get(r.id);
+      return f ? [f.subject, ...f.evidence] : [];
+    });
   }
 
   // --- Lookups -------------------------------------------------------------

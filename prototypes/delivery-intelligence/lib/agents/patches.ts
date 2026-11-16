@@ -43,7 +43,8 @@ export function applyPatch(data: PortfolioData, patch: ChangePatch, at: IsoDateT
 function applyUnchecked(data: PortfolioData, patch: ChangePatch, at: IsoDateTime): PatchResult {
   switch (patch.op) {
     case 'set-field': {
-      const { entity, id, field } = patch;
+      const { entity, id } = patch;
+      const field: string = patch.field;
       if (field === 'reportedRag' || !isEditable(entity, field)) {
         return { ok: false, reason: field === 'reportedRag' ? `Reported RAG in ${terms.systems['portfolio-system']} cannot be changed by any agent or approval.` : `${field} on ${entity} is not a field an approved change may set.` };
       }

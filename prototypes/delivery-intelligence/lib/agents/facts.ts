@@ -58,7 +58,7 @@ export function raidProblems(kit: AgentKit, r: RaidItem): string[] {
   if (!r.mitigationDue) problems.push('has no mitigation date');
   else if (kit.daysFromToday(r.mitigationDue) < 0) problems.push(`passed its mitigation date of ${date(r.mitigationDue)}`);
   const idle = -kit.daysFromToday(r.updated);
-  if (idle >= 14) problems.push(`has had no update for ${days(idle)}`);
+  if (idle >= 14) problems.push(`is stale, with no update for ${days(idle)}`);
   return problems;
 }
 

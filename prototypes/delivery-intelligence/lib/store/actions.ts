@@ -47,6 +47,7 @@ import type {
   IsoDateTime,
   PdlcRun,
   PdlcStageId,
+  PdlcStageState,
   PortfolioData,
   ProposedChange,
   ReviewRoleId,
@@ -376,7 +377,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
         const wp = AGENT_WORK_PRODUCT[stage]?.[agentId];
         const at = agentRun.completedAt ?? agentRun.startedAt;
         const next = updateStage(live, stage, (st) => {
-          let s2 = { ...st, agentRunIds: [...st.agentRunIds, agentRun.id], status: st.status === 'approved' ? st.status : ('in-review' as const) };
+          let s2: PdlcStageState = { ...st, agentRunIds: [...st.agentRunIds, agentRun.id], status: st.status === 'approved' ? st.status : 'in-review' };
           s2 = { ...s2, reviews: s2.reviews.map((r) => (r.state === 'not-requested' || r.state === 'returned' ? { ...r, state: 'pending' as const } : r)) };
           if (wp) s2 = setWorkProduct(s2, wp, 'drafted', draft ? { kind: 'status-draft', id: draft.id } : { kind: 'agent-run', id: agentRun.id });
           return s2;

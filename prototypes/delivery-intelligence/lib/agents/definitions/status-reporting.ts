@@ -105,7 +105,7 @@ function deliverableStatus(kit: AgentKit, d: TechDeliverable): AgentRunOutput {
     } else {
       headline.push(kit.sentence(`The evidence supports the reported ${terms.rag[rag.reported]}.`, [dRef, ...rag.reasons.flatMap((r) => r.refs)]));
     }
-    for (const r of rag.reasons.slice(0, 3)) headline.push(kit.sentence(r.message, r.refs, dRef));
+    for (const r of rag.reasons.slice(0, 2)) headline.push(kit.sentence(r.message, r.refs, dRef));
   }
   kit.section('Headline', headline);
 
@@ -171,7 +171,7 @@ function deliverableStatus(kit: AgentKit, d: TechDeliverable): AgentRunOutput {
     const bySev = (['critical', 'high', 'medium', 'low'] as const).map((s) => [s, raid.filter((r) => r.severity === s).length] as const).filter(([, n]) => n > 0);
     risks.push(kit.sentence(`${plural(raid.length, 'RAID item')} ${raid.length === 1 ? 'is' : 'are'} open: ${listPhrases(bySev.map(([s, n]) => `${n} ${lowerFirst(terms.severity[s])}`))}.`, raid.map((r) => ref.raid(r.id))));
     for (const r of raid.slice(0, 4)) {
-      const problems = raidProblems(kit, r);
+      const problems = raidProblems(kit, r).filter((x) => !x.startsWith('is stale'));
       risks.push(kit.sentence(raidSentence(kit, r) + (problems.length > 0 ? ` It ${listPhrases(problems)}.` : ''), [ref.raid(r.id), ...(r.ownerId ? [ref.person(r.ownerId)] : [])]));
     }
   }

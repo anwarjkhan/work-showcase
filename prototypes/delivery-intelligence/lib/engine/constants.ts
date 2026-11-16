@@ -9,6 +9,14 @@ export { RAG_RULES, RULE_SEVERITY, RULE_THRESHOLDS } from '@/lib/config/threshol
 
 /** Forecast: throughput is measured over the closed points of this many days before today (three sprints). */
 export const FORECAST_LOOKBACK_DAYS = 42;
+/** Forecast gate: work must have started at least this many days before today to project from throughput. */
+export const FORECAST_MIN_HISTORY_DAYS = 28;
+/** Forecast gate: at least this share (0..1) of points must be closed to project from throughput. */
+export const FORECAST_MIN_COMPLETION_RATIO = 0.25;
+/** Forecast gate: at least this many story-level items closed in the lookback window. */
+export const FORECAST_MIN_RECENT_CLOSED_ITEMS = 5;
+/** A projection slipping more than this many days past plan is low confidence: show the planned end and flag it at risk. */
+export const FORECAST_MAX_CREDIBLE_SLIP_DAYS = 120;
 
 /** Upper bound on evidence references attached to one finding, to keep findings readable. */
 export const MAX_FINDING_REFS = 25;
