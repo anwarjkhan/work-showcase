@@ -1,16 +1,14 @@
+'use client';
+
 /**
  * Theme state: `data-theme` on <html>, remembered in localStorage.
  * The inline script in app/layout.tsx applies the stored (or system) choice
  * before first paint; `useTheme()` reads and changes it afterwards.
  */
 import { useCallback, useSyncExternalStore } from 'react';
+import { THEME_STORAGE_KEY } from './theme-script';
 
 export type ThemeName = 'light' | 'dark';
-
-export const THEME_STORAGE_KEY = 'di-theme';
-
-/** Runs in <head> before paint. Kept tiny and dependency-free. */
-export const THEME_INIT_SCRIPT = `(function(){var d=document.documentElement;try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}d.setAttribute('data-theme',t)}catch(e){d.setAttribute('data-theme','light')}})();`;
 
 function readTheme(): ThemeName {
   return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';

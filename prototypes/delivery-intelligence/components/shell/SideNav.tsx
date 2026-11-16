@@ -30,7 +30,7 @@ export function SideNav() {
         </span>
         <span className="flex min-w-0 flex-col leading-tight">
           <span className="truncate font-display text-[15px] font-semibold tracking-[-0.01em] text-nav-fg-strong">{terms.app.name}</span>
-          <span className="truncate text-[11px] text-nav-muted">{terms.app.hierarchyModel}</span>
+          <span className="truncate text-[11px] text-nav-muted">{terms.app.navSubtitle}</span>
         </span>
       </div>
 

@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 
 // Browser tests run against the static export (the artefact we ship), served
@@ -6,13 +5,10 @@ import { defineConfig, devices } from '@playwright/test';
 const PORT = 4173;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
-// The browser is pre-installed on this machine; fall back to the known path if
-// Playwright cannot find its own copy. Never run `playwright install` here.
-const PREINSTALLED_CHROMIUM = '/opt/pw-browsers/chromium';
-const launchOptions =
-  process.env.PW_CHROMIUM_PATH || existsSync(PREINSTALLED_CHROMIUM)
-    ? { executablePath: process.env.PW_CHROMIUM_PATH ?? PREINSTALLED_CHROMIUM }
-    : {};
+// Playwright uses its own pre-installed browser (PLAYWRIGHT_BROWSERS_PATH). If a
+// machine has a browser elsewhere, point PW_CHROMIUM_PATH at it (for example
+// /opt/pw-browsers/chromium). Never run `playwright install` for this project.
+const launchOptions = process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {};
 
 export default defineConfig({
   testDir: './e2e',

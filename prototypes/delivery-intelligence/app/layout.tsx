@@ -6,7 +6,7 @@ import '@fontsource-variable/plus-jakarta-sans/index.css';
 import '@fontsource-variable/jetbrains-mono/index.css';
 import './globals.css';
 import { AppShell } from '@/components/shell/AppShell';
-import { THEME_INIT_SCRIPT } from '@/components/shell/theme';
+import { THEME_INIT_SCRIPT } from '@/components/shell/theme-script';
 import { terms } from '@/lib/config/terminology';
 import { DemoStoreProvider } from '@/lib/store/provider';
 

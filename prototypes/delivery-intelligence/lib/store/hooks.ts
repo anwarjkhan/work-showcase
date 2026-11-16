@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Selector hooks for screens. All read from the single demo store and
  * re-render only when the selected value changes.

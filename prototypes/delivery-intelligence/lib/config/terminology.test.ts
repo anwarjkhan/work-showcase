@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import localOverride from '@local/terminology';
 import { baseTerminology, mergeTerminology, terms } from './terminology';
+import fallback from './terminology.local.fallback';
 
 describe('terminology', () => {
-  it('falls back to the base labels when no local override exists', () => {
-    // No terminology.local.ts is committed, so the alias resolves to the empty fallback.
-    expect(terms).toEqual(baseTerminology);
+  it('ships an empty fallback, so without a local file the labels are the base labels', () => {
+    expect(fallback).toEqual({});
+    expect(mergeTerminology(baseTerminology, fallback)).toEqual(baseTerminology);
+  });
+
+  it('applies whichever override the alias resolves to (local file when present, else the fallback)', () => {
+    expect(terms).toEqual(mergeTerminology(baseTerminology, localOverride));
   });
 
   it('overrides only the labels given, leaving the rest intact', () => {

@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   devIndicators: false,
+  // `next dev` would otherwise write an AGENTS.md into the project folder.
+  agentRules: false,
   turbopack: {
     root: rootDir,
     resolveAlias: {

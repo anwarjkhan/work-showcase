@@ -9,7 +9,6 @@ import { routeById, type RouteId } from '@/lib/config/routes';
 import { terms } from '@/lib/config/terminology';
 import { useDeliverable } from '@/lib/store';
 import { PageMeta } from './page-meta';
-import { ProvenanceBadges } from './ProvenanceBadge';
 
 export interface RoutePlaceholderProps {
   routeId: RouteId;
@@ -28,7 +27,7 @@ export function RoutePlaceholder({ routeId, entityId }: RoutePlaceholderProps) {
 
       <section className="di-card relative overflow-hidden px-8 py-7">
         <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-accent-soft blur-3xl" />
-        <div className="relative flex items-start justify-between gap-8">
+        <div className="relative">
           <div className="max-w-3xl">
             <div className="mb-3 inline-flex items-center gap-1.5 rounded-pill border border-accent-line bg-accent-soft px-2.5 py-1 text-[11.5px] font-semibold text-accent">
               <Sparkles aria-hidden className="size-3.5" />
@@ -45,7 +44,6 @@ export function RoutePlaceholder({ routeId, entityId }: RoutePlaceholderProps) {
               </p>
             )}
           </div>
-          <ProvenanceBadges kinds={route.provenance} className="justify-end" />
         </div>
       </section>
 

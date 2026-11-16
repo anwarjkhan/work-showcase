@@ -36,6 +36,8 @@ export const baseTerminology = {
   app: {
     name: 'Delivery Intelligence',
     tagline: 'Evidence-based delivery insight across the portfolio',
+    /** Short line under the product name in the navigation. */
+    navSubtitle: 'Evidence-based delivery',
     /** Name for the simplified project-management hierarchy model. */
     hierarchyModel: 'Simplified delivery hierarchy',
     lifecycleModel: 'AI-first product delivery lifecycle',
