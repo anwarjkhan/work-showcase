@@ -139,21 +139,22 @@ export function ExplorerTree({ view, onViewChange }: { view: ExplorerView; onVie
   }, [data.deliverables, view, results]);
   const visibleIds = useMemo(() => new Set([...visibleByRequest.values()].flat().map((d) => d.id)), [visibleByRequest]);
 
-  /** PmNode has a visible deliverable somewhere below it. */
-  const pmVisible = useMemo(() => {
-    const memo = new Map<string, boolean>();
-    const visit = (p: PmNode): boolean => {
+  /** Visible deliverables at any depth below each PmNode (rolled-up count). */
+  const pmCount = useMemo(() => {
+    const memo = new Map<string, number>();
+    const visit = (p: PmNode): number => {
       const hit = memo.get(p.id);
       if (hit !== undefined) return hit;
-      memo.set(p.id, false); // cycle guard
-      const own = (model.deliverablesByPm.get(p.id) ?? []).some((d) => visibleIds.has(d.id));
-      const v = own || (model.pmChildren.get(p.id) ?? []).some(visit);
-      memo.set(p.id, v);
-      return v;
+      memo.set(p.id, 0); // cycle guard
+      const own = (model.deliverablesByPm.get(p.id) ?? []).filter((d) => visibleIds.has(d.id)).length;
+      const n = own + (model.pmChildren.get(p.id) ?? []).reduce((sum, k) => sum + visit(k), 0);
+      memo.set(p.id, n);
+      return n;
     };
     data.pmNodes.forEach(visit);
     return memo;
   }, [data.pmNodes, model, visibleIds]);
+  const pmVisible = useMemo(() => new Map([...pmCount].map(([id, n]) => [id, n > 0])), [pmCount]);
 
   const requests = model.requests.filter((r) => view === 'all' || (visibleByRequest.get(r.id)?.length ?? 0) > 0);
 
@@ -478,7 +479,7 @@ export function ExplorerTree({ view, onViewChange }: { view: ExplorerView; onVie
           }
           trailing={
             <>
-              <span className="text-[11px] text-fg-muted tabular-nums">{dels.length} {dels.length === 1 ? 'deliverable' : 'deliverables'}</span>
+              <span className="text-[11px] text-fg-muted tabular-nums">{pmCount.get(p.id) ?? 0} {pmCount.get(p.id) === 1 ? 'deliverable' : 'deliverables'}</span>
               {rag ? <RagPair reported={rag.reported} evidence={rag.evidence} disagrees={rag.disagrees} size="sm" /> : null}
             </>
           }

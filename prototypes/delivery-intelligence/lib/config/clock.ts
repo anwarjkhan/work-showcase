@@ -25,13 +25,16 @@ export function addDays(date: IsoDate, days: number): IsoDate {
   return new Date(Date.parse(date.slice(0, 10)) + days * DAY_MS).toISOString().slice(0, 10);
 }
 
-/** Formats an ISO date for display, e.g. "8 Mar 2027". Locale-stable (en-GB, UTC). */
+/** Three-letter month names. Fixed here so every runtime prints "Sep", never "Sept". */
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * Formats an ISO date for display, e.g. "8 Mar 2027" (UTC).
+ * Built by hand rather than through the locale API so the server render and
+ * every browser produce identical text.
+ */
 export function formatDate(date: IsoDate | IsoDateTime, opts: { withYear?: boolean } = {}): string {
   const d = new Date(date.length === 10 ? `${date}T00:00:00Z` : date);
-  return d.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    ...(opts.withYear === false ? {} : { year: 'numeric' }),
-    timeZone: 'UTC',
-  });
+  const dayAndMonth = `${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`;
+  return opts.withYear === false ? dayAndMonth : `${dayAndMonth} ${d.getUTCFullYear()}`;
 }

@@ -259,7 +259,7 @@ export function HubDetail({ hub, onClose }: { hub: HubView; onClose: () => void 
 }
 
 /** Shown in the panel when no hub is selected: where to look first. */
-export function GlobalOverview({ model, onSelectHub, onShowHero }: { model: GlobalModel; onSelectHub: (id: string) => void; onShowHero: () => void }) {
+export function GlobalOverview({ model, onSelectHub, onShowHero, focusLabel }: { model: GlobalModel; onSelectHub: (id: string) => void; onShowHero: () => void; focusLabel: string }) {
   const attention = model.hubs.filter((h) => h.attention).sort((a, b) => b.lateDependencyIds.length - a.lateDependencyIds.length || b.disagreementIds.length - a.disagreementIds.length);
   const late = model.dependencies.filter((d) => d.crossHub && (d.tone === 'late' || d.tone === 'at-risk')).sort((a, b) => Number(b.tone === 'late') - Number(a.tone === 'late') || b.lateDays - a.lateDays);
   return (
@@ -275,7 +275,7 @@ export function GlobalOverview({ model, onSelectHub, onShowHero }: { model: Glob
       </header>
       {model.heroDependency ? (
         <Button variant="secondary" size="sm" onClick={onShowHero} className="self-start">
-          Show hero dependency
+          {focusLabel}
         </Button>
       ) : null}
       <section className="flex flex-col gap-1">
@@ -311,20 +311,20 @@ export function GlobalOverview({ model, onSelectHub, onShowHero }: { model: Glob
   );
 }
 
-/** The hero story in one card: the late dependency crossing continents into the hero deliverable. */
+/** The story dependency in one card: the late dependency crossing continents into the pinned deliverable. */
 export function HeroCallout({ view, onExit }: { view: DependencyView; onExit: () => void }) {
   const index = usePortfolioIndex();
   const from = index.hubs.get(view.dep.fromHubId);
   const to = index.hubs.get(view.dep.toHubId);
   const raid = view.dep.raidKey;
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-status-red-line bg-status-red-soft p-4" data-testid="hero-callout" role="region" aria-label="Hero dependency">
+    <div className="flex flex-col gap-3 rounded-lg border border-status-red-line bg-status-red-soft p-4" data-testid="hero-callout" role="region" aria-label="Critical late dependency">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="di-eyebrow mb-1">Hero dependency</div>
+          <div className="di-eyebrow mb-1">{view.dep.critical ? 'Critical late dependency' : 'Late dependency'}</div>
           <h3 className="font-display text-base leading-snug font-semibold text-title">{view.dep.title}</h3>
         </div>
-        <IconButton label="Exit hero view" icon={<X />} size="sm" onClick={onExit} />
+        <IconButton label="Close dependency focus" icon={<X />} size="sm" onClick={onExit} />
       </div>
       <div className="flex items-end gap-3">
         <div className="font-display text-[44px] leading-none font-semibold text-status-red-fg tabular-nums">{view.lateDays}</div>

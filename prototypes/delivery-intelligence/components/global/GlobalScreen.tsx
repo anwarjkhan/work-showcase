@@ -19,7 +19,7 @@ const FILTERS: Array<{ id: ArcFilter; label: string }> = [
   { id: 'all', label: 'All' },
   { id: 'late', label: 'Late only' },
   { id: 'hub', label: 'Selected hub' },
-  { id: 'hero', label: 'Hero deliverable' },
+  { id: 'hero', label: '' },
 ];
 
 function setHash(on: boolean) {
@@ -101,12 +101,14 @@ export function GlobalScreen() {
 
   const from = heroDep ? model.hubById.get(heroDep.dep.fromHubId)?.hub : undefined;
   const to = heroDep ? model.hubById.get(heroDep.dep.toHubId)?.hub : undefined;
+  const receiver = heroDep ? data.deliverables.find((d) => d.id === heroDep.dep.toDeliverableId) : undefined;
+  const receiverRef = receiver?.ref ?? heroDep?.dep.toDeliverableId ?? '';
   const headline =
     heroDep && from && to && heroDep.lateDays > 0
-      ? `The hero deliverable is waiting ${heroDep.lateDays} days on ${from.name}`
+      ? `${receiverRef} is waiting ${heroDep.lateDays} days on ${from.name}`
       : `${model.totals.late} cross-hub ${model.totals.late === 1 ? 'dependency is' : 'dependencies are'} late`;
   const subline = heroDep && from && to
-    ? `${heroDep.dep.title}: provided from ${from.name} and needed in ${to.name}, across continents. ${model.totals.late} of ${model.totals.crossHub} cross-hub dependencies are late${model.totals.atRisk > 0 ? ` and ${model.totals.atRisk} at risk` : ''}; ${model.totals.attentionHubs} of ${model.totals.hubs} hubs carry a status disagreement or a late dependency.`
+    ? `${receiver ? `${receiver.title}. ` : ''}${heroDep.dep.title}: provided from ${from.name} and needed in ${to.name}, across continents. ${model.totals.late} of ${model.totals.crossHub} cross-hub dependencies are late${model.totals.atRisk > 0 ? ` and ${model.totals.atRisk} at risk` : ''}; ${model.totals.attentionHubs} of ${model.totals.hubs} hubs carry a status disagreement or a late dependency.`
     : `${model.totals.crossHub} cross-hub dependencies across ${model.totals.hubs} hubs on ${model.totals.continents} continents.`;
 
   return (
@@ -146,6 +148,7 @@ export function GlobalScreen() {
             {FILTERS.map((f) => (
               <Chip
                 key={f.id}
+                hidden={f.id === 'hero' && !heroDep}
                 selected={filter === f.id}
                 aria-pressed={filter === f.id}
                 disabled={f.id === 'hub' && !selectedHubId}
@@ -159,14 +162,14 @@ export function GlobalScreen() {
                   setFilter(f.id);
                 }}
               >
-                {f.label}
+                {f.id === 'hero' ? `${receiverRef} dependencies` : f.label}
               </Chip>
             ))}
           </div>
         </div>
         {heroDep ? (
           <Button variant={heroOn ? 'secondary' : 'primary'} size="sm" icon={<Route />} onClick={heroOn ? exitHero : showHero} aria-pressed={heroOn}>
-            {heroOn ? 'Show all hubs' : 'Show hero dependency'}
+            {heroOn ? 'Show all hubs' : `Show the ${receiverRef} dependency`}
           </Button>
         ) : null}
       </div>
@@ -203,7 +206,7 @@ export function GlobalScreen() {
               {selectedHub ? (
                 <HubDetail hub={selectedHub} onClose={() => selectHub(null)} />
               ) : heroOn ? null : (
-                <GlobalOverview model={model} onSelectHub={selectHub} onShowHero={showHero} />
+                <GlobalOverview model={model} onSelectHub={selectHub} onShowHero={showHero} focusLabel={`Show the ${receiverRef} dependency`} />
               )}
             </div>
           </aside>
