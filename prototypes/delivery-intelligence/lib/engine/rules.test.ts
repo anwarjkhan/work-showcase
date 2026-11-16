@@ -15,6 +15,7 @@ import {
   item,
   milestone,
   openStory,
+  outcome,
   raid,
   story,
 } from './test-fixtures';
@@ -300,28 +301,82 @@ describe('R10 agent-assigned item with no named human reviewer', () => {
   });
 });
 
-describe('R11 outcome reported on track with no acceptance recorded', () => {
-  it('hits for on-track and complete outcomes that are not accepted', () => {
-    const data = change(baseline(), (d) => {
-      d.criteria[0] = criterion('c-1', 'oc-1', { state: 'open', acceptedById: null, acceptedAt: null });
-      d.evidence = d.evidence.filter((e) => e.id !== 'ev-ba-1' && e.id !== 'ev-ba-2');
-      d.outcomes[1]!.reportedStatus = 'complete';
+describe('R11 outcome reported on track or complete with no acceptance recorded', () => {
+  const pm = terms.systems['portfolio-system'];
+  /** Baseline with oc-1 no longer accepted (its business-acceptance record removed). */
+  const unaccepted = (fn: (d: PortfolioData) => void = () => {}) =>
+    change(baseline(), (d) => {
+      d.evidence = d.evidence.filter((e) => e.id !== 'ev-ba-1');
+      fn(d);
     });
-    const fs = findings(data, 'R11');
-    expect(fs.map((f) => f.subject.id)).toEqual(['oc-1', 'oc-2']);
-    expect(fs[0]!.message).toBe(
-      `Outcome “Outcome oc-1” (TD-1) is reported on track in ${terms.systems['portfolio-system']}, but its mandatory criterion is not accepted and no business acceptance record is held.`,
-    );
-    expect(fs[1]!.message).toContain('is reported complete');
+
+  it('hits (a): reported complete and not accepted', () => {
+    const data = unaccepted((d) => {
+      d.outcomes[0]!.reportedStatus = 'complete';
+      d.workItems.push(openStory('S-4', 'E-1', 'oc-1'));
+    });
+    const [f] = findings(data, 'R11');
+    expect(f!.subject).toEqual({ kind: 'outcome', id: 'oc-1' });
+    expect(f!.message).toBe(`Outcome “Outcome oc-1” (TD-1) is reported complete in ${pm} with no acceptance recorded: no business acceptance record is held.`);
   });
 
-  it('misses: accepted outcomes, and outcomes reported at risk', () => {
-    const atRisk = change(baseline(), (d) => {
-      d.evidence = d.evidence.filter((e) => e.id !== 'ev-ba-1');
-      d.outcomes[0]!.reportedStatus = 'at-risk';
+  it('hits (b1): reported on track, past its due date, work still open', () => {
+    const data = unaccepted((d) => {
+      d.outcomes[0]!.dueDate = '2027-02-24';
+      d.workItems.push(openStory('S-4', 'E-1', 'oc-1'));
+      d.criteria[0] = criterion('c-1', 'oc-1', { state: 'open', acceptedById: null, acceptedAt: null });
+    });
+    const [f] = findings(data, 'R11');
+    expect(f!.message).toBe(
+      `Outcome “Outcome oc-1” (TD-1) is reported on track in ${pm}, due 12 days ago, with no acceptance recorded: its mandatory criterion is not accepted and no business acceptance record is held.`,
+    );
+  });
+
+  it('hits (b2): reported on track, not yet due, all linked work closed', () => {
+    const [f] = findings(unaccepted(), 'R11');
+    expect(f!.message).toBe(
+      `Outcome “Outcome oc-1” (TD-1) is reported on track in ${pm} with all linked work closed (2 items) and no acceptance recorded: no business acceptance record is held.`,
+    );
+    expect(f!.evidence).toContainEqual({ kind: 'work-item', id: 'S-1' });
+  });
+
+  it('misses: on track, not yet due, with open work (the normal case)', () => {
+    const data = unaccepted((d) => {
+      d.workItems.push(openStory('S-4', 'E-1', 'oc-1'));
+    });
+    expect(findings(data, 'R11')).toEqual([]);
+  });
+
+  it('misses: on track, not yet due, with no linked work', () => {
+    const data = change(baseline(), (d) => {
+      d.outcomes.push(outcome('oc-3', 'td-1'));
+    });
+    expect(findings(data, 'R11')).toEqual([]);
+  });
+
+  it('misses: due today is not yet overdue', () => {
+    const data = unaccepted((d) => {
+      d.outcomes[0]!.dueDate = '2027-03-08';
+      d.workItems.push(openStory('S-4', 'E-1', 'oc-1'));
+    });
+    expect(findings(data, 'R11')).toEqual([]);
+  });
+
+  it('misses: accepted outcomes under every condition', () => {
+    const data = change(baseline(), (d) => {
+      d.outcomes[0]!.reportedStatus = 'complete';
+      d.outcomes[1]!.dueDate = '2027-02-01';
     });
     expect(findings(baseline(), 'R11')).toEqual([]);
-    expect(findings(atRisk, 'R11')).toEqual([]);
+    expect(findings(data, 'R11')).toEqual([]);
+  });
+
+  it('misses: reported at risk or off track, even when overdue with all work closed', () => {
+    const data = unaccepted((d) => {
+      d.outcomes[0]!.reportedStatus = 'at-risk';
+      d.outcomes[0]!.dueDate = '2027-02-01';
+    });
+    expect(findings(data, 'R11')).toEqual([]);
   });
 });
 

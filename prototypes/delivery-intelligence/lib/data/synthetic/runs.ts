@@ -6,6 +6,7 @@
  */
 import { createPdlcRun, PDLC_STAGES, PDLC_STAGE_IDS } from '@/lib/config/pdlc';
 import { WORKFLOW_DELIVERABLE_ID } from '@/lib/config/story';
+import { PENDING_RELEASE } from './catalogue';
 import type { Evidence, PdlcMove, PdlcRun } from '@/lib/types';
 import { addDays, dateAtFraction, minDate, stamp, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
@@ -47,7 +48,18 @@ export function buildPdlcRuns(hierarchy: Hierarchy, evidence: Evidence[]): PdlcR
         state.workProducts.forEach((wp, j) => {
           wp.state = j < complete ? 'complete' : j === complete ? 'drafted' : 'missing';
         });
-        if (d.id === 'td-1014') {
+        const reviewTime = stamp(addDays(TODAY, -1), 18, 0);
+        if (current === 4 && spec.progress >= 1 && !PENDING_RELEASE.has(d.id)) {
+          // Completed final-stage work: every review approved by its named reviewer.
+          state.status = 'approved';
+          state.workProducts.forEach((wp) => (wp.state = 'complete'));
+          for (const review of state.reviews) {
+            review.state = 'approved';
+            if (review.reviewerId) {
+              review.decisions = [{ id: `rd-${d.id}-${def.id}-${review.roleId}`, stageId: def.id, roleId: review.roleId, decision: 'approved', reviewerId: review.reviewerId, decidedAt: reviewTime, reason: null }];
+            }
+          }
+        } else if (current >= 1 && spec.progress >= 0.3) {
           state.status = 'in-review';
           for (const review of state.reviews) review.state = 'pending';
         }

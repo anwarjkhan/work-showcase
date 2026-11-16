@@ -73,6 +73,7 @@ function FieldChip({ x, y, label }: { x: number; y: number; label: string }) {
   const w = label.length * 7.4 + 22;
   return (
     <g>
+      <rect x={x - w / 2} y={y - 12} width={w} height={24} rx={12} className="fill-surface-2" />
       <rect x={x - w / 2} y={y - 12} width={w} height={24} rx={12} className="fill-accent-soft stroke-accent-line" strokeWidth={1} />
       <text x={x} y={y + 4} textAnchor="middle" className="fill-accent font-mono" fontSize={12} fontWeight={600}>
         {label}
@@ -203,7 +204,7 @@ export function ModelDiagram({ model, view, onView }: { model: TreeModel; view: 
         {`one deliverable, 1..n ${h.epic}s`}
       </text>
       <text x={935} y={226} className="fill-fg-muted" fontSize={10.5}>
-        draws work from several Epics
+        {`draws work from several ${h.epic}s`}
       </text>
 
       {/* Jira zone */}
@@ -223,7 +224,7 @@ export function ModelDiagram({ model, view, onView }: { model: TreeModel; view: 
         {jiraTypes.slice(4).join(', ')}
       </text>
       <text x={18} y={392} className="fill-fg-muted" fontSize={12}>
-        Each Epic carries one Deliverable ID.
+        {`Each ${h.epic} carries one ${h.deliverableIdField}.`}
       </text>
     </svg>
   );

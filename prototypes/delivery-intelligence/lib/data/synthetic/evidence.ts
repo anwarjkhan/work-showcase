@@ -9,7 +9,7 @@
  */
 import { PDLC_STAGE_IDS } from '@/lib/config/pdlc';
 import type { Evidence, EvidenceKind, PdlcStageId, ReviewRoleId, SourceSystemId, WorkItem } from '@/lib/types';
-import type { DeliverableSpec } from './catalogue';
+import { PENDING_RELEASE, type DeliverableSpec } from './catalogue';
 import { addDays, clampDate, dateOf, daysBetween, stamp, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
 import { isStoryLevel } from './workitems';
@@ -183,7 +183,7 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
         const isLast = i === count - 1;
         let result: Evidence['result'] = 'pass';
         if (isLast && flags.failingTest) result = 'fail';
-        else if (isLast && !finished && !staleTest && dr.chance(0.35)) result = 'pending';
+        else if (isLast && stageIndex === 3 && !staleTest && dr.chance(0.35)) result = 'pending';
         const a = anchor(date, isLast && staleTest);
         const epicTitle = spec.epics[i % spec.epics.length] as string;
         const record = add('test-result', `${dr.pick(TEST_KINDS)} — ${trimTitle(epicTitle)}`, result, { key: a.key, date: a.date });
@@ -200,9 +200,9 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
 
     // Release checklist at the launch stage.
     if (stageIndex >= 4) {
-      const finished = spec.end < TODAY;
-      const a = anchor(finished ? clampDate(addDays(spec.end, -1), addDays(spec.start, 5), addDays(TODAY, -1)) : addDays(TODAY, -2));
-      add('release-checklist', `Release checklist — ${trimTitle(spec.title)}`, finished ? 'pass' : 'pending', { key: a.key, date: a.date });
+      const passing = !PENDING_RELEASE.has(spec.id);
+      const a = anchor(passing ? clampDate(addDays(spec.end, -1), addDays(spec.start, 5), addDays(TODAY, -1)) : addDays(TODAY, -2));
+      add('release-checklist', `Release checklist — ${trimTitle(spec.title)}`, passing ? 'pass' : 'pending', { key: a.key, date: a.date });
     }
 
     // Planted stale records: the covered item changes after the evidence was observed.

@@ -175,8 +175,8 @@ export function buildStoryRecords(ref: Reference): StoryRecords {
   });
   const heroOutcomes: Outcome[] = [
     oc(1, 'Quarter-end stress scenario set agreed and loaded', 'The approved scenario set loads without manual edits and the business owner has confirmed it.', 2, '2027-02-12', 'complete'),
-    oc(2, 'Stressed exposures reconcile between the risk engine and the reporting layer', 'Stressed exposures agree by netting set within the agreed tolerance and reruns reproduce the result.', 3, '2027-03-19', 'on-track'),
-    oc(3, 'Reconciliation breaks explained to risk users', 'Every break above tolerance carries a cause and risk users can see it in one view.', 3, '2027-03-26', 'on-track'),
+    oc(2, 'Stressed exposures reconcile between the risk engine and the reporting layer', 'Stressed exposures agree by netting set within the agreed tolerance and reruns reproduce the result.', 3, '2027-03-01', 'on-track'),
+    oc(3, 'Reconciliation breaks explained to risk users', 'Every break above tolerance carries a cause and risk users can see it in one view.', 3, '2027-03-05', 'on-track'),
     oc(4, 'Control evidence filed for model validation and reporting sign-off', 'Evidence for the reconciliation controls is filed in the control register and confirmed complete.', 2, '2027-03-31', 'at-risk'),
   ];
 
@@ -293,7 +293,7 @@ export function buildStoryRecords(ref: Reference): StoryRecords {
     { ...toItem(wfRow('LIM-13', 'Show active filters as removable chips', null, null, '2027-03-04')), assigneeId: `${W}-3`, sprintId: null },
   ];
   const wfOutcomes: Outcome[] = [
-    { id: 'oc-2001-1', ref: 'OC-2001-1', deliverableId: WORKFLOW_DELIVERABLE_ID, title: 'Desk heads can filter limit breaches by desk and limit type', description: 'A desk head sees only the breaches for their desk and the limit type they choose.', weight: 1, dueDate: '2027-04-30', reportedStatus: 'at-risk', acceptanceOwnerId: PRESENTER_PERSON_ID },
+    { id: 'oc-2001-1', ref: 'OC-2001-1', deliverableId: WORKFLOW_DELIVERABLE_ID, title: 'Desk heads can filter limit breaches by desk and limit type', description: 'A desk head sees only the breaches for their desk and the limit type they choose.', weight: 1, dueDate: '2027-04-30', reportedStatus: 'on-track', acceptanceOwnerId: PRESENTER_PERSON_ID },
   ];
   const wfCriteria: AcceptanceCriterion[] = [
     { id: 'ac-oc-2001-1-1', outcomeId: 'oc-2001-1', text: 'Filtering by desk returns only breaches for that desk in the user acceptance environment', mandatory: true, state: 'open', acceptedById: null, acceptedAt: null, rejectedById: null, rejectionReason: null },

@@ -111,14 +111,17 @@ export const ruleR11: Rule = ({ ctx, measures }) => {
     const condition = r11Condition(ctx, o);
     if (!condition) continue;
     const held = a.businessAcceptanceEvidenceIds.length > 0;
-    const parts = [
-      a.mandatoryCount === 0
-        ? 'no mandatory acceptance criteria are defined'
-        : a.mandatoryCount === 1
+    // Name only what is missing, so the reader sees the gap.
+    const parts: string[] = [];
+    if (a.mandatoryCount === 0) parts.push('no mandatory acceptance criteria are defined');
+    else if (a.mandatoryAccepted < a.mandatoryCount) {
+      parts.push(
+        a.mandatoryCount === 1
           ? 'its mandatory criterion is not accepted'
-          : `${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria are accepted`,
-      held ? `a ${evidenceKindLabel('business-acceptance')} record is held` : `no ${evidenceKindLabel('business-acceptance')} record is held`,
-    ];
+          : `only ${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria are accepted`,
+      );
+    }
+    if (!held) parts.push(`no ${evidenceKindLabel('business-acceptance')} record is held`);
     const deliverable = ctx.idx.deliverables.get(o.deliverableId);
     out.push(
       finding(

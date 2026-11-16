@@ -327,12 +327,44 @@ describe('integration with the engine', () => {
     }
   });
 
-  it('has a spread of readiness', () => {
+  it('has a spread of readiness, with completed final-stage work ready', () => {
     const counts = { ready: 0, 'not-ready': 0, unknown: 0 };
     for (const d of data.deliverables) counts[result.deliverables[d.id]!.readiness.state] += 1;
-    expect(counts.ready).toBeGreaterThanOrEqual(2);
-    expect(counts['not-ready']).toBeGreaterThanOrEqual(2);
-    expect(counts.unknown).toBeGreaterThanOrEqual(2);
+    expect(counts.ready).toBeGreaterThanOrEqual(8);
+    expect(counts.ready).toBeLessThanOrEqual(10);
+    expect(counts['not-ready']).toBeGreaterThanOrEqual(3);
+    expect(counts['not-ready']).toBeLessThanOrEqual(5);
+    expect(counts.unknown).toBeGreaterThan(0);
+    const completedFinal = data.deliverables.filter((d) => d.pdlcStage === 'delivery-launch' && data.outcomes.filter((o) => o.deliverableId === d.id).every((o) => o.reportedStatus === 'complete'));
+    const pending = completedFinal.filter((d) => result.deliverables[d.id]!.readiness.state !== 'ready');
+    expect(completedFinal.length).toBeGreaterThanOrEqual(8);
+    expect(pending.length).toBeLessThanOrEqual(2);
+  });
+
+  it('produces R11 for the hero and the deliberate disagreements, not for healthy in-flight work', () => {
+    const r11 = new Set(result.findings.filter((f) => f.ruleId === 'R11').map((f) => f.deliverableId));
+    for (const id of [HERO_DELIVERABLE_ID, 'td-1005', 'td-1008', 'td-1009', 'td-1014', 'td-2006']) expect(r11.has(id), id).toBe(true);
+    expect(r11.size).toBeLessThanOrEqual(8);
+  });
+});
+
+describe('PDLC runs', () => {
+  const order = ['ideation-requirements', 'design-specifications', 'risk-control-compliance', 'build-test-validate', 'delivery-launch'] as const;
+  it('records earlier stages as approved and the current review consistently with progress', () => {
+    for (const run of data.pdlcRuns) {
+      const current = order.indexOf(run.currentStage);
+      expect(run.stages[run.currentStage].status).not.toBe('not-started');
+      order.slice(0, current).forEach((id) => {
+        expect(run.stages[id].status).toBe('approved');
+        for (const review of run.stages[id].reviews) expect(review.state).toBe('approved');
+      });
+    }
+    for (const d of data.deliverables.filter((x) => x.pdlcStage === 'delivery-launch')) {
+      const run = data.pdlcRuns.find((r) => r.deliverableId === d.id)!;
+      for (const review of run.stages['delivery-launch'].reviews) expect(review.state).not.toBe('not-requested');
+    }
+    const mid = data.pdlcRuns.filter((r) => ['risk-control-compliance', 'build-test-validate'].includes(r.currentStage));
+    expect(mid.some((r) => r.stages[r.currentStage].reviews.some((rv) => rv.state === 'pending'))).toBe(true);
   });
 });
 

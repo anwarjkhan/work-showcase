@@ -43,7 +43,6 @@ export function buildOutcomes(root: Rng, hierarchy: Hierarchy): OutcomePlan {
 
       let reportedStatus: Outcome['reportedStatus'] = 'on-track';
       if (isAccepted || isCompleteUnaccepted) reportedStatus = 'complete';
-      else if (spec.rag === 'green' && !REPORTED_ON_TRACK.has(spec.id)) reportedStatus = 'at-risk';
       else if (i === m && spec.rag === 'amber') reportedStatus = 'at-risk';
       else if (i === m && spec.rag === 'red') reportedStatus = 'off-track';
       else if (i === m - 1 && spec.rag === 'red') reportedStatus = 'at-risk';
@@ -55,7 +54,7 @@ export function buildOutcomes(root: Rng, hierarchy: Hierarchy): OutcomePlan {
         title: os.title,
         description: os.description,
         weight: dr.pick([1, 2, 2, 3]),
-        dueDate: dateAtFraction(spec.start, spec.end, i / m),
+        dueDate: REPORTED_ON_TRACK.has(spec.id) && i === spec.accepted + 1 ? addDays(TODAY, -dr.int(4, 12)) : dateAtFraction(spec.start, spec.end, i / m),
         reportedStatus,
         acceptanceOwnerId: owner,
       });

@@ -194,9 +194,9 @@ export const DELIVERABLES: DeliverableSpec[] = [
     id: 'td-1004', n: 1004,
     title: 'Wrong-way risk flags in counterparty limit checks',
     summary: 'Flag counterparties where exposure rises as credit quality falls, and apply the adjustment in limit checks.',
-    programme: 'ccr', pmNodeId: 'pm-ccr-exposure', tier: 'T3', stage: 'build-test-validate', template: 'advanced',
-    start: '2027-01-18', end: '2027-04-30', forecast: '2027-04-30', hubs: ['hub-ldn', 'hub-war'], podId: 'pod-risk-ldn',
-    rag: 'green', commentary: 'Two outcomes accepted; limit integration in test.', progress: 0.72, accepted: 2,
+    programme: 'ccr', pmNodeId: 'pm-ccr-exposure', tier: 'T3', stage: 'delivery-launch', template: 'advanced',
+    start: '2027-01-18', end: '2027-03-26', forecast: '2027-03-26', hubs: ['hub-ldn', 'hub-war'], podId: 'pod-risk-ldn',
+    rag: 'green', commentary: 'All outcomes accepted; release checklist signed off.', progress: 1, accepted: 3,
     epics: ['Wrong-way risk indicator service', 'Limit check integration and override workflow'],
     outcomes: [
       o('Wrong-way indicators available for every rated counterparty', 'An indicator and its rationale is held for each rated counterparty.'),
@@ -442,7 +442,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Consumers migrated from the batch feed', 'Named consumers have moved to the stream and the batch feed is retired.'),
     ],
     objects: ['intraday position deltas', 'stream replay checkpoints', 'schema registry entries'],
-    flags: { epicMismatch: 'owner' },
+    flags: { epicMismatch: 'owner', epicDeliverableId: 'dangling' },
   },
   {
     id: 'td-1020', n: 1020,
@@ -626,10 +626,12 @@ export const CRITERIA_TEMPLATES = [
   'Documentation published where users can find it',
 ];
 
+/** Release checklist stays pending on these final-stage deliverables, as a realistic exception. */
+export const PENDING_RELEASE = new Set(['td-1018']);
+
 /**
- * Deliverables reported Green that keep their unaccepted outcomes reported
- * "on track". The engine flags these (R11) and they are meant to disagree with
- * their reported status. Every other Green-reported deliverable reports its
- * unaccepted outcomes as at risk (scope or acceptance still being agreed).
+ * Deliverables whose first unaccepted outcome is reported on track although its
+ * due date has passed, so the engine flags it (R11). They are meant to disagree
+ * with their reported status.
  */
 export const REPORTED_ON_TRACK = new Set(['td-1005', 'td-1008', 'td-1009', 'td-1014', 'td-2006']);
