@@ -55,6 +55,7 @@ actions.rejectProposal(id, me, 'optional note');    // changes no data; audited
 | `returnReview(id, stageId, roleId, reviewerId, reason)` | Records the reason and moves the deliverable back one stage (if there is one) |
 | `recordEvidence({ deliverableId, kind, result, title, recordedById, simulated, outcomeId?, workItemKey? })` | With `simulated: true`, the provenance is `simulated` (use this for "Simulate evidence arriving"). A passing `business-acceptance` needs the outcome's acceptance owner and every mandatory criterion accepted first. If the deliverable has only one outcome, it is filled in automatically |
 | `acceptCriterion(criterionId, personId)` / `rejectCriterion(..., reason)` | Only by the outcome's `acceptanceOwnerId` |
+| `simulateWorkClosed(id, actorId, { share? })` | A **simulated** demo step. Closes open story-level items (and their sub-tasks) in key order: all of them, or the first `share` (0 to 1, rounded up), so two clicks of `0.5` then all show progress. Allowed from Build, Test & Validate onwards, by a named person. Audited as `evidence.simulated` with `details.simulation = 'work-closed'`. Closing work changes `updated` and `resolved`, so evidence already held for that work goes **stale** under the engine's rule (correct, and worth showing): close work **before** recording test evidence. `describeWorkflow(...).stages[3].simulatedSteps[0]` gives `{ enabled, reason, openItems }` for the button. Badge it `Simulated evidence` |
 | `moveStage(id, 'forward' \| 'back', by, reason?)` | Uses the engine's transition checks. Back needs a reason and resets the target stage's reviews to `pending`, so they must be approved again. `TechDeliverable.pdlcStage` follows the run |
 
 Failing evidence does not move the deliverable on its own. The screen offers the move back (`backSuggestion`), and the presenter confirms it with `moveStage(..., 'back', ..., reason)`.
@@ -82,6 +83,7 @@ The presenter (`p-presenter`) holds every review role and the acceptance owner r
 ```ts
 const TD = WORKFLOW_DELIVERABLE_ID, me = PRESENTER_PERSON_ID;
 // Start: 0/8 points, 0/1 outcomes, unknown. Moving forward is refused: the requirements owner review is outstanding.
+// simulateWorkClosed is refused here: "Work can be closed only from Build, Test & Validate onwards; ..." 
 const { runId } = actions.runStageAgent(TD).value;             // Requirements structuring: draft + 1 pending proposal (4 stories)
 actions.approveProposal(proposalOf(runId).id, me);             // stories added: 0/18, 0/1, unknown
 actions.approveReview(TD, 'ideation-requirements', 'requirements-owner', me);
@@ -94,8 +96,10 @@ actions.runStageAgent(TD);                                     // Control eviden
 actions.approveReview(TD, 'risk-control-compliance', 'control-owner', me);
 actions.moveStage(TD, 'forward', me);                          // Build, Test & Validate
 actions.runStageAgent(TD);                                     // Release readiness checklist
+actions.simulateWorkClosed(TD, me, { share: 0.5 });            // simulated: 4 items closed, 11/18 points (61%), 0/1, unknown
+actions.simulateWorkClosed(TD, me);                            // simulated: the rest, 18/18 (100%), 0/1, unknown
 actions.recordEvidence({ deliverableId: TD, kind: 'test-result', result: 'fail', title: 'Filter regression suite', recordedById: me, simulated: true });
-//   readiness: not-ready. The validator approval is refused. describeWorkflow(...).backSuggestion.offer === true
+//   18/18, 0/1, not-ready. The validator approval is refused. describeWorkflow(...).backSuggestion.offer === true
 actions.moveStage(TD, 'back', me, 'Regression suite failed; control mapping must cover the saved default.');
 actions.approveReview(TD, 'risk-control-compliance', 'control-owner', me);   // needed again after the move back
 actions.moveStage(TD, 'forward', me);
@@ -110,10 +114,10 @@ actions.recordEvidence({ deliverableId: TD, kind: 'business-acceptance', result:
 actions.approveReview(TD, 'delivery-launch', 'business-owner', me);
 actions.recordEvidence({ deliverableId: TD, kind: 'release-checklist', result: 'pass', title: 'Release checklist complete', recordedById: me, simulated: false });
 actions.approveReview(TD, 'delivery-launch', 'release-owner', me);
-// Ready: 0/18 points, 1/1 outcomes, ready.
+// Ready: 18/18 points (100%), 1/1 outcomes accepted (100%), ready.
 ```
 
-Work completion stays at 0% because no action closes work items. This demonstrates that the three measures are independent. If the walk-through needs closed work, it would need a separate, labelled control.
+Stages 1 to 3 stay at 0/18 work, 0/1 outcomes and readiness unknown. Each measure moves only when its own evidence does. Closed work never accepts an outcome, and accepted outcomes never make the deliverable ready.
 
 ## Files
 
