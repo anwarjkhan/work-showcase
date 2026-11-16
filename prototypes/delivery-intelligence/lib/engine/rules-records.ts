@@ -10,7 +10,7 @@ import { terms } from '@/lib/config/terminology';
 import type { Finding, Person, TechDeliverable } from '@/lib/types';
 import { RULE_THRESHOLDS } from './constants';
 import { isEpic } from './context';
-import { date, evidenceKindLabel, itemLabel, listPhrases, plural, portfolioSystem, quote, workTracker } from './messages';
+import { date, evidenceKindLabel, itemLabel, listPhrases, portfolioSystem, quote, workTracker } from './messages';
 import { finding, ref, type Rule } from './rule-kit';
 import { dayDiff } from './util';
 
@@ -91,7 +91,9 @@ export const ruleR11: Rule = ({ ctx, measures }) => {
     const parts = [
       a.mandatoryCount === 0
         ? 'no mandatory acceptance criteria are defined'
-        : `${a.mandatoryAccepted} of ${plural(a.mandatoryCount, 'mandatory criterion', 'mandatory criteria')} ${a.mandatoryAccepted === 1 ? 'is' : 'are'} accepted`,
+        : a.mandatoryCount === 1
+          ? 'its mandatory criterion is not accepted'
+          : `${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria are accepted`,
       held ? `a ${evidenceKindLabel('business-acceptance')} record is held` : `no ${evidenceKindLabel('business-acceptance')} record is held`,
     ];
     const deliverable = ctx.idx.deliverables.get(o.deliverableId);

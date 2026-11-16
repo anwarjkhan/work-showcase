@@ -31,8 +31,19 @@ export function pct(ratio: number): string {
   return `${Math.round(ratio * 100)}%`;
 }
 
+/**
+ * Date as shown in messages, e.g. "8 Mar 2027" (the shared formatDate). Memoised by
+ * calendar date: locale formatting is slow and the same dates recur across findings.
+ */
+const dateLabels = new Map<string, string>();
 export function date(d: IsoDate | IsoDateTime): string {
-  return formatDate(d);
+  const key = d.slice(0, 10);
+  let label = dateLabels.get(key);
+  if (label === undefined) {
+    label = formatDate(key);
+    dateLabels.set(key, label);
+  }
+  return label;
 }
 
 export function evidenceKindLabel(kind: EvidenceKind, midSentence = true): string {

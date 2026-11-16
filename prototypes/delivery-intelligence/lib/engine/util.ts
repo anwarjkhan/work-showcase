@@ -62,6 +62,7 @@ export function unique<T>(items: Iterable<T>): T[] {
 }
 
 /** Natural compare for ids such as "CCR-9" and "CCR-10". */
+const idCollator = new Intl.Collator('en', { numeric: true });
 export function compareIds(a: string, b: string): number {
-  return a.localeCompare(b, 'en', { numeric: true });
+  return idCollator.compare(a, b);
 }

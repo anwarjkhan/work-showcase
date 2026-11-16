@@ -37,7 +37,9 @@ export function outcomeAcceptance(ctx: EngineContext, outcome: Outcome): Outcome
     reasons.push({
       code: 'criteria-not-accepted',
       message:
-        `${acceptedByHuman.length} of ${plural(mandatory.length, 'mandatory criterion', 'mandatory criteria')} accepted by a named person` +
+        (mandatory.length === 1
+          ? 'The mandatory criterion is not accepted by a named person'
+          : `${acceptedByHuman.length} of ${mandatory.length} mandatory criteria are accepted by a named person`) +
         (unnamed.length > 0 ? `; ${unnamed.length} marked accepted without a named person` : '') +
         '.',
       refs: outstanding.map((c) => ({ kind: 'criterion', id: c.id })),

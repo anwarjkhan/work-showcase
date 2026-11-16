@@ -13,9 +13,9 @@ import type { EntityRef, EvidenceRag, EvidenceRagStatus, Finding, Milestone, Rag
 import { RAG_RULES, RULE_THRESHOLDS } from './constants';
 import type { EngineContext } from './context';
 import type { MeasuresResult } from './measures';
-import { date, days, listPhrases, plural, portfolioSystem, quote } from './messages';
+import { date, days, listPhrases, lowerFirst, plural, portfolioSystem, quote } from './messages';
 import { RULE_DESCRIPTIONS } from '@/lib/config/thresholds';
-import { dayDiff, RAG_RANK, SEVERITY_RANK } from './util';
+import { compareIds, dayDiff, RAG_RANK, SEVERITY_RANK } from './util';
 
 /** Milestones that are missed, or planned with their date already passed. */
 export function missedMilestones(ctx: EngineContext, deliverableId: string): Milestone[] {
@@ -40,7 +40,7 @@ function findingReasons(findings: Finding[], code: string): Reason[] {
       message:
         list.length === 1
           ? first.message
-          : `${plural(list.length, `${terms.severity[first.severity].toLowerCase()} finding`)} (${ruleId}: ${RULE_DESCRIPTIONS[ruleId]}). First: ${first.message}`,
+          : `${plural(list.length, `${lowerFirst(terms.severity[first.severity])} finding`)} (${ruleId}: ${RULE_DESCRIPTIONS[ruleId]}). First: ${first.message}`,
       refs,
     });
   }
@@ -179,7 +179,7 @@ export function statusDisagreements(rags: Record<string, EvidenceRag>): string[]
         Math.abs(gapB) - Math.abs(gapA) ||
         EVIDENCE_RANK[b.evidence] - EVIDENCE_RANK[a.evidence] ||
         gapB - gapA ||
-        a.entity.id.localeCompare(b.entity.id, 'en', { numeric: true })
+        compareIds(a.entity.id, b.entity.id)
       );
     })
     .map((r) => r.entity.id);

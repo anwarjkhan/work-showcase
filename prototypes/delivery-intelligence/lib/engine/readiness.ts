@@ -8,7 +8,7 @@
  */
 import { requiredEvidenceFor } from '@/lib/config/risk-tiers';
 import { terms } from '@/lib/config/terminology';
-import type { Evidence, EvidenceHeldState, EvidenceKind, HeldEvidence, ReadinessAssessment, Reason, TechDeliverable } from '@/lib/types';
+import type { Evidence, EvidenceKind, HeldEvidence, ReadinessAssessment, Reason, TechDeliverable } from '@/lib/types';
 import type { EngineContext } from './context';
 import { dependencyLateDays, isDependencyOpen } from './dependencies';
 import { currentEvidenceByKind, evidenceStaleness, recordState, worseHeldState } from './evidence';
@@ -73,7 +73,7 @@ export function deliverableReadiness(ctx: EngineContext, d: TechDeliverable): Re
       code: 'critical-dependency-open',
       message:
         `Critical dependency ${quote(dep.title)}${provider ? ` from ${provider.ref}` : ''} is not yet delivered ` +
-        `(${lowerFirst(terms.dependencyStatus[dep.status])},needed by ${date(dep.needBy)}${late > 0 ? `, ${days(late)} late` : ''}).`,
+        `(${lowerFirst(terms.dependencyStatus[dep.status])}, needed by ${date(dep.needBy)}${late > 0 ? `, ${days(late)} late` : ''}).`,
       refs: [{ kind: 'dependency', id: dep.id }],
     });
   }
