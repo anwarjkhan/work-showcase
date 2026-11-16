@@ -56,21 +56,12 @@ Audience order: own management, divisional leadership, wider technology leadersh
 5. **Fonts are bundled** as npm packages, so the build does not fetch anything from the internet.
 6. **The demo clock is fixed** at 8 March 2027, so every screen shows the same thing on every run.
 
-### Repository exposure — to resolve before the build starts
+### Repository exposure — resolved 16 November 2026
 
-Checked on 16 November 2026:
-
-- The repository is **public**. `README.md` and `docs/sharing-guidelines.md` describe it as private and invitation-only.
-- `PDLC_Jira_Cloud_Configuration_Matrix.xlsx` uses the portfolio system's real short name 15 times, lists a technology domain breakdown, and carries the author's name in its file properties. No other internal product, template or application name was found in it or in the Markdown files.
-- The file is in the first commit, so deleting it in a new commit leaves it in the history.
-
-The build does not start until the owner has chosen one of:
-
-1. Make the repository private, and leave the file as it is.
-2. Keep it public, replace the file with a cleaned version, and rewrite the history so the original is gone. This needs a forced push.
-3. Keep it public and accept the file as it is.
-
-The blueprint screen takes its content from `lib/config/blueprint.ts`, written with generic names, so it does not depend on the spreadsheet staying in the repository.
+- The repository is public by the owner's choice.
+- `PDLC_Jira_Cloud_Configuration_Matrix.xlsx` was replaced with a cleaned copy: the portfolio system's short name became "Portfolio System", the technology domain list became generic, and the author name was removed from the file properties.
+- The history was rewritten so the original file is no longer in any commit on `main`, and `main` was force-pushed.
+- The blueprint screen takes its content from `lib/config/blueprint.ts`, written with generic names, so it does not depend on the spreadsheet.
 
 ---
 
