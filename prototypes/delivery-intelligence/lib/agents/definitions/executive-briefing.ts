@@ -9,7 +9,7 @@ import { terms } from '@/lib/config/terminology';
 import { dependencyKnockOn, isClosed, isDependencyTroubled, rollupMeasures } from '@/lib/engine';
 import type { AgentRunOutput, DraftSentence, EntityRef } from '@/lib/types';
 import { decisionsFor } from '../facts';
-import { AgentKit, date, listPhrases, lowerFirst, plural, quote, ref } from '../kit';
+import { AgentKit, softLower, date, listPhrases, lowerFirst, plural, quote, ref } from '../kit';
 import type { ScriptedAgent, ScriptedAgentInput } from '../types';
 import { ragPair } from './status-reporting';
 
@@ -130,7 +130,7 @@ export const executiveBriefingAgent: ScriptedAgent = {
         const first = rag.reasons[0];
         disagree.push(
           kit.sentence(
-            `${d.ref} ${quote(d.title)} is ${ragPair(kit, id, false)}${first ? `: ${lowerFirst(first.message)}` : '.'}`,
+            `${d.ref} ${quote(d.title)} is ${ragPair(kit, id, false)}${first ? `: ${softLower(first.message)}` : '.'}`,
             [ref.deliverable(id), ...(first?.refs ?? [])],
           ),
         );

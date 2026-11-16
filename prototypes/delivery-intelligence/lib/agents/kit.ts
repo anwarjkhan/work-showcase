@@ -28,6 +28,11 @@ import type { AgentRunScope, ScriptedAgentInput } from './types';
 
 export { date, days, listPhrases, lowerFirst, plural, quote };
 
+/** Lower-cases the first letter unless the first word is an acronym or key ("TD-1001", "RAID"). */
+export function softLower(text: string): string {
+  return /^[A-Z][A-Z0-9-]/.test(text) ? text : lowerFirst(text);
+}
+
 /** Suggested playback time per step kind, in milliseconds. */
 export const STEP_DURATION_MS: Record<AgentStepKind, number> = {
   read: 900,

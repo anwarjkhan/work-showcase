@@ -10,7 +10,7 @@ import { terms } from '@/lib/config/terminology';
 import { isClosed } from '@/lib/engine';
 import type { AgentRunOutput, DraftSentence, TechDeliverable } from '@/lib/types';
 import { dependenciesInto, dependencySentence, outstandingStageReviews, stageName } from '../facts';
-import { AgentKit, date, listPhrases, lowerFirst, plural, quote, ref } from '../kit';
+import { AgentKit, softLower, date, listPhrases, lowerFirst, plural, quote, ref } from '../kit';
 import type { ScriptedAgent, ScriptedAgentInput } from '../types';
 
 const meta = AGENT_CATALOGUE['release-readiness'];
@@ -49,7 +49,7 @@ export const releaseReadinessAgent: ScriptedAgent = {
         const ex = rd.missing.length + rd.failing.length + rd.stale.length + rd.blockingDependencyIds.length;
         exceptions += ex;
         if (rd.state === 'ready') continue;
-        lines.push(kit.sentence(`${d.ref} ${quote(d.title)} is ${lowerFirst(terms.readiness[rd.state])}: ${rd.reasons.map((r) => lowerFirst(r.message.replace(/\.$/, ''))).slice(0, 2).join('; ')}.`, [ref.deliverable(d.id), ...rd.reasons.flatMap((r) => r.refs)]));
+        lines.push(kit.sentence(`${d.ref} ${quote(d.title)} is ${lowerFirst(terms.readiness[rd.state])}: ${rd.reasons.map((r) => softLower(r.message.replace(/\.$/, ''))).slice(0, 2).join('; ')}.`, [ref.deliverable(d.id), ...rd.reasons.flatMap((r) => r.refs)]));
       }
       kit.step('check', `Checked required evidence and critical dependencies for ${plural(ds.length, 'deliverable')}`, `${counts.ready} ready, ${counts['not-ready']} not ready, ${counts.unknown} unknown.`, []);
       kit.section('Summary', [

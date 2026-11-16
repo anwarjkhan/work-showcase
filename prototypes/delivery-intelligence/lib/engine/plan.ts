@@ -17,7 +17,7 @@ const minDate = (dates: IsoDate[], fallback: IsoDate) => dates.reduce((a, b) => 
 /** Forecast per deliverable id (story-level work across all its Epics). */
 export function deliverableForecasts(ctx: EngineContext): Map<string, Forecast> {
   const out = new Map<string, Forecast>();
-  for (const d of ctx.data.deliverables) out.set(d.id, forecastEnd(ctx.storiesByDeliverable.get(d.id) ?? [], d.plannedEnd, ctx.clock));
+  for (const d of ctx.data.deliverables) out.set(d.id, forecastEnd(ctx.storiesByDeliverable.get(d.id) ?? [], d.plannedEnd, ctx.clock, d.plannedStart));
   return out;
 }
 
@@ -112,7 +112,7 @@ export function buildPlan(ctx: EngineContext, forecasts: Map<string, Forecast>):
       const start = epic?.startDate ?? d.plannedStart;
       const end = epic?.targetDate ?? d.plannedEnd;
       const stories = (ctx.childrenOf.get(key) ?? []).filter((w: WorkItem) => isStoryLevel(w));
-      const f = forecastEnd(stories, end, ctx.clock);
+      const f = forecastEnd(stories, end, ctx.clock, start);
       return {
         entity: { kind: 'work-item', id: key },
         level: 'epic',
