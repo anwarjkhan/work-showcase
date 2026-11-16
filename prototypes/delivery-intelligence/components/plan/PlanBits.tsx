@@ -3,10 +3,10 @@
 import { CircleCheck, Diamond, Landmark, OctagonX, TriangleAlert } from 'lucide-react';
 import { cx } from '@/components/ui';
 import { StatusGlyph } from '@/components/ui/status';
-import { formatDate } from '@/lib/config/clock';
+
 import { terms } from '@/lib/config/terminology';
 import type { Computable, EvidenceRagStatus, Milestone, RagStatus, WorkCompletion } from '@/lib/types';
-import type { MilestoneRisk } from './layout';
+import { formatDateCached as formatDate, type MilestoneRisk } from './layout';
 
 /** Copy used on this screen only (no system, template or status names here: those come from `terms`). */
 export const planText = {

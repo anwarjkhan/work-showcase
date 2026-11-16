@@ -4,7 +4,7 @@
  * datePosition, sprintFor); these functions only arrange the results into rows,
  * geometry and window summaries. No clock, no globals: unit-tested in layout.test.ts.
  */
-import { addDays, daysBetween } from '@/lib/config/clock';
+import { addDays, daysBetween, formatDate } from '@/lib/config/clock';
 import { HERO_DELIVERABLE_ID } from '@/lib/config/story';
 import {
   barSpan,
@@ -381,7 +381,7 @@ export function dayCentre(window: Pick<PlanWindow, 'start' | 'end'>, date: IsoDa
 }
 
 /** Minimum canvas width per zoom so labels stay legible; narrower containers scroll horizontally. */
-export const MIN_CANVAS: Record<PlanZoom, number> = { year: 1080, quarter: 1040, month: 1180, sprint: 1120 };
+export const MIN_CANVAS: Record<PlanZoom, number> = { year: 760, quarter: 760, month: 900, sprint: 760 };
 
 export function canvasWidth(zoom: PlanZoom, available: number): number {
   return Math.max(MIN_CANVAS[zoom], Math.floor(available));
@@ -529,16 +529,33 @@ export function storySpan(item: WorkItem, sprint: { start: IsoDate; end: IsoDate
   return { start: start > sprint.end ? sprint.end : start, end: end > sprint.end ? sprint.end : end };
 }
 
+const dateCache = new Map<string, string>();
+
+/** `formatDate` with a cache: Intl formatting is the costliest call when the plan re-renders on zoom. */
+export function formatDateCached(date: IsoDate, opts: { withYear?: boolean } = {}): string {
+  const key = `${date}|${opts.withYear === false ? 0 : 1}`;
+  let out = dateCache.get(key);
+  if (out === undefined) {
+    out = formatDate(date, opts);
+    if (dateCache.size > 5000) dateCache.clear();
+    dateCache.set(key, out);
+  }
+  return out;
+}
+
+/** 1214 -> "1,214" without Intl. */
+const thousands = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
 /** "+9 days", "−3 days", "On plan". */
 export function slipText(days: number): string {
   if (days === 0) return 'On plan';
-  const abs = Math.abs(days).toLocaleString('en-GB');
+  const abs = thousands(Math.abs(days));
   return `${days > 0 ? '+' : '−'}${abs} ${Math.abs(days) === 1 ? 'day' : 'days'}`;
 }
 
 /** Compact "+9d". */
 export function slipShort(days: number): string {
-  return `${days > 0 ? '+' : '−'}${Math.abs(days).toLocaleString('en-GB')}d`;
+  return `${days > 0 ? '+' : '−'}${thousands(Math.abs(days))}d`;
 }
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

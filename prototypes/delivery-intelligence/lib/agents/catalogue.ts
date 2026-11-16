@@ -6,7 +6,8 @@
  * Stages agree with `PDLC_STAGES[].agentAssist` and `CROSS_CUTTING_AGENTS` in
  * `lib/config/pdlc.ts` (a test keeps them in step).
  */
-import type { AgentId, AgentMode, AgentScope, PdlcStageId } from '@/lib/types';
+import type { AgentId, AgentMode, PdlcStageId } from '@/lib/types';
+import type { AgentScopeKind } from './types';
 import { CROSS_CUTTING_AGENTS } from '@/lib/config/pdlc';
 
 /** Lucide icon component names used by the catalogue (import from `lucide-react`). */
@@ -31,8 +32,8 @@ export interface AgentCatalogueEntry {
   mode: AgentMode;
   /** What it produces. */
   output: string;
-  /** Scopes it accepts, in order of preference (first is the default). */
-  scopes: AgentScope['kind'][];
+  /** Scopes it accepts, in order of preference (first is the default). `programme` is local to lib/agents (see types.ts). */
+  scopes: AgentScopeKind[];
   /** Lucide icon component name, e.g. `import { ListTree } from 'lucide-react'`. */
   icon: AgentIconName;
 }
@@ -55,7 +56,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: ['design-specifications'],
     mode: 'propose-change',
     output: 'Outcome ID suggestions for unmapped items',
-    scopes: ['deliverable', 'pdlc-stage', 'portfolio'],
+    scopes: ['deliverable', 'pdlc-stage', 'programme', 'portfolio'],
     icon: 'Target',
   },
   'control-evidence-check': {
@@ -65,7 +66,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: ['risk-control-compliance'],
     mode: 'read-only',
     output: "Missing fields and evidence for the item's risk tier",
-    scopes: ['deliverable', 'pdlc-stage', 'portfolio'],
+    scopes: ['deliverable', 'pdlc-stage', 'programme', 'portfolio'],
     icon: 'ShieldCheck',
   },
   'release-readiness': {
@@ -75,7 +76,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: ['build-test-validate', 'delivery-launch'],
     mode: 'read-only',
     output: 'Readiness checklist with exceptions',
-    scopes: ['deliverable', 'pdlc-stage', 'portfolio'],
+    scopes: ['deliverable', 'pdlc-stage', 'programme', 'portfolio'],
     icon: 'Rocket',
   },
   'raid-quality': {
@@ -85,7 +86,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: [],
     mode: 'propose-change',
     output: 'Owner, date and duplicate fixes',
-    scopes: ['portfolio', 'deliverable'],
+    scopes: ['portfolio', 'programme', 'deliverable'],
     icon: 'TriangleAlert',
   },
   'dependency-discovery': {
@@ -95,7 +96,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: [],
     mode: 'propose-change',
     output: 'Candidate dependencies with evidence',
-    scopes: ['portfolio', 'deliverable'],
+    scopes: ['portfolio', 'programme', 'deliverable'],
     icon: 'Waypoints',
   },
   'portfolio-reconciliation': {
@@ -105,7 +106,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: [],
     mode: 'read-only',
     output: 'Book-of-record against work-tracker discrepancy report',
-    scopes: ['portfolio', 'deliverable'],
+    scopes: ['portfolio', 'programme', 'deliverable'],
     icon: 'GitCompare',
   },
   'status-reporting': {
@@ -115,7 +116,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: [],
     mode: 'draft',
     output: 'Weekly status with a citation per sentence',
-    scopes: ['deliverable', 'portfolio'],
+    scopes: ['deliverable', 'programme', 'portfolio'],
     icon: 'FileText',
   },
   'executive-briefing': {
@@ -125,7 +126,7 @@ export const AGENT_CATALOGUE: Record<AgentId, AgentCatalogueEntry> = {
     stages: [],
     mode: 'draft',
     output: 'Decision-focused portfolio brief',
-    scopes: ['portfolio'],
+    scopes: ['portfolio', 'programme'],
     icon: 'Presentation',
   },
 };
@@ -152,10 +153,3 @@ export function agentsForStage(stageId: PdlcStageId): AgentCatalogueEntry[] {
 export function crossCuttingAgents(): AgentCatalogueEntry[] {
   return CROSS_CUTTING_AGENTS.map((id) => AGENT_CATALOGUE[id]);
 }
-
-/** Human labels for agent modes. */
-export const AGENT_MODE_LABELS: Record<AgentMode, string> = {
-  'read-only': 'Read only',
-  'propose-change': 'Propose change',
-  draft: 'Draft',
-};

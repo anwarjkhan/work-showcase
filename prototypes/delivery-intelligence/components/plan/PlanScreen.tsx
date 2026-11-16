@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { ProvenanceBadge, ProvenanceBadges } from '@/components/shell';
 import { Button, Chip, IconButton, StatTile, Tabs, cx } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
-import { formatDate } from '@/lib/config/clock';
+
 import { terms } from '@/lib/config/terminology';
 import { PLAN_ZOOMS, planWindow, stepWindow } from '@/lib/engine';
 import type { IsoDate, PlanZoom } from '@/lib/types';
@@ -23,6 +23,7 @@ import {
   zoomAnchor,
   type PlanFilters,
 } from './layout';
+import { formatDateCached as formatDate } from './layout';
 import { planText } from './PlanBits';
 import { PlanDrawer } from './PlanDrawer';
 import { PlanTimeline } from './PlanTimeline';

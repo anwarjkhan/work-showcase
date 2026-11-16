@@ -6,7 +6,7 @@ import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState, type CSS
 import { cx, Tooltip } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { MOTION } from '@/components/ui/motion';
-import { addDays, daysBetween, formatDate } from '@/lib/config/clock';
+import { addDays, daysBetween } from '@/lib/config/clock';
 import { terms } from '@/lib/config/terminology';
 import type { Dependency, IsoDate, PlanTick, PlanWindow, Sprint } from '@/lib/types';
 import {
@@ -22,6 +22,7 @@ import {
   type PlanRow,
   type SpanGeometry,
 } from './layout';
+import { formatDateCached as formatDate } from './layout';
 import { MilestoneMark, MiniRag, planText, ProgressFigure } from './PlanBits';
 import type { PlanState } from './usePlanIndex';
 
@@ -71,6 +72,16 @@ export function PlanTimeline({ state, window, rows, sprint, selectedId, onSelect
   const { top: offsets, total } = useMemo(() => rowOffsets(rows), [rows]);
   const todayX = dayCentre(window, state.clock.today);
   const todayVisible = todayX >= 0 && todayX <= 1;
+
+  // When the canvas is wider than the viewport, keep today (or the window start) in view after a zoom or step.
+  useLayoutEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const viewport = el.clientWidth - left;
+    if (canvas <= viewport) return;
+    const focus = todayVisible ? todayX * canvas : 0;
+    if (focus < el.scrollLeft || focus > el.scrollLeft + viewport - 40) el.scrollLeft = Math.max(0, focus - viewport * 0.6);
+  }, [window.zoom, window.start, canvas, left, todayX, todayVisible]);
 
   // Arrow keys move between row toggles; Right expands, Left collapses.
   const onKeyDown = useCallback(
@@ -299,7 +310,6 @@ interface RowProps {
 }
 
 const Row = memo(function Row({ row, state, window, left, canvas, sprint, selected, onSelect, onToggle }: RowProps) {
-  const reduce = useReducedMotion();
   const tone =
     row.kind === 'rollup' && row.level === 'investment-request'
       ? 'bg-surface-2'
@@ -309,13 +319,14 @@ const Row = memo(function Row({ row, state, window, left, canvas, sprint, select
           ? 'bg-canvas/40'
           : '';
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: MOTION.base, ease: MOTION.easeStandard }}
+    <div
       data-row={row.kind}
       data-row-key={row.key}
-      className={cx('group relative flex border-b border-line/70', tone, row.kind === 'deliverable' && 'hover:bg-hover')}
+      className={cx(
+        'group relative flex border-b border-line/70 transition-opacity duration-(--di-duration-base) ease-standard starting:opacity-0',
+        tone,
+        row.kind === 'deliverable' && 'hover:bg-hover',
+      )}
       style={{ height: row.height }}
     >
       <div
@@ -327,7 +338,7 @@ const Row = memo(function Row({ row, state, window, left, canvas, sprint, select
       <div className="relative shrink-0 overflow-hidden" style={{ width: canvas }}>
         <Track row={row} state={state} window={window} sprint={sprint} selected={selected} onSelect={onSelect} />
       </div>
-    </motion.div>
+    </div>
   );
 });
 
@@ -348,7 +359,7 @@ function Toggle({ id, expanded, label, onToggle, children }: { id: string; expan
   );
 }
 
-function NameCell({ row, state, onToggle }: { row: PlanRow; state: PlanState; onToggle: (id: string) => void }) {
+const NameCell = memo(function NameCell({ row, state, onToggle }: { row: PlanRow; state: PlanState; onToggle: (id: string) => void }) {
   const { data, result, rollups, index } = state;
   switch (row.kind) {
     case 'rollup': {
@@ -461,7 +472,7 @@ function NameCell({ row, state, onToggle }: { row: PlanRow; state: PlanState; on
       );
     }
   }
-}
+});
 
 // ---------------------------------------------------------------------------
 // Tracks
