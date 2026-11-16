@@ -10,7 +10,7 @@
 import { PDLC_STAGE_IDS } from '@/lib/config/pdlc';
 import type { Evidence, EvidenceKind, PdlcStageId, ReviewRoleId, SourceSystemId, WorkItem } from '@/lib/types';
 import type { DeliverableSpec } from './catalogue';
-import { addDays, clampDate, dateOf, daysBetween, stampOn, TODAY } from './dates';
+import { addDays, clampDate, dateOf, daysBetween, stamp, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
 import { isStoryLevel } from './workitems';
 import type { AcceptanceDates, OutcomePlan } from './outcomes';
@@ -76,7 +76,19 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
 
   for (const deliverable of hierarchy.deliverables) {
     const spec = hierarchy.specs.get(deliverable.id) as DeliverableSpec;
-    if (spec.pinned || spec.stage === 'ideation-requirements') continue;
+    if (spec.pinned) continue;
+    if (spec.stage === 'ideation-requirements') {
+      // Not-started deliverables hold no evidence, except where a requirements sign-off has been requested.
+      if (spec.n % 2 === 0) {
+        const own = deliverable.epicKeys[0] as string;
+        evidence.push({
+          id: `ev-${spec.n}-rs-01`, kind: 'requirements-sign-off', title: `Requirements sign-off — ${trimTitle(spec.title)}`, deliverableId: spec.id, outcomeId: null, workItemKey: own,
+          stageId: 'ideation-requirements', result: 'pending', source: 'document-store', sourceRef: `DOC-${(docCounter += 7)}`, observedAt: stamp(addDays(TODAY, -1), 18, 0),
+          recordedById: deliverable.reviewers['requirements-owner'] ?? null, provenance: 'sample',
+        });
+      }
+      continue;
+    }
     const dr = rng.fork(spec.id);
     const stageIndex = PDLC_STAGE_IDS.indexOf(spec.stage);
     const flags = spec.flags ?? {};

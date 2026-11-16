@@ -4,10 +4,10 @@
  * the hero's late market-data dependency is declared here so every dependency
  * lives in one list.
  */
-import { HERO_DELIVERABLE_ID, WORKFLOW_DELIVERABLE_ID } from '@/lib/config/story';
+import { HERO_DELIVERABLE_ID } from '@/lib/config/story';
 import type { Dependency, DependencyStatus, Milestone, RaidItem, RaidKind, Severity, WorkItem } from '@/lib/types';
 import { PROJECT_KEYS, type DeliverableSpec } from './catalogue';
-import { addDays, dateAtFraction, stamp, stampOn, TODAY } from './dates';
+import { addDays, dateAtFraction, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
 import type { OutcomePlan } from './outcomes';
 import type { Rng } from './random';
@@ -38,7 +38,7 @@ const DEPENDENCY_SPECS: DependencySpec[] = [
   { from: 'td-1018', to: 'td-1008', title: 'Trade and position feed quality attestations', needBy: '2027-03-12', committed: '2027-03-26', status: 'late', critical: true },
   { from: 'td-1016', to: 'td-1007', title: 'Stressed and historical curves for sensitivity calculation', needBy: '2027-05-14', committed: '2027-05-07', status: 'on-track' },
   { from: 'td-1019', to: 'td-1007', title: 'Intraday position deltas for desk capital', needBy: '2027-07-30', committed: '2027-07-23', status: 'on-track' },
-  { from: 'td-1002', to: 'td-1010', title: 'Lineage metadata for the desk capital pack', needBy: '2027-06-18', committed: '2027-06-30', status: 'at-risk' },
+  { from: 'td-1002', to: 'td-1010', title: 'Lineage metadata for the desk capital pack', needBy: '2027-06-18', committed: '2027-06-11', status: 'on-track' },
   { from: 'td-1013', to: 'td-1014', title: 'Intercompany reconciliation outputs for accrual attestation', needBy: '2027-03-26', committed: '2027-04-09', status: 'late' },
   { from: 'td-1017', to: 'td-1012', title: 'Reference data feed for chart-of-accounts mapping', needBy: '2027-02-12', committed: '2027-02-10', status: 'delivered', deliveredOn: '2027-02-10' },
   { from: 'td-1015', to: 'td-1012', title: 'Derivative subledger posting rules for the parallel run', needBy: '2027-03-31', committed: '2027-02-26', status: 'delivered', deliveredOn: '2027-02-26' },
@@ -49,7 +49,7 @@ const DEPENDENCY_SPECS: DependencySpec[] = [
   { from: 'td-1016', to: 'td-1019', title: 'Curve snapshot interface for streaming consumers', needBy: '2027-06-11', committed: '2027-06-04', status: 'on-track' },
   { from: 'td-1017', to: 'td-1014', title: 'Entity hierarchy for accrual ownership', needBy: '2027-04-16', committed: '2027-02-19', status: 'delivered', deliveredOn: '2027-02-19' },
   { from: 'td-1009', to: 'td-1007', title: 'Risk factor eligibility results for non-modellable charges', needBy: '2027-05-28', committed: '2027-05-21', status: 'on-track' },
-  { from: 'td-1010', to: 'td-1011', title: 'Desk capital pack template for attribution reporting', needBy: '2027-06-25', committed: null, status: 'at-risk' },
+  { from: 'td-1010', to: 'td-1011', title: 'Desk capital pack template for attribution reporting', needBy: '2027-06-25', committed: '2027-06-18', status: 'on-track' },
   { from: 'td-1012', to: 'td-1013', title: 'Chart-of-accounts mapping tables for intercompany matching', needBy: '2027-03-19', committed: '2027-03-19', status: 'on-track' },
   { from: 'td-2002', to: 'td-2003', title: 'Exception ageing metrics for the evidence export', needBy: '2027-03-05', committed: '2027-03-02', status: 'delivered', deliveredOn: '2027-03-02' },
   { from: 'td-2005', to: 'td-2004', title: 'Stress run scheduler interface for library tagging', needBy: '2027-06-04', committed: '2027-05-28', status: 'on-track' },
@@ -62,7 +62,7 @@ const DEPENDENCY_SPECS: DependencySpec[] = [
   { from: 'td-1012', to: 'td-1014', title: 'Trial balance snapshots for accrual testing', needBy: '2027-04-09', committed: '2027-04-09', status: 'on-track' },
   { from: 'td-2004', to: 'td-2006', title: 'Scenario tag taxonomy for the reverse stress export', needBy: '2027-04-02', committed: '2027-03-26', status: 'on-track' },
   { from: 'td-1011', to: 'td-1010', title: 'Attribution results for the desk capital pack', needBy: '2027-09-17', committed: '2027-09-10', status: 'on-track' },
-  { from: 'td-1019', to: 'td-1009', title: 'Intraday feed samples for eligibility testing', needBy: '2027-03-26', committed: null, status: 'blocked', critical: true },
+  { from: 'td-1019', to: 'td-1009', title: 'Intraday feed samples for eligibility testing', needBy: '2027-03-26', committed: '2027-04-02', status: 'at-risk' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -303,8 +303,5 @@ export function buildRaidAndDependencies(root: Rng, hierarchy: Hierarchy, ref: R
       });
     }
   }
-  // Keep the workflow story's own milestones out of this list (story.ts owns them).
-  void WORKFLOW_DELIVERABLE_ID;
-  void stamp;
   return { raid, dependencies, milestones };
 }

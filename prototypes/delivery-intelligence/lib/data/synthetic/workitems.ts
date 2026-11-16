@@ -102,7 +102,6 @@ export function buildWorkItems(root: Rng, hierarchy: Hierarchy, ref: Reference, 
     if (!person.podId) continue;
     peopleByHub.set(person.hubId, [...(peopleByHub.get(person.hubId) ?? []), person]);
   }
-  const personById = new Map(ref.people.map((p) => [p.id, p]));
   const podById = new Map(ref.pods.map((p) => [p.id, p]));
   const currentSprint = sprintIndexFor(TODAY);
 

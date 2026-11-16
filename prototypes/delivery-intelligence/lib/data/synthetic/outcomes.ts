@@ -3,7 +3,7 @@
  * and workflow-story outcomes are hand-written in story.ts.
  */
 import type { AcceptanceCriterion, Outcome, WorkItem } from '@/lib/types';
-import { CRITERIA_TEMPLATES } from './catalogue';
+import { CRITERIA_TEMPLATES, REPORTED_ON_TRACK } from './catalogue';
 import { addDays, clampDate, dateAtFraction, dateOf, minDate, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
 import type { Rng } from './random';
@@ -43,6 +43,7 @@ export function buildOutcomes(root: Rng, hierarchy: Hierarchy): OutcomePlan {
 
       let reportedStatus: Outcome['reportedStatus'] = 'on-track';
       if (isAccepted || isCompleteUnaccepted) reportedStatus = 'complete';
+      else if (spec.rag === 'green' && !REPORTED_ON_TRACK.has(spec.id)) reportedStatus = 'at-risk';
       else if (i === m && spec.rag === 'amber') reportedStatus = 'at-risk';
       else if (i === m && spec.rag === 'red') reportedStatus = 'off-track';
       else if (i === m - 1 && spec.rag === 'red') reportedStatus = 'at-risk';

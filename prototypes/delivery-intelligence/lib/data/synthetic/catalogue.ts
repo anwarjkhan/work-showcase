@@ -165,7 +165,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
     summary: 'Trace every regulatory exposure figure back to trade capture so auditors and supervisors can follow the numbers.',
     programme: 'ccr', pmNodeId: 'pm-ccr-exposure', tier: 'T4', stage: 'design-specifications', template: 'advanced',
     start: '2027-02-01', end: '2027-06-30', forecast: '2027-07-15', hubs: ['hub-sgp', 'hub-blr'], podId: 'pod-data-sgp',
-    rag: 'amber', commentary: 'Lineage tooling onboarding is slower than planned; design authority review brought forward.', progress: 0.1, accepted: 0,
+    rag: 'green', commentary: 'Lineage tooling onboarding under way; design authority review brought forward.', progress: 0.1, accepted: 0,
     epics: ['Lineage capture from trade capture to the exposure store', 'Lineage browser for regulatory reporting teams'],
     outcomes: [
       o('Exposure figures traceable to source trades', 'Every regulatory exposure figure can be traced to the trades and static data behind it.'),
@@ -179,9 +179,9 @@ export const DELIVERABLES: DeliverableSpec[] = [
     id: 'td-1003', n: 1003,
     title: 'Collateral margin-call dispute workflow',
     summary: 'Give operations and credit one workflow to log, age and resolve margin-call disputes with counterparties.',
-    programme: 'ccr', pmNodeId: 'pm-ccr-collateral', tier: 'T3', stage: 'build-test-validate', template: 'advanced',
-    start: '2027-01-11', end: '2027-05-28', forecast: '2027-05-28', hubs: ['hub-nyc', 'hub-tor', 'hub-chi'], podId: 'pod-xva-nyc',
-    rag: 'green', commentary: 'Build progressing to plan; user acceptance testing scheduled for April.', progress: 0.45, accepted: 1,
+    programme: 'ccr', pmNodeId: 'pm-ccr-collateral', tier: 'T3', stage: 'delivery-launch', template: 'advanced',
+    start: '2027-01-11', end: '2027-03-26', forecast: '2027-03-26', hubs: ['hub-nyc', 'hub-tor', 'hub-chi'], podId: 'pod-xva-nyc',
+    rag: 'green', commentary: 'All outcomes accepted; release checklist in progress.', progress: 1, accepted: 3,
     epics: ['Dispute capture and counterparty correspondence log', 'Dispute ageing and escalation rules', 'Dispute reporting for credit and operations'],
     outcomes: [
       o('Disputes logged against the originating margin call', 'Each dispute is linked to the call, the counterparty and the disputed amount.'),
@@ -189,15 +189,14 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Credit and operations share one dispute ageing view', 'One report replaces the separate spreadsheets kept by credit and operations.'),
     ],
     objects: ['margin call disputes', 'dispute ageing buckets', 'counterparty correspondence records'],
-    flags: { failingTest: true, unmapped: 2 },
   },
   {
     id: 'td-1004', n: 1004,
     title: 'Wrong-way risk flags in counterparty limit checks',
     summary: 'Flag counterparties where exposure rises as credit quality falls, and apply the adjustment in limit checks.',
-    programme: 'ccr', pmNodeId: 'pm-ccr-exposure', tier: 'T3', stage: 'risk-control-compliance', template: 'advanced',
-    start: '2027-01-18', end: '2027-06-25', forecast: '2027-07-02', hubs: ['hub-ldn', 'hub-war'], podId: 'pod-risk-ldn',
-    rag: 'amber', commentary: 'Design approved; control review slightly behind because of validator availability.', progress: 0.38, accepted: 1,
+    programme: 'ccr', pmNodeId: 'pm-ccr-exposure', tier: 'T3', stage: 'build-test-validate', template: 'advanced',
+    start: '2027-01-18', end: '2027-04-30', forecast: '2027-04-30', hubs: ['hub-ldn', 'hub-war'], podId: 'pod-risk-ldn',
+    rag: 'green', commentary: 'Two outcomes accepted; limit integration in test.', progress: 0.72, accepted: 2,
     epics: ['Wrong-way risk indicator service', 'Limit check integration and override workflow'],
     outcomes: [
       o('Wrong-way indicators available for every rated counterparty', 'An indicator and its rationale is held for each rated counterparty.'),
@@ -205,7 +204,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Overrides require recorded approval from a credit officer', 'Every override is approved, reasoned and visible in the audit view.'),
     ],
     objects: ['wrong-way risk indicators', 'limit utilisation overlays', 'credit officer overrides'],
-    flags: { epicMismatch: 'dates', staleEvidence: 1 },
+    flags: { epicMismatch: 'dates' },
   },
   {
     id: 'td-1005', n: 1005,
@@ -221,15 +220,15 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Sensitivity breaks reconciled to the valuation system', 'Differences to the valuation system are explained within a day.'),
     ],
     objects: ['CVA delta ladders', 'credit spread vega buckets', 'intraday refresh jobs'],
-    flags: { noReviewer: 6, r1Milestone: true, staleEvidence: 1 },
+    flags: { noReviewer: 6, r1Milestone: true, staleEvidence: 1, epicDeliverableId: 'missing' },
   },
   {
     id: 'td-1006', n: 1006,
     title: 'Netting agreement data cleanse and golden source',
     summary: 'Hold each netting agreement once, with verified enforceability flags, in a governed golden source.',
     programme: 'ccr', pmNodeId: 'pm-ccr-collateral', tier: 'T2', stage: 'delivery-launch', template: 'rapid',
-    start: '2027-01-04', end: '2027-03-19', forecast: '2027-03-19', hubs: ['hub-war', 'hub-ldn'], podId: 'pod-ctrl-war',
-    rag: 'green', commentary: 'All outcomes accepted; release checklist in progress.', progress: 1, accepted: 2,
+    start: '2027-01-04', end: '2027-03-05', forecast: '2027-03-05', hubs: ['hub-war', 'hub-ldn'], podId: 'pod-ctrl-war',
+    rag: 'green', commentary: 'Delivered and accepted; release checklist signed off.', progress: 1, accepted: 2,
     epics: ['Netting agreement remediation and golden source load'],
     outcomes: [
       o('Netting agreements held once in a governed golden source', 'Duplicate and conflicting agreement records are removed and one record is authoritative.'),
@@ -253,7 +252,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Capital results reproducible in the reporting layer', 'The reporting layer reproduces the engine results for any past date.'),
     ],
     objects: ['equity delta sensitivities', 'curvature scenario shifts', 'bucket correlation matrices'],
-    flags: { unmapped: 4, staleEvidence: 1 },
+    flags: { unmapped: 4, staleEvidence: 1, closedEpic: true, epicDeliverableId: 'missing' },
   },
   {
     id: 'td-1008', n: 1008,
@@ -293,7 +292,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
     summary: 'Produce a monthly capital pack for desk heads and finance with variances explained against the prior month.',
     programme: 'frtb', pmNodeId: 'pm-frtb-sa', tier: 'T3', stage: 'design-specifications', template: 'advanced',
     start: '2027-03-01', end: '2027-09-24', forecast: '2027-10-08', hubs: ['hub-war', 'hub-fra'], podId: 'pod-ctrl-war',
-    rag: 'amber', commentary: 'Scope agreed; waiting on a lineage metadata commitment from the platform team.', progress: 0.05, accepted: 0,
+    rag: 'green', commentary: 'Scope agreed; lineage metadata commitment from the platform team confirmed.', progress: 0.05, accepted: 0,
     epics: ['Pack data model and desk attribution', 'Pack layout and distribution'],
     outcomes: [
       o('Capital attributed to trading desks consistently', 'Attribution rules are applied identically across all desks and months.'),
@@ -301,7 +300,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Pack variances explained against the prior month', 'Variances above threshold carry a short commentary from the desk.'),
     ],
     objects: ['desk attribution rules', 'prior-month variance commentary', 'capital pack distribution lists'],
-    flags: { epicDeliverableId: 'missing', noReviewer: 1 },
+    
   },
   {
     id: 'td-1011', n: 1011,
@@ -317,7 +316,6 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Test history retained for supervisory review', 'Statistics and the P&L inputs behind them are retained for the required period.'),
     ],
     objects: ['attribution test statistics', 'unexplained P&L ratios', 'desk approval status'],
-    flags: { epicDeliverableId: 'dangling' },
   },
 
   // ---- Finance ledger ------------------------------------------------------
@@ -366,7 +364,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Attestation evidence filed centrally each month', 'Attestations are filed in one place and retrievable for audit.'),
     ],
     objects: ['accrual schedules', 'exception sign-off records', 'account owner attestations'],
-    flags: { r1Milestone: true, completeUnaccepted: true },
+    flags: { r1Milestone: true, completeUnaccepted: true, epicDeliverableId: 'dangling' },
   },
   {
     id: 'td-1015', n: 1015,
@@ -419,9 +417,9 @@ export const DELIVERABLES: DeliverableSpec[] = [
     id: 'td-1018', n: 1018,
     title: 'Data quality rules engine for trade and position feeds',
     summary: 'Run versioned quality rules on every trade and position feed and alert the feed owner of breaches.',
-    programme: 'data', pmNodeId: 'pm-data-gov', tier: 'T3', stage: 'build-test-validate', template: 'advanced',
-    start: '2027-01-04', end: '2027-06-25', forecast: '2027-07-09', hubs: ['hub-mum', 'hub-blr'], podId: 'pod-plat-mum',
-    rag: 'amber', commentary: 'Framework delivered; alerting and dashboards behind plan.', progress: 0.4, accepted: 1,
+    programme: 'data', pmNodeId: 'pm-data-gov', tier: 'T3', stage: 'delivery-launch', template: 'advanced',
+    start: '2027-01-04', end: '2027-03-31', forecast: '2027-03-31', hubs: ['hub-mum', 'hub-blr'], podId: 'pod-plat-mum',
+    rag: 'green', commentary: 'All outcomes accepted; release checklist in progress.', progress: 1, accepted: 3,
     epics: ['Rule definition and execution framework', 'Quality dashboards and feed owner alerts'],
     outcomes: [
       o('Quality rules defined and versioned with feed owners', 'Rules are agreed with feed owners and held under version control.'),
@@ -429,7 +427,6 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Feed owners alerted to breaches within 30 minutes', 'Breaches raise an alert to the accountable owner inside half an hour.'),
     ],
     objects: ['feed quality rules', 'position feed completeness checks', 'breach alert routes'],
-    flags: { closedEpic: true, noReviewer: 2, unmapped: 3 },
   },
   {
     id: 'td-1019', n: 1019,
@@ -492,8 +489,8 @@ export const DELIVERABLES: DeliverableSpec[] = [
     title: 'Independent price verification evidence export',
     summary: 'Export the evidence behind each price test in one step for internal audit and supervisors.',
     programme: 'limits', pmNodeId: null, tier: 'T2', stage: 'delivery-launch', template: 'rapid',
-    start: '2027-01-04', end: '2027-03-12', forecast: '2027-03-12', hubs: ['hub-hkg', 'hub-tyo'], podId: 'pod-pricing-hkg',
-    rag: 'green', commentary: 'Accepted; waiting for the release window.', progress: 1, accepted: 2,
+    start: '2027-01-04', end: '2027-03-04', forecast: '2027-03-04', hubs: ['hub-hkg', 'hub-tyo'], podId: 'pod-pricing-hkg',
+    rag: 'green', commentary: 'Accepted and released; closing out.', progress: 1, accepted: 2,
     epics: ['Evidence pack export for price testing'],
     outcomes: [
       o('Price testing evidence exported in one step', 'A single action produces the pack for a chosen desk and period.'),
@@ -522,14 +519,14 @@ export const DELIVERABLES: DeliverableSpec[] = [
     summary: 'Let analysts schedule stress runs themselves and tell them why a run failed.',
     programme: 'stress', pmNodeId: null, tier: 'T2', stage: 'design-specifications', template: 'rapid',
     start: '2027-02-22', end: '2027-05-28', forecast: '2027-06-11', hubs: ['hub-tor', 'hub-nyc'], podId: 'pod-stress-tor',
-    rag: 'amber', commentary: 'Design review scheduled; two integration questions open with the platform team.', progress: 0.1, accepted: 0,
+    rag: 'green', commentary: 'Design review scheduled; integration questions with the platform team resolved.', progress: 0.1, accepted: 0,
     epics: ['Self-service scheduling of stress runs'],
     outcomes: [
       o('Analysts schedule stress runs without a service request', 'A run can be scheduled and cancelled by the analyst who owns it.'),
       o('Run failures notified to the requester with the cause', 'Failure notices state the cause and the next step.'),
     ],
     objects: ['stress run schedules', 'run failure notices', 'compute queue allocations'],
-    flags: { epicDeliverableId: 'missing', unmapped: 2 },
+    flags: { unmapped: 2 },
   },
   {
     id: 'td-2006', n: 2006,
@@ -537,14 +534,14 @@ export const DELIVERABLES: DeliverableSpec[] = [
     summary: 'Export reverse stress test results to the reporting layer and retain them for supervisory review.',
     programme: 'stress', pmNodeId: null, tier: 'T1', stage: 'build-test-validate', template: 'rapid',
     start: '2027-01-18', end: '2027-04-16', forecast: '2027-04-16', hubs: ['hub-syd', 'hub-mel'], podId: 'pod-ux-syd',
-    rag: 'green', commentary: 'First outcome complete; second in test.', progress: 0.5, accepted: 0,
+    rag: 'green', commentary: 'Export built; both outcomes in test.', progress: 0.5, accepted: 0,
     epics: ['Export of reverse stress results'],
     outcomes: [
       o('Reverse stress results exportable to the reporting layer', 'Results flow to the reporting layer in the agreed format.'),
       o('Exports retained for supervisory review', 'Exports are retained and retrievable for the required period.'),
     ],
     objects: ['reverse stress targets', 'result export files', 'retention schedules'],
-    flags: { completeUnaccepted: true, noReviewer: 2 },
+    flags: { noReviewer: 2 },
   },
 ];
 
@@ -628,3 +625,11 @@ export const CRITERIA_TEMPLATES = [
   'Data owner confirms the definitions used',
   'Documentation published where users can find it',
 ];
+
+/**
+ * Deliverables reported Green that keep their unaccepted outcomes reported
+ * "on track". The engine flags these (R11) and they are meant to disagree with
+ * their reported status. Every other Green-reported deliverable reports its
+ * unaccepted outcomes as at risk (scope or acceptance still being agreed).
+ */
+export const REPORTED_ON_TRACK = new Set(['td-1005', 'td-1008', 'td-1009', 'td-1014', 'td-2006']);
