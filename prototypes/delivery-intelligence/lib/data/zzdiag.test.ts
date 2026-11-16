@@ -1,0 +1,20 @@
+import fs from 'node:fs';
+import { it } from 'vitest';
+import { DEMO_CLOCK } from '@/lib/config/clock';
+import { computeAll } from '@/lib/engine';
+import { createSyntheticPortfolio } from './synthetic';
+it('diag', () => {
+  const d = createSyntheticPortfolio();
+  const r = computeAll(d, DEMO_CLOCK);
+  const c = (a: string[]) => a.reduce((m: Record<string, number>, k) => ((m[k] = (m[k] ?? 0) + 1), m), {});
+  const out: string[] = [];
+  out.push('vol ' + JSON.stringify({ ir: d.investmentRequests.length, pm: d.pmNodes.length, del: d.deliverables.length, epics: d.workItems.filter((w) => w.type === 'epic').length, oc: d.outcomes.length, cr: d.criteria.length, wi: d.workItems.length, ev: d.evidence.length, raid: d.raid.length, dep: d.dependencies.length, ms: d.milestones.length }));
+  out.push('rag ' + JSON.stringify(c(d.deliverables.map((x) => r.deliverableRag[x.id]!.evidence))));
+  out.push('ready ' + JSON.stringify(c(d.deliverables.map((x) => r.deliverables[x.id]!.readiness.state))));
+  out.push('rules ' + JSON.stringify(c(r.findings.map((f) => f.ruleId))));
+  out.push('disagree ' + d.deliverables.map((x) => `${x.id}:${x.reportedRag}/${r.deliverableRag[x.id]!.evidence}`).join(' '));
+  const h = r.deliverables['td-1001']!;
+  out.push('hero ' + JSON.stringify([h.workCompletion, h.acceptedOutcomes.computable && h.acceptedOutcomes.value.acceptedCount, h.readiness.state]));
+  out.push('herofind ' + r.findings.filter((f) => f.deliverableId === 'td-1001').map((f) => f.ruleId).join(','));
+  fs.writeFileSync('/tmp/claude-0/diag.txt', out.join('\n'));
+});
