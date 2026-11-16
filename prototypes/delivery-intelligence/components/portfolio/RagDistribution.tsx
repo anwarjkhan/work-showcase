@@ -9,7 +9,7 @@ import type { EvidenceRagStatus, RagCounts } from '@/lib/types';
 
 const ORDER: EvidenceRagStatus[] = ['red', 'amber', 'green', 'unknown'];
 
-function Row({ label, counts, total, testId }: { label: string; counts: RagCounts; total: number; testId: string }) {
+function Row({ label, counts, testId }: { label: string; counts: RagCounts; testId: string }) {
   return (
     <div data-testid={testId} className="grid grid-cols-[132px_minmax(0,1fr)_auto] items-center gap-4">
       <span className="text-[13px] font-medium text-fg">{label}</span>
@@ -29,7 +29,7 @@ function Row({ label, counts, total, testId }: { label: string; counts: RagCount
       </div>
       <div className="grid grid-cols-4 gap-3">
         {ORDER.map((s) => (
-          <span key={s} data-testid={`${testId}-${s}`} className="w-14 text-right font-display text-lg font-semibold text-title tabular-nums">
+          <span key={s} data-testid={`${testId}-${s}`} className="w-[68px] text-right font-display text-lg font-semibold text-title tabular-nums">
             {counts[s]}
             <span className="sr-only"> {terms.rag[s]}</span>
           </span>
@@ -47,15 +47,15 @@ export function RagDistribution({ reported, evidence, total }: { reported: RagCo
         <span />
         <div className="grid grid-cols-4 gap-3">
           {ORDER.map((s) => (
-            <span key={s} className="flex w-14 items-center justify-end gap-1 text-[11px] text-fg-muted">
+            <span key={s} className="flex w-[68px] items-center justify-end gap-1 text-[11px] text-fg-muted">
               <StatusGlyph status={s} className="size-3" />
               {terms.rag[s]}
             </span>
           ))}
         </div>
       </div>
-      <Row label={terms.ragKinds.reported} counts={reported} total={total} testId="rag-reported" />
-      <Row label={terms.ragKinds.evidence} counts={evidence} total={total} testId="rag-evidence" />
+      <Row label={terms.ragKinds.reported} counts={reported} testId="rag-reported" />
+      <Row label={terms.ragKinds.evidence} counts={evidence} testId="rag-evidence" />
     </Card>
   );
 }

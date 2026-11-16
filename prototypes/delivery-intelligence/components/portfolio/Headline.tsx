@@ -26,19 +26,19 @@ export function Headline({ view }: { view: PortfolioView }) {
   const ao = summary.acceptedOutcomes;
   const readinessTotal = READINESS_ORDER.reduce((s, k) => s + summary.readiness[k], 0);
   return (
-    <div className="di-card grid grid-cols-1 overflow-hidden xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-      <div className="flex items-center gap-6 border-b border-line bg-status-amber-soft/40 p-6 xl:border-r xl:border-b-0">
+    <div className="di-card grid grid-cols-1 overflow-hidden xl:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] 2xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <div className="flex items-center gap-4 2xl:gap-6 border-b border-line bg-status-amber-soft/40 p-6 xl:border-r xl:border-b-0">
         <div className="flex flex-col items-start">
           <div className="di-eyebrow flex items-center gap-1.5">
             <GitCompareArrows aria-hidden className="size-3.5 text-status-amber" strokeWidth={2.2} />
             Status disagreements
           </div>
-          <div data-testid="disagreement-count" className="font-display text-[88px] leading-[0.95] font-semibold tracking-tight text-title tabular-nums">
+          <div data-testid="disagreement-count" className="font-display text-[72px] 2xl:text-[88px] leading-[0.95] font-semibold tracking-tight text-title tabular-nums">
             {view.disagreementCount}
           </div>
         </div>
         <div className="min-w-0">
-          <p data-testid="headline-sentence" className="font-display text-xl leading-snug font-semibold text-title">
+          <p data-testid="headline-sentence" className="font-display text-lg 2xl:text-xl leading-snug font-semibold text-title">
             {view.headline}
           </p>
           <p className="mt-2 text-[13px] text-fg-muted">
@@ -47,7 +47,7 @@ export function Headline({ view }: { view: PortfolioView }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 divide-y divide-line md:grid-cols-3 md:divide-x md:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-line md:grid-cols-[1fr_1fr_1.3fr] md:divide-x md:divide-y-0">
         <MeasureCell label={terms.measures.workCompletion} testId="measure-work">
           {wc.computable ? (
             <>
@@ -79,13 +79,13 @@ export function Headline({ view }: { view: PortfolioView }) {
           )}
         </MeasureCell>
         <MeasureCell label={terms.measures.readiness} testId="measure-readiness">
-          <div className="flex items-end gap-4">
+          <div className="flex items-end gap-3 2xl:gap-4">
             {READINESS_ORDER.map((k) => {
               const Icon = READINESS_ICON[k];
               const tone = TONE[READINESS_TONE[k]];
               return (
                 <div key={k} className="flex flex-col gap-1">
-                  <span data-testid={`readiness-${k}`} className={cx('font-display text-[34px] leading-none font-semibold tabular-nums', tone.text)}>
+                  <span data-testid={`readiness-${k}`} className={cx('font-display text-[30px] 2xl:text-[34px] leading-none font-semibold tabular-nums', tone.text)}>
                     {summary.readiness[k]}
                   </span>
                   <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-muted">

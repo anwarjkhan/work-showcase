@@ -211,7 +211,7 @@ Checks (each produces `Finding` records; thresholds live in config):
 | R8 | Portfolio-system fields disagree with the Jira Epic (dates, owner, deliverable ID) |
 | R9 | Story-level item with no Outcome ID |
 | R10 | Agent-assigned item with no named human reviewer |
-| R11 | Outcome reported on track or complete with no acceptance recorded |
+| R11 | Outcome not accepted, and either reported complete, or reported on track while past its due date or with all linked work closed |
 | R12 | Evidence older than the latest change to the work it covers |
 | R13 | A required test result is failing |
 | R14 | Epic with no Deliverable ID, or a Deliverable ID that does not exist |

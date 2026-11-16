@@ -4,15 +4,20 @@
  *        (Epic start before the deliverable's planned start, or target after its
  *        planned end, beyond the tolerance) or owner. Also an Epic the book of
  *        record lists that does not exist in the work tracker.
- *   R11  Outcome reported on track or complete with no acceptance recorded.
+ *   R11  Outcome not accepted (by the acceptance measure) while reported complete, or
+ *        reported on track and either past its due date or with all linked
+ *        story-level work closed (at least one item). On track, not yet due and
+ *        with open work is normal and raises nothing. Overdue is reported before
+ *        all-work-closed when both apply.
  */
 import { terms } from '@/lib/config/terminology';
-import type { Finding, Person, TechDeliverable } from '@/lib/types';
+import type { Finding, Outcome, Person, TechDeliverable } from '@/lib/types';
 import { RULE_THRESHOLDS } from './constants';
-import { isEpic } from './context';
-import { date, evidenceKindLabel, itemLabel, listPhrases, portfolioSystem, quote, workTracker } from './messages';
+import { isEpic, type EngineContext } from './context';
+import { date, days, evidenceKindLabel, itemLabel, listPhrases, plural, portfolioSystem, quote, workTracker } from './messages';
 import { finding, ref, type Rule } from './rule-kit';
 import { dayDiff } from './util';
+import { isClosed } from './work';
 
 export const ruleR8: Rule = ({ ctx }) => {
   const out: Finding[] = [];
@@ -81,12 +86,30 @@ export const ruleR8: Rule = ({ ctx }) => {
   return out;
 };
 
+/**
+ * Why an unaccepted outcome is flagged, or null when its reported status is still
+ * credible (on track, not yet due, work still open).
+ */
+function r11Condition(ctx: EngineContext, o: Outcome): string | null {
+  const pm = portfolioSystem();
+  if (o.reportedStatus === 'complete') return `reported complete in ${pm} with no acceptance recorded`;
+  if (o.reportedStatus !== 'on-track') return null;
+  const overdue = dayDiff(o.dueDate, ctx.clock.today);
+  if (overdue > 0) return `reported on track in ${pm}, due ${days(overdue)} ago, with no acceptance recorded`;
+  const items = ctx.storiesByOutcome.get(o.id) ?? [];
+  if (items.length > 0 && items.every(isClosed)) {
+    return `reported on track in ${pm} with all linked work closed (${plural(items.length, 'item')}) and no acceptance recorded`;
+  }
+  return null;
+}
+
 export const ruleR11: Rule = ({ ctx, measures }) => {
   const out: Finding[] = [];
   for (const o of ctx.data.outcomes) {
-    if (o.reportedStatus !== 'on-track' && o.reportedStatus !== 'complete') continue;
     const a = measures.acceptance.get(o.id);
     if (!a || a.accepted) continue;
+    const condition = r11Condition(ctx, o);
+    if (!condition) continue;
     const held = a.businessAcceptanceEvidenceIds.length > 0;
     const parts = [
       a.mandatoryCount === 0
@@ -103,9 +126,8 @@ export const ruleR11: Rule = ({ ctx, measures }) => {
         'R11',
         ref.outcome(o.id),
         o.deliverableId,
-        `${terms.hierarchy.outcome} ${quote(o.title)}${deliverable ? ` (${deliverable.ref})` : ''} is reported ` +
-          `${o.reportedStatus === 'complete' ? 'complete' : 'on track'} in ${portfolioSystem()}, but ${parts.join(' and ')}.`,
-        [...a.reasons.flatMap((r) => r.refs), ...a.businessAcceptanceEvidenceIds.map(ref.evidence)],
+        `${terms.hierarchy.outcome} ${quote(o.title)}${deliverable ? ` (${deliverable.ref})` : ''} is ${condition}: ${parts.join(' and ')}.`,
+        [...a.reasons.flatMap((r) => r.refs), ...a.businessAcceptanceEvidenceIds.map(ref.evidence), ...(ctx.storiesByOutcome.get(o.id) ?? []).map((i) => ref.item(i.key))],
       ),
     );
   }

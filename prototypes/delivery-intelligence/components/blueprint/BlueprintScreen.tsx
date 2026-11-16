@@ -329,8 +329,7 @@ function RolloutCharts() {
     { id: 'other', label: 'Other templates', value: ESTATE.projectsOnOtherTemplates, color: chartColor(5) },
   ];
   const waves = ESTATE.rolloutWaves.map((w) => ({ label: `${w.label} ${w.quarter}`, value: w.projects, color: chartColor(2) }));
-  let running = 0;
-  const cumulative = ESTATE.rolloutWaves.map((w) => (running += w.projects));
+  const cumulative = ESTATE.rolloutWaves.map((_, i) => ESTATE.rolloutWaves.slice(0, i + 1).reduce((sum, w) => sum + w.projects, 0));
   return (
     <div className="grid gap-4 lg:grid-cols-[2fr_3fr]">
       <Card title="Projects by template today" bodyClassName="flex flex-col gap-4" footer={<span>{ROLLOUT_PLACEHOLDER_NOTE}</span>}>

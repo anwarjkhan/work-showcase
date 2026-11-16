@@ -9,9 +9,9 @@ import type { PortfolioView, ProgrammeRow } from './model';
 function Tile({ label, value, caption, testId }: { label: string; value: number; caption?: string; testId: string }) {
   return (
     <div className="flex min-w-0 flex-col gap-1.5 p-4">
-      <div className="di-eyebrow truncate">{label}</div>
+      <div className="di-eyebrow">{label}</div>
       <div data-testid={testId} className="font-display text-[30px] leading-none font-semibold text-title tabular-nums">{value}</div>
-      <div className="min-h-4 truncate text-xs text-fg-muted">{caption}</div>
+      <div className="min-h-4 text-xs text-fg-muted">{caption}</div>
     </div>
   );
 }
