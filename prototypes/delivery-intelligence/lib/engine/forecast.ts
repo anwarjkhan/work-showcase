@@ -22,7 +22,7 @@ import {
   FORECAST_MIN_HISTORY_DAYS,
   FORECAST_MIN_RECENT_CLOSED_ITEMS,
 } from './constants';
-import { date, days, pct, plural } from './messages';
+import { date, days, plural } from './messages';
 import { addDaysTo, dayDiff, laterOf, toDate, toMs } from './util';
 import { isClosed } from './work';
 
@@ -112,11 +112,12 @@ export function forecastEnd(items: readonly WorkItem[], plannedEnd: IsoDate, clo
   const ratio = (total - remaining) / total;
   if (age < FORECAST_MIN_HISTORY_DAYS) {
     return fallback(
-      `Too early to forecast from throughput: work started ${age <= 0 ? (age === 0 ? 'today' : `in ${days(age)}`) : `${days(age)} ago`}; ${showingPlanned}.`,
+      `Too early to forecast from throughput: ${age < 0 ? `work has not started (planned start ${date(start)})` : age === 0 ? 'work started today' : `work started ${days(age)} ago`}; ${showingPlanned}.`,
     );
   }
   if (ratio < FORECAST_MIN_COMPLETION_RATIO) {
-    return fallback(`Too early to forecast from throughput: ${pct(ratio)} of work closed; ${showingPlanned}.`);
+    // Rounded down, so a share just under the gate never reads as the gate itself.
+    return fallback(`Too early to forecast from throughput: ${Math.floor(ratio * 100)}% of work closed; ${showingPlanned}.`);
   }
   if (recentItems < FORECAST_MIN_RECENT_CLOSED_ITEMS) {
     return fallback(

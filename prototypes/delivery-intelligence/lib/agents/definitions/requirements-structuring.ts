@@ -263,7 +263,7 @@ function spikeFor(kit: AgentKit, r: RaidItem, epicKey: string, outcome: Outcome 
   const owner = r.ownerId && kit.ctx.idx.people.has(r.ownerId) ? kit.person(r.ownerId) : 'the owner';
   return {
     type: 'spike',
-    summary: `Spike to close ${lowerFirst(terms.raidKinds[r.kind])} ${r.key}`,
+    summary: `Settle ${lowerFirst(terms.raidKinds[r.kind])} ${r.key} before build`,
     narrative: `Settle ${lowerFirst(terms.raidKinds[r.kind])} ${r.key} ${quote(r.title)} before build starts, so the design does not rest on an untested ${r.kind === 'risk' ? 'risk' : 'assumption'}.`,
     points: 2,
     outcome,

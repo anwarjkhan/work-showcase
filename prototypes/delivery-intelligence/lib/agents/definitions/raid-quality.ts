@@ -73,18 +73,18 @@ export const raidQualityAgent: ScriptedAgent = {
       const nextMs = (kit.ctx.milestonesByDeliverable.get(d.id) ?? []).filter((m) => m.status === 'planned' && m.date > kit.today).sort((a, b) => a.date.localeCompare(b.date))[0];
       if (nextMs && nextMs.date < due) {
         due = nextMs.date;
-        why = `before ${quote(nextMs.title)} on ${date(nextMs.date)}`;
+        why = `the date of ${quote(nextMs.title)}, the next milestone`;
       }
       if (d.plannedEnd < due && d.plannedEnd > kit.today) {
         due = d.plannedEnd;
-        why = `by ${d.ref}'s planned end`;
+        why = `${d.ref}'s planned end`;
       }
       kit.propose({
         agentId: 'raid-quality',
         deliverableId: d.id,
         target: ref.raid(r.id),
         title: `Set a mitigation date on ${r.key}`,
-        rationale: `${r.key} ${quote(r.title)} has no mitigation date; ${date(due)} allows ${why}.`,
+        rationale: `${r.key} ${quote(r.title)} has no mitigation date; proposed ${date(due)}, ${why}.`,
         evidence: [ref.raid(r.id), ...(nextMs ? [ref.milestone(nextMs.id)] : [ref.deliverable(d.id)])],
         patch: { op: 'set-field', entity: 'raid', id: r.id, field: 'mitigationDue', before: r.mitigationDue, after: due },
         beforeText: 'Mitigation due: none',

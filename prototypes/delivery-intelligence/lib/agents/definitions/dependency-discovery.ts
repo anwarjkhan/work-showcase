@@ -20,7 +20,7 @@ const meta = AGENT_CATALOGUE['dependency-discovery'];
 
 /** Words that describe the kind of work rather than its subject; ignored when matching providers. */
 const GENERIC = new Set(
-  'add build capture sign off criteria automate reduce manual step instrument standardise standardize fix rounding differently source system production improve performance plan migration expose audit trail prototype archive validate configurable threshold publish update runbook configure draft release note backfill user level entitlement agree data contract set up monitoring onboard desk write unit test reconcile parameterise month end overnight batch asia time zone acceptance environment legal entities entity rate across handle support review report dashboard view new existing delivery deliver'
+  'add build capture sign off criteria automate reduce manual step instrument standardise standardize fix rounding differently source system production improve performance plan migration expose audit trail prototype archive validate configurable threshold publish update runbook configure draft release note backfill user level entitlement agree data contract set up monitoring onboard desk write unit test reconcile parameterise month end overnight batch asia time zone acceptance environment legal entities entity rate across handle support review report dashboard view new existing delivery deliver risk reporting layer based calculation calculate table store column mapping data model engine service desks equities equity'
     .split(' ')
     .flatMap((w) => [...tokens(w)]),
 );

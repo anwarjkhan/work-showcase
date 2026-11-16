@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildContext } from './context';
-import { barSpan, computeAll, datePosition, dependencyKnockOn, forecastEnd, planTimeline, planWindow, stepWindow, windowDays } from './index';
+import { barSpan, computeAll, computePlanExtras, datePosition, dependencyKnockOn, forecastEnd, planTimeline, planWindow, stepWindow, windowDays } from './index';
 import { CLOCK, baseline, change, deliverable, dependency, milestone, openStory, story } from './test-fixtures';
 
 const sprints = baseline().sprints; // 26 two-week sprints from Mon 4 Jan 2027
@@ -96,30 +96,80 @@ describe('bar spans', () => {
 });
 
 describe('forecast end against planned end', () => {
-  const items = [
-    story('A', 'E', null, { points: 21, resolved: '2027-02-15T09:00:00.000Z' }), // inside the 42-day lookback
-    story('B', 'E', null, { points: 8, resolved: '2027-01-10T09:00:00.000Z' }), // outside it
-    openStory('C', 'E', null, { points: 10 }),
-  ];
+  const START = '2027-01-04'; // 63 days before the clock
+  /** `n` closed items of `points` each, resolved inside the 42-day lookback. */
+  const closedRecent = (n: number, points: number) =>
+    Array.from({ length: n }, (_, i) => story(`R${i}`, 'E', null, { points, resolved: '2027-02-15T09:00:00.000Z' }));
+  const open = (points: number) => [openStory('C', 'E', null, { points })];
 
-  it('projects remaining points at the recent rate', () => {
-    const f = forecastEnd(items, '2027-03-20', CLOCK);
-    expect(f.method).toBe('throughput');
-    expect(f.dailyRate).toBe(0.5); // 21 points / 42 days
-    expect(f.forecastEnd).toBe('2027-03-28'); // today + ceil(10 / 0.5)
-    expect(f.slipDays).toBe(8);
+  it('projects remaining points at the recent rate when every gate passes', () => {
+    const f = forecastEnd([...closedRecent(7, 3), ...open(10)], '2027-03-20', CLOCK, START);
+    expect(f).toMatchObject({ method: 'throughput', dailyRate: 0.5, forecastEnd: '2027-03-28', slipDays: 8, atRisk: false });
     expect(f.explanation).toContain('10 points remain');
   });
 
+  it('gate 1: too early when work started fewer than 28 days ago', () => {
+    const f = forecastEnd([...closedRecent(7, 3), ...open(10)], '2027-03-20', CLOCK, '2027-02-20');
+    expect(f).toMatchObject({ method: 'planned-fallback', forecastEnd: '2027-03-20', slipDays: 0, atRisk: false });
+    expect(f.explanation).toBe('Too early to forecast from throughput: work started 16 days ago; showing the planned end (20 Mar 2027).');
+  });
+
+  it('gate 1 says when work has not started yet', () => {
+    expect(forecastEnd([...closedRecent(7, 3), ...open(10)], '2027-06-30', CLOCK, '2027-04-05').explanation).toBe(
+      'Too early to forecast from throughput: work has not started (planned start 5 Apr 2027); showing the planned end (30 Jun 2027).',
+    );
+  });
+
+  it('gate 2 rounds the share down so a value just under 25% never reads as 25%', () => {
+    // 49 of 200 points closed = 24.5%
+    const items = [...closedRecent(7, 7), ...open(151)];
+    expect(forecastEnd(items, '2027-06-30', CLOCK, START).explanation).toContain('24% of work closed');
+  });
+
+  it('gate 1 uses the earliest item created when no start date is given', () => {
+    const items = [...closedRecent(7, 3), ...open(10)].map((i) => ({ ...i, created: '2027-03-01T09:00:00.000Z' }));
+    expect(forecastEnd(items, '2027-03-20', CLOCK).explanation).toContain('work started 7 days ago');
+  });
+
+  it('gate 2: too early under 25% of work closed', () => {
+    const f = forecastEnd([...closedRecent(5, 1), ...open(120)], '2027-06-30', CLOCK, START);
+    expect(f).toMatchObject({ method: 'planned-fallback', forecastEnd: '2027-06-30', slipDays: 0 });
+    expect(f.explanation).toBe('Too early to forecast from throughput: 4% of work closed; showing the planned end (30 Jun 2027).');
+  });
+
+  it('gate 3: too little recent throughput under 5 items closed in the lookback', () => {
+    const f = forecastEnd([...closedRecent(4, 10), ...open(10)], '2027-03-20', CLOCK, START);
+    expect(f.method).toBe('planned-fallback');
+    expect(f.explanation).toBe('Too little recent throughput to forecast: 4 items closed in the last 42 days; showing the planned end (20 Mar 2027).');
+  });
+
+  it('passes each gate at exactly its threshold', () => {
+    // started 28 days ago, 25% closed, 5 items in the lookback
+    const f = forecastEnd([...closedRecent(5, 2), ...open(30)], '2027-06-30', CLOCK, '2027-02-08');
+    expect(f.method).toBe('throughput');
+  });
+
+  it('caps implausible projections: over 120 days of slip shows the planned end, flagged at risk', () => {
+    // 10 of 40 points closed recently: 1.7 a week against 30 remaining -> 126 days out, 126 days late
+    const f = forecastEnd([...closedRecent(5, 2), ...open(30)], '2027-03-08', CLOCK, START);
+    expect(f).toMatchObject({ method: 'planned-fallback', forecastEnd: '2027-03-08', slipDays: 0, atRisk: true, dailyRate: 0 });
+    expect(f.explanation).toBe(
+      'Recent throughput (1.7 points a week against 30 remaining points) is too low to give a reliable date; at risk of slipping well beyond the planned end, which is shown (8 Mar 2027).',
+    );
+    const justInside = forecastEnd([...closedRecent(5, 2), ...open(30)], '2027-03-14', CLOCK, START);
+    expect(justInside).toMatchObject({ method: 'throughput', slipDays: 120, atRisk: false });
+  });
+
   it('falls back to the planned end when nothing closed recently or there is no estimated work', () => {
-    const stalled = forecastEnd([items[1]!, items[2]!], '2027-03-20', CLOCK);
-    expect(stalled).toMatchObject({ method: 'planned-fallback', forecastEnd: '2027-03-20', slipDays: 0 });
+    const old = story('B', 'E', null, { points: 30, resolved: '2027-01-10T09:00:00.000Z' });
+    expect(forecastEnd([old, ...open(10)], '2027-03-20', CLOCK, START)).toMatchObject({ method: 'planned-fallback', forecastEnd: '2027-03-20', slipDays: 0 });
     expect(forecastEnd([], '2027-03-20', CLOCK).method).toBe('planned-fallback');
   });
 
-  it('uses the last resolution date when all work is closed', () => {
-    const f = forecastEnd([items[0]!, items[1]!], '2027-03-20', CLOCK);
-    expect(f).toMatchObject({ method: 'complete', forecastEnd: '2027-02-15', slipDays: -33 });
+  it('uses the last resolution date when all work is closed, whatever the gates', () => {
+    const a = story('A', 'E', null, { points: 21, resolved: '2027-02-15T09:00:00.000Z' });
+    const b = story('B', 'E', null, { points: 8, resolved: '2027-01-10T09:00:00.000Z' });
+    expect(forecastEnd([a, b], '2027-03-20', CLOCK, '2027-03-01')).toMatchObject({ method: 'complete', forecastEnd: '2027-02-15', slipDays: -33 });
   });
 });
 
@@ -143,6 +193,7 @@ describe('plan model', () => {
       d.dependencies.push(dependency('dep-1', 'td-s', 'td-1', { needBy: '2027-03-01', committed: '2027-03-10', status: 'late' }));
       d.workItems.push(openStory('S-4', 'E-1', 'oc-1', { points: 10 }));
       d.workItems.find((w) => w.key === 'S-1')!.points = 21;
+      for (const k of [5, 6]) d.workItems.push(story(`S-${k}`, 'E-2', 'oc-2', { points: 0, resolved: '2027-03-03T09:00:00.000Z' })); // 5 recent closes
     });
     const r = computeAll(data, CLOCK);
     const td1 = r.plan.spans.find((s) => s.entity.id === 'td-1')!;
@@ -151,6 +202,23 @@ describe('plan model', () => {
     expect(r.plan.spans.find((s) => s.entity.id === 'td-s')!.parentId).toBe('ir-1');
     expect(r.plan.spans.find((s) => s.entity.id === 'pm-1')!.lateDependencyIds).toEqual(['dep-1']);
     expect(r.plan.lateDependencyIds).toEqual(['dep-1']);
+  });
+
+  it('rolls gated forecasts up: an implausible deliverable projection never reaches parent rows', () => {
+    const data = change(baseline(), (d) => {
+      d.deliverables[0]!.plannedEnd = '2027-03-31';
+      // 34% closed (200 points long ago, 10 recently over 5 items), 400 open: projection is years out
+      d.workItems = d.workItems.filter((w) => w.type === 'epic');
+      d.workItems.push(story('S-old', 'E-1', 'oc-1', { points: 200, resolved: '2027-01-15T09:00:00.000Z' }));
+      for (let i = 0; i < 5; i++) d.workItems.push(story(`S-${i}`, 'E-1', 'oc-1', { points: 2, resolved: '2027-03-01T09:00:00.000Z' }));
+      d.workItems.push(openStory('S-9', 'E-2', 'oc-2', { points: 400 }));
+    });
+    const r = computeAll(data, CLOCK);
+    for (const span of r.plan.spans) expect(span.slipDays).toBeLessThanOrEqual(120);
+    expect(r.plan.spans.find((s) => s.entity.id === 'td-1')).toMatchObject({ forecastEnd: '2027-03-31', slipDays: 0 });
+    expect(r.plan.spans.find((s) => s.entity.id === 'ir-1')!.slipDays).toBeLessThanOrEqual(0);
+    const extras = computePlanExtras(data, CLOCK).forecasts.get('td-1')!;
+    expect(extras).toMatchObject({ atRisk: true, method: 'planned-fallback' });
   });
 
   it('works out the knock-on of a late dependency on the receiver', () => {
