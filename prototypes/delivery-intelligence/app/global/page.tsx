@@ -1,9 +1,8 @@
-// PLACEHOLDER — replaced by the screen deliverable that owns this route (see lib/config/routes.ts, builtBy).
 import { routeMetadata } from '@/components/shell/metadata';
-import { RoutePlaceholder } from '@/components/shell/RoutePlaceholder';
+import { GlobalScreen } from '@/components/global/GlobalScreen';
 
 export const metadata = routeMetadata('global');
 
 export default function Page() {
-  return <RoutePlaceholder routeId="global" />;
+  return <GlobalScreen />;
 }

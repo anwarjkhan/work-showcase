@@ -16,7 +16,6 @@ import {
   stepWindow,
   windowDays,
   type Forecast,
-  type HierarchyRollups,
   type KnockOn,
 } from '@/lib/engine';
 import { isStoryLevel } from '@/lib/engine/context';
@@ -540,4 +539,45 @@ export function slipText(days: number): string {
 /** Compact "+9d". */
 export function slipShort(days: number): string {
   return `${days > 0 ? '+' : '−'}${Math.abs(days).toLocaleString('en-GB')}d`;
+}
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** Heading for a window: "2027", "Q1 2027", "March 2027", "S05". */
+export function windowTitle(window: PlanWindow, clock: DemoClock, sprints: readonly Sprint[]): string {
+  const year = window.start.slice(0, 4);
+  switch (window.zoom) {
+    case 'year':
+      return year;
+    case 'quarter':
+      return planTimeline('year', window.start, window.start, clock, sprints).ticks.find((t) => window.start >= t.start && window.start <= t.end)?.label ?? year;
+    case 'month':
+      return `${MONTH_NAMES[Number(window.start.slice(5, 7)) - 1] ?? ''} ${year}`;
+    case 'sprint': {
+      const data = sprints.find((s) => s.start === window.start);
+      return data ? data.name : sprintFor(window.start, sprints).label;
+    }
+  }
+}
+
+/** The word for a window in sentences. */
+export const WINDOW_NOUN: Record<PlanZoom, string> = { year: 'year', quarter: 'quarter', month: 'month', sprint: 'sprint' };
+
+/** Date to keep in view when the zoom changes: today if it is in the window, else the window start. */
+export function zoomAnchor(window: Pick<PlanWindow, 'start' | 'end'>, today: IsoDate): IsoDate {
+  return inWindow(today, window) ? today : window.start;
+}
+
+/**
+ * Knock-ons that matter for a window, most consequential first: those that
+ * move a commitment due in the window (the receiver's end or a milestone)
+ * before the rest, then by days late.
+ */
+export function windowKnockOns(index: PlanIndex, summary: Pick<WindowSummary, 'lateDependencies'>, window: Pick<PlanWindow, 'start' | 'end'>): KnockOn[] {
+  const score = (k: KnockOn) =>
+    (inWindow(k.receiverPlannedEnd, window) ? 2 : 0) + k.affectedMilestones.filter((m) => inWindow(m.date, window)).length;
+  return summary.lateDependencies
+    .map((id) => index.knockOnByDependency.get(id))
+    .filter((k): k is KnockOn => k !== undefined)
+    .sort((a, b) => score(b) - score(a) || b.lateDays - a.lateDays || a.dependencyId.localeCompare(b.dependencyId));
 }

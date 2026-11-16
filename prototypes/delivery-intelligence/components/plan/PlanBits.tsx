@@ -71,7 +71,22 @@ export function ProgressFigure({ value }: { value: Computable<WorkCompletion> | 
  * Milestone marker: diamond for an ordinary milestone; a landmark shape with a
  * "REG" tag for a regulatory one. Missed or at-risk ones carry a status shape.
  */
-export function MilestoneMark({ milestone, risk, ghost, showTitle, size = 'md' }: { milestone: Milestone; risk: MilestoneRisk | null; ghost?: boolean; showTitle?: boolean; size?: 'sm' | 'md' }) {
+export function MilestoneMark({
+  milestone,
+  risk,
+  ghost,
+  showTitle,
+  flip,
+  size = 'md',
+}: {
+  milestone: Milestone;
+  risk: MilestoneRisk | null;
+  ghost?: boolean;
+  showTitle?: boolean;
+  /** Put the tag and title on the left of the marker (near the right edge). */
+  flip?: boolean;
+  size?: 'sm' | 'md';
+}) {
   const reg = milestone.regulatory;
   const met = milestone.status === 'met';
   const bad = risk === 'missed' || risk === 'overdue';
@@ -79,8 +94,9 @@ export function MilestoneMark({ milestone, risk, ghost, showTitle, size = 'md' }
   const Shape = reg ? Landmark : Diamond;
   const dim = size === 'sm' ? 'size-3' : 'size-3.5';
   const title = `${reg ? `${planText.regulatory} milestone` : 'Milestone'}: ${milestone.title}, ${formatDate(milestone.date)}${met ? ' (met)' : ''}${risk ? `. ${planText.risk[risk]}` : ''}`;
+  const tag = reg && !ghost;
   return (
-    <span className={cx('pointer-events-auto relative flex -translate-x-1/2 items-center gap-1', ghost && 'opacity-80')} title={title}>
+    <span className={cx('pointer-events-auto relative inline-flex -translate-x-1/2', ghost && 'opacity-90')} title={title}>
       <span
         className={cx(
           'relative inline-flex items-center justify-center rounded-xs',
@@ -100,8 +116,16 @@ export function MilestoneMark({ milestone, risk, ghost, showTitle, size = 'md' }
           </span>
         ) : null}
       </span>
-      {reg && !ghost ? <span className="rounded-xs border border-accent-line bg-accent-soft px-0.5 text-[8.5px] leading-[12px] font-bold tracking-wider text-heading">{planText.regulatoryShort}</span> : null}
-      {showTitle ? <span className={cx('max-w-[180px] truncate text-[11px] whitespace-nowrap', ghost ? 'text-status-amber-fg italic' : 'text-fg-muted')}>{ghost ? `→ ${formatDate(milestone.date, { withYear: false })}` : milestone.title}</span> : null}
+      {tag || showTitle ? (
+        <span className={cx('absolute top-1/2 flex -translate-y-1/2 items-center gap-1 whitespace-nowrap', flip ? 'right-full mr-1.5 flex-row-reverse' : 'left-full ml-1.5')}>
+          {tag ? <span className="rounded-xs border border-accent-line bg-accent-soft px-0.5 text-[8.5px] leading-[12px] font-bold tracking-wider text-heading">{planText.regulatoryShort}</span> : null}
+          {showTitle ? (
+            <span className={cx('max-w-[180px] truncate text-[11px]', ghost ? 'text-status-amber-fg italic' : 'text-fg-muted')}>
+              {ghost ? `moves to ${formatDate(milestone.date, { withYear: false })}` : milestone.title}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
       <span className="sr-only">{title}</span>
     </span>
   );

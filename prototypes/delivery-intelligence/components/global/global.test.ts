@@ -119,3 +119,18 @@ describe('helpers', () => {
     expect(arc.mid[1]).toBeLessThan(100);
   });
 });
+
+describe('marker separation', () => {
+  it('pushes overlapping markers apart and leaves distant ones in place', async () => {
+    const { separateMarkers } = await import('./geo');
+    const out = separateMarkers([
+      { id: 'a', x: 100, y: 100, r: 10 },
+      { id: 'b', x: 105, y: 100, r: 10 },
+      { id: 'c', x: 400, y: 300, r: 10 },
+    ]);
+    const [ax, ay] = out.get('a')!;
+    const [bx, by] = out.get('b')!;
+    expect(Math.hypot(bx - ax, by - ay)).toBeGreaterThanOrEqual(20);
+    expect(out.get('c')).toEqual([400, 300]);
+  });
+});

@@ -88,6 +88,8 @@ export interface ArcGeometry {
   d: string;
   /** Point on the curve at its middle, for day-count labels. */
   mid: [number, number];
+  /** Point on the curve at t (0 = provider end, 1 = receiver end). */
+  at: (t: number) => [number, number];
 }
 
 /**
@@ -113,7 +115,11 @@ export function arcPath(a: [number, number], b: [number, number], trimStart: num
   const c: [number, number] = [(a[0] + b[0]) / 2 + nx * lift, (a[1] + b[1]) / 2 + ny * lift];
   const mid: [number, number] = [0.25 * p0[0] + 0.5 * c[0] + 0.25 * p1[0], 0.25 * p0[1] + 0.5 * c[1] + 0.25 * p1[1]];
   const f = (n: number) => n.toFixed(1);
-  return { d: `M${f(p0[0])},${f(p0[1])} Q${f(c[0])},${f(c[1])} ${f(p1[0])},${f(p1[1])}`, mid };
+  const at = (t: number): [number, number] => {
+    const u = 1 - t;
+    return [u * u * p0[0] + 2 * u * t * c[0] + t * t * p1[0], u * u * p0[1] + 2 * u * t * c[1] + t * t * p1[1]];
+  };
+  return { d: `M${f(p0[0])},${f(p0[1])} Q${f(c[0])},${f(c[1])} ${f(p1[0])},${f(p1[1])}`, mid, at };
 }
 
 // ---------------------------------------------------------------------------
@@ -216,4 +222,51 @@ export function placeLabels(items: LabelInput[], frame: { width: number; height:
     }
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------
+// Marker separation
+// ---------------------------------------------------------------------------
+
+/**
+ * Nudges overlapping markers apart (dense regions such as Western Europe) by
+ * simple pairwise relaxation. Returns display positions; callers draw a small
+ * dot and a tether at the true location when a marker moved.
+ */
+export function separateMarkers(items: Array<{ id: string; x: number; y: number; r: number }>, gap = 2, iterations = 80): Map<string, [number, number]> {
+  const pos = items.map((i) => ({ id: i.id, x: i.x, y: i.y, r: i.r, ox: i.x, oy: i.y }));
+  for (let it = 0; it < iterations; it++) {
+    let moved = false;
+    for (let a = 0; a < pos.length; a++) {
+      for (let b = a + 1; b < pos.length; b++) {
+        const p = pos[a]!;
+        const q = pos[b]!;
+        let dx = q.x - p.x;
+        let dy = q.y - p.y;
+        let d = Math.hypot(dx, dy);
+        const min = p.r + q.r + gap;
+        if (d >= min) continue;
+        if (d < 0.01) {
+          dx = 1;
+          dy = 0;
+          d = 1;
+        }
+        const push = (min - d) / 2;
+        const ux = dx / d;
+        const uy = dy / d;
+        p.x -= ux * push;
+        p.y -= uy * push;
+        q.x += ux * push;
+        q.y += uy * push;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+    // Gentle pull back towards the true location keeps the layout honest.
+    for (const p of pos) {
+      p.x += (p.ox - p.x) * 0.02;
+      p.y += (p.oy - p.y) * 0.02;
+    }
+  }
+  return new Map(pos.map((p) => [p.id, [p.x, p.y] as [number, number]]));
 }
