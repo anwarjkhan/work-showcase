@@ -309,8 +309,8 @@ export function buildDeliverableModel(data: PortfolioData, result: EngineResult,
     .map((outcome) => {
       const m = result.outcomes[outcome.id];
       const accepted = m?.acceptance.accepted ?? false;
-      const reportedGood = outcome.reportedStatus === 'on-track' || outcome.reportedStatus === 'complete';
-      const gap = !accepted && reportedGood;
+      // The gap is the engine's R11 finding (not accepted, and reported complete, or on track while past due or with all work closed).
+      const gap = !accepted && findings.some((f) => f.ruleId === 'R11' && f.subject.kind === 'outcome' && f.subject.id === outcome.id);
       const acc = m?.acceptance;
       return {
         outcome,

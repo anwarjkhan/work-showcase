@@ -152,7 +152,7 @@ export function OutcomesTab({ model }: { model: DeliverableModel }) {
     <div className="flex flex-col gap-3">
       {gaps > 0 ? (
         <p className="text-[13px] text-fg-muted">
-          <strong className="font-semibold text-status-amber-fg">{gaps} of {model.outcomes.length} outcomes</strong> are reported on track or complete without being accepted. Reported status is the portfolio system&apos;s; acceptance is recorded only by a named human against the criteria.
+          <strong className="font-semibold text-status-amber-fg">{gaps} of {model.outcomes.length} outcomes</strong> are flagged by rule R11: reported complete, or on track while past due or with all linked work closed, yet not accepted. Reported status is the portfolio system&apos;s; acceptance is recorded only by a named human against the criteria.
         </p>
       ) : null}
       {model.outcomes.map((row) => (

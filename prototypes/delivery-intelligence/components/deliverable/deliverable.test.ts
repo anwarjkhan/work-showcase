@@ -25,7 +25,8 @@ describe('deliverable detail model', () => {
     expect(m!.verdict.disagrees).toBe(true);
     expect(m!.verdict.sentence).toMatch(/Reported Green.*evidence says Red/);
     expect(m!.verdict.sentence).toMatch(/23 days/);
-    expect(m!.outcomes.filter((o) => o.gap)).toHaveLength(2);
+    expect(m!.outcomes.filter((o) => o.gap).map((o) => o.outcome.id).sort()).toEqual(['oc-1001-2', 'oc-1001-3']);
+    for (const id of ['td-2001', 'td-1020']) expect(build(id).m!.outcomes.filter((o) => o.gap)).toHaveLength(0);
   });
 
   it('builds a model for every deliverable, including thin ones', () => {
