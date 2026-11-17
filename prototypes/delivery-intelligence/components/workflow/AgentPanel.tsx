@@ -1,13 +1,13 @@
 'use client';
 
-import { ArrowRight, Bot, Check, CheckCircle2, Circle, LoaderCircle, Play, RotateCcw, TriangleAlert, X } from 'lucide-react';
+import { ArrowRight, Bot, Check, Clock3, CheckCircle2, Circle, LoaderCircle, Play, RotateCcw, TriangleAlert, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { AGENT_CATALOGUE } from '@/lib/agents/catalogue';
 import { playbackAt, runFindings } from '@/lib/agents';
 import { terms } from '@/lib/config/terminology';
 import { ProvenanceBadge } from '@/components/shell';
 import { Avatar, Badge, Button, cx, Disclosure, ProgressBar, SeverityBadge } from '@/components/ui';
-import { useAgentRun, useProposals, useStatusDrafts } from '@/lib/store';
+import { useAgentRun, usePortfolioData, useProposals, useStatusDrafts } from '@/lib/store';
 import type { AgentRun, ProposedChange, StatusDraft } from '@/lib/types';
 import { BeatHeader } from './bits';
 import { useTarget, useWorkflow } from './context';
@@ -77,7 +77,15 @@ export function AgentPanel() {
 function RunView({ run, playing }: { run: AgentRun; playing: boolean }) {
   const { playing: pb, finishPlayback, view, evidence } = useWorkflow();
   const at = run.completedAt ?? run.startedAt;
-  const outdated = view.run.updatedAt > at || evidence.some((e) => e.observedAt > at);
+  const data = usePortfolioData();
+  const allProposals = useProposals();
+  const epics = view.run.deliverableId ? (data.deliverables.find((d) => d.id === view.run.deliverableId)?.epicKeys ?? []) : [];
+  const changed =
+    view.run.updatedAt > at ||
+    evidence.some((e) => e.observedAt > at) ||
+    data.workItems.some((w) => w.updated > at && (epics.includes(w.key) || (w.epicKey !== null && epics.includes(w.epicKey))));
+  // A run with a decision still pending stays open: its proposal is the work in hand.
+  const outdated = changed && !allProposals.some((p) => p.runId === run.id && p.status === 'pending');
   const [now, setNow] = useState(() => performance.now());
   useEffect(() => {
     if (!playing) return;
@@ -126,16 +134,32 @@ function RunView({ run, playing }: { run: AgentRun; playing: boolean }) {
     );
   }
 
+  if (outdated) {
+    const kind = run.draftId ? 'Report' : 'Output';
+    return (
+      <div className="flex flex-col gap-2" data-testid="agent-output" data-outdated="true">
+        <p className="flex items-center gap-2 rounded-md border border-dashed border-line-strong px-3 py-2 text-[12px] text-fg-muted">
+          <Clock3 aria-hidden className="size-3.5 shrink-0 text-fg-subtle" />
+          {kind} as at {formatStamp(at)} is out of date: records have changed since. Run again for the current picture.
+        </p>
+        <Disclosure summary={<span className="text-[12px] text-fg-muted">Show the earlier {kind.toLowerCase()}</span>}>
+          <div className="flex flex-col gap-3 opacity-80">
+            <p className="text-[12.5px] text-fg">{run.summary}</p>
+            {steps}
+            <RunOutput run={run} />
+          </div>
+        </Disclosure>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-3" data-testid="agent-output">
       <div className="flex items-start gap-2 rounded-md bg-surface-2 px-3 py-2 text-[12.5px]">
         {run.status === 'failed' ? <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-status-red" /> : <CheckCircle2 aria-hidden className="mt-0.5 size-4 shrink-0 text-status-green" />}
         <span className="min-w-0 text-fg">
           {run.summary}
-          <span className="block text-[11px] text-fg-subtle">
-            As at {formatStamp(run.completedAt ?? run.startedAt)}
-            {outdated ? '. Records have changed since; run again for the current picture.' : '.'}
-          </span>
+          <span className="block text-[11px] text-fg-subtle">As at {formatStamp(at)}.</span>
         </span>
       </div>
       <Disclosure summary={<span className="text-[12px] text-fg-muted">{run.steps.length} steps the agent took</span>}>{steps}</Disclosure>
