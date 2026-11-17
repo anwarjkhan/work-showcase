@@ -635,3 +635,17 @@ export const PENDING_RELEASE = new Set(['td-1018']);
  * with their reported status.
  */
 export const REPORTED_ON_TRACK = new Set(['td-1005', 'td-1008', 'td-1009', 'td-1014', 'td-2006']);
+
+/**
+ * Target forecast slip in days (positive is late) for in-flight deliverables
+ * whose recent throughput would otherwise project an implausibly early finish.
+ * The generator re-opens the most recently closed work until the engine's
+ * throughput forecast (remaining points over points closed in the last 42 days)
+ * lands near planned end plus this slip.
+ */
+export const FORECAST_TARGET_SLIP: Record<string, number> = {
+  'td-1008': 8,
+  'td-1014': 10,
+  'td-1009': -6,
+  'td-1012': 12,
+};

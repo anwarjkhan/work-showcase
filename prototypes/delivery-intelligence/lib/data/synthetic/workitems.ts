@@ -6,13 +6,14 @@
 import type { AgentIdentity, AssigneeType, Person, StatusCategory, WorkItem, WorkItemType } from '@/lib/types';
 import {
   BUG_DEFECTS,
+  FORECAST_TARGET_SLIP,
   STORY_VERBS,
   SUBTASK_TEMPLATES,
   SUFFIXES,
   TASK_VERBS,
   THEME_OBJECTS,
 } from './catalogue';
-import { addDays, clampDate, dateAtFraction, maxDate, minDate, sprintEnd, sprintIdFor, sprintIndexFor, sprintIdForIndex, stampOn, TODAY } from './dates';
+import { addDays, clampDate, dateAtFraction, dateOf, daysBetween, maxDate, minDate, sprintEnd, sprintIdFor, sprintIndexFor, sprintIdForIndex, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
 import type { OutcomePlan } from './outcomes';
 import type { Rng } from './random';
@@ -415,6 +416,38 @@ export function buildWorkItems(root: Rng, hierarchy: Hierarchy, ref: Reference, 
         it.outcomeId = null;
         for (const sub of items.filter((x) => x.parentKey === it.key)) sub.outcomeId = null;
       }
+    }
+    // ---- Forecast tuning ------------------------------------------------------
+    const targetSlip = FORECAST_TARGET_SLIP[spec.id];
+    if (targetSlip !== undefined) {
+      const epicSet = new Set(deliverable.epicKeys);
+      const mine = storyItems.filter((it) => it.epicKey !== null && epicSet.has(it.epicKey) && (it.points ?? 0) > 0);
+      const protectedOutcomes = new Set([...outcomePlan.acceptedIds, ...outcomePlan.completeUnacceptedIds]);
+      const windowStart = addDays(TODAY, -42);
+      const horizon = daysBetween(TODAY, spec.end) + targetSlip;
+      const candidates = mine
+        .filter((it) => it.statusCategory === 'done' && it.resolved !== null && dateOf(it.resolved) >= windowStart && !(it.outcomeId && protectedOutcomes.has(it.outcomeId)))
+        .sort((a, b) => ((a.resolved as string) < (b.resolved as string) ? 1 : -1));
+      for (const candidate of candidates) {
+        const remaining = mine.filter((it) => it.statusCategory !== 'done').reduce((sum, it) => sum + (it.points as number), 0);
+        const recent = mine.filter((it) => it.statusCategory === 'done' && it.resolved !== null && dateOf(it.resolved) >= windowStart).reduce((sum, it) => sum + (it.points as number), 0);
+        if (recent === 0 || Math.ceil((remaining * 42) / recent) >= horizon) break;
+        candidate.status = 'In Review';
+        candidate.statusCategory = 'in-progress';
+        candidate.resolved = null;
+        candidate.updated = stampOn(maxDate(addDays(TODAY, -dr.int(0, 6)), dateOf(candidate.created)), dr);
+        candidate.sprintId = sprintIdForIndex(currentSprint);
+      }
+      // An Epic that is no longer fully closed goes back to in progress (except the one planted for R2).
+      deliverable.epicKeys.forEach((epicKey, e) => {
+        const epic = items.find((it) => it.key === epicKey);
+        const open = items.some((it) => it.epicKey === epicKey && it.type !== 'sub-task' && it.statusCategory !== 'done');
+        if (epic && epic.statusCategory === 'done' && open && !(flags.closedEpic && e === 0)) {
+          epic.status = 'In Progress';
+          epic.statusCategory = 'in-progress';
+          epic.resolved = null;
+        }
+      });
     }
     if (flags.overdueBias) {
       const early = [...overdueCandidates].sort((a, b) => (a.created < b.created ? -1 : 1)).slice(0, 7);
