@@ -1,6 +1,6 @@
 # Delivery Intelligence — Design
 
-**Status:** design for review. Nothing below is built yet.
+**Status:** built. All 16 deliverables are complete; section 9 lists where the build differs from this design.
 **Working title:** "Delivery Intelligence" (set in the terminology file, changeable).
 **Location:** `prototypes/delivery-intelligence/` in this repository. All paths below are relative to that folder unless they start with `/`.
 
@@ -390,3 +390,17 @@ Each deliverable is built by one subagent. "Model" is the cheapest that should d
 4. Implement `JiraSource` against the Jira API, read-only first.
 5. Implement a `ModelProvider` against the approved agent platform.
 6. Replace the Pilot evidence placeholders with the measured baseline.
+
+## 9. Where the build differs from this design
+
+- **TypeScript 6, not the newest major**, because the lint tooling does not yet support it.
+- **Rule R11 was refined.** It fires only when an unaccepted outcome is reported complete, or reported on track while past its due date or with all linked work closed. An outcome that is on track, not yet due and still has open work raises nothing.
+- **Forecasts are gated.** A throughput forecast is shown only when the deliverable started at least 28 days ago, is at least 25% complete and closed at least five items in the last 42 days. Otherwise the planned end is shown with the reason. A projected slip over 120 days is flagged as at risk without a date.
+- **A "simulate work closed" step was added** to the Build, Test & Validate stage, so the walk-through ends with all three measures complete. It is labelled as simulated.
+- **Required evidence per risk tier is illustrative:** T1 needs requirements sign-off, test result, business acceptance and release checklist; T2 adds design review; T3 and T4 need all six kinds. Set in `lib/config/risk-tiers.ts`.
+- **Evidence-based status for a parent** (project, programme, initiative, investment request) is its worst child's.
+- **Any open critical incoming dependency makes a deliverable not ready**, even when it is on track.
+- **Synthetic volumes:** 855 work items and 301 evidence records, against about 900 and about 300 in section 5.
+- **A sixth provenance label, "Simulated evidence"**, was added to those in section 4.
+- **The on-screen name for the hierarchy** is "Simplified delivery hierarchy", set in the terminology file.
+- **Browser tests:** 43, covering every route at two widths, both themes, the guided journey, the main storyline, the agent centre with a governance refusal, the workflow walk-through and reset.

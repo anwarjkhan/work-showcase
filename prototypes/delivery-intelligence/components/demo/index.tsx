@@ -1,17 +1,8 @@
 /**
- * STUB — replaced by deliverable D14 (Guided demo), which owns components/demo/*.
- *
- * The shell mounts these two exports (see components/shell/DemoSlot.tsx):
- *   DemoControl  — compact control in the top bar (start / step / exit).
- *   DemoOverlay  — fixed-position layer for step prompts, rendered once.
- * Both take no props; use '@/lib/store' hooks, next/navigation and
- * '@/lib/config/demo-script' (also D14's) for what they need.
- * They must stay client-safe: add 'use client' to the files that need it.
+ * Guided demo (D14). The shell mounts these two exports (components/shell/DemoSlot.tsx):
+ *   DemoControl  compact control in the top bar (start, step indicator, previous, next, exit).
+ *   DemoOverlay  docked bar at the bottom of the viewport with the point to make and prompts.
+ * The script is in lib/config/demo-script.ts.
  */
-export function DemoControl() {
-  return null;
-}
-
-export function DemoOverlay() {
-  return null;
-}
+export { DemoControl } from './DemoControl';
+export { DemoOverlay } from './DemoOverlay';

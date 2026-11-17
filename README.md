@@ -11,7 +11,7 @@ A curated collection of independently developed, shareable prototypes, reference
 | [AI delivery](ai-delivery/README.md) | PDLC concepts and human-in-the-loop agent workflows |
 | [Jira](jira/README.md) | Generic issue-management models, examples and governance patterns |
 | [Portfolio management](portfolio-management/README.md) | Reporting, risk, capacity and automation examples |
-| [Prototypes](prototypes/README.md) | Independently developed demonstration applications |
+| [Prototypes](prototypes/README.md) | Independently developed demonstration applications, including [Delivery Intelligence](prototypes/delivery-intelligence/README.md) |
 | [Documentation](docs/sharing-guidelines.md) | Rules for safely contributing and sharing |
 
 ## Project documentation standard
