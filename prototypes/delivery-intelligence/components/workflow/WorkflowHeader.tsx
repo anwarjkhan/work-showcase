@@ -23,7 +23,7 @@ export function WorkflowHeader({ celebrate, complete }: { celebrate: boolean; co
   const route = ir?.route ?? (d.pmNodeId ? 'formal' : 'standalone');
 
   return (
-    <section aria-labelledby="wf-title" className="grid items-stretch gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,780px)]">
+    <section aria-labelledby="wf-title" className="grid items-stretch gap-3 min-[1600px]:grid-cols-[minmax(0,1fr)_minmax(0,780px)]">
       <div className="flex min-w-0 flex-col justify-between gap-2.5">
         <div className="min-w-0">
           <div className="di-eyebrow flex items-center gap-2">

@@ -1,7 +1,7 @@
 'use client';
 
 import { BookLock, Eye, FilePenLine, GitPullRequestArrow, ListChecks, ScrollText, ShieldCheck, UserCheck } from 'lucide-react';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ProvenanceBadge } from '@/components/shell';
 import { Disclosure, cx } from '@/components/ui';
 import { AGENT_CATALOGUE, AGENT_IDS, GOVERNANCE_RULES } from '@/lib/agents';
@@ -71,7 +71,7 @@ function AgentCard({ id, selected, onSelect, stageLabel }: { id: AgentId; select
         <AgentGlyph id={id} />
         <div className="min-w-0 flex-1">
           <div className="di-eyebrow truncate">{stageLabel}</div>
-          <h4 className="truncate text-[14px] leading-snug font-semibold text-title">{a.name}</h4>
+          <h4 className="text-[14px] leading-snug font-semibold text-title">{a.name}</h4>
         </div>
         <ModeBadge mode={a.mode} />
       </div>
@@ -119,7 +119,7 @@ export function Catalogue({ selectedId, onSelect }: { selectedId: AgentId; onSel
             const stages = AGENT_CATALOGUE[id].stages;
             const first = PDLC_STAGES.findIndex((s) => s.id === stages[0]) + 1;
             return (
-              <div key={id} className="min-w-0 2xl:[grid-column:var(--agent-col)]" style={{ '--agent-col': `${Math.max(1, first)} / span ${stages.length}` } as CSSProperties}>
+              <div key={id} className={cx('min-w-0', stages.length > 1 && '2xl:col-span-2')} data-first-stage={first}>
                 <AgentCard id={id} selected={selectedId === id} onSelect={onSelect} stageLabel={stageName(id)} />
               </div>
             );
@@ -130,7 +130,7 @@ export function Catalogue({ selectedId, onSelect }: { selectedId: AgentId; onSel
         <h3 className="di-eyebrow">Cross-cutting</h3>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-5">
           {cross.map((id) => (
-            <AgentCard key={id} id={id} selected={selectedId === id} onSelect={onSelect} stageLabel="Across all stages" />
+            <AgentCard key={id} id={id} selected={selectedId === id} onSelect={onSelect} stageLabel="Cross-cutting" />
           ))}
         </div>
       </div>

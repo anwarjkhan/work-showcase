@@ -60,7 +60,7 @@ export function RunConsole(props: RunConsoleProps) {
   const presetActive = (p: Preset) => p.agentId === agentId && scopeKey(p.scope) === scopeKey(scope);
 
   return (
-    <section aria-labelledby="run-console-h" className="di-card flex min-h-0 min-w-0 flex-col" data-testid="run-console">
+    <section aria-labelledby="run-console-h" className="di-card flex min-h-0 min-w-0 flex-1 flex-col" data-testid="run-console">
       <header className="flex flex-col gap-3 border-b border-line px-5 pt-4 pb-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">

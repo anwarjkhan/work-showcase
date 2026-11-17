@@ -3,7 +3,7 @@
 import { BadgeCheck, Check, Info, Lightbulb, ShieldAlert, ShieldCheck, Users, X, Zap } from 'lucide-react';
 import { ProvenanceBadge } from '@/components/shell';
 import { Avatar, Badge, Button, Chip, EmptyState, cx } from '@/components/ui';
-import { AGENT_CATALOGUE } from '@/lib/agents';
+import { AGENT_CATALOGUE, resolveRef } from '@/lib/agents';
 import { RISK_TIER_POLICIES } from '@/lib/config/risk-tiers';
 import { terms } from '@/lib/config/terminology';
 import type { AgentRun, PortfolioData, ProposalStatus, ProposedChange, TechDeliverable } from '@/lib/types';
@@ -79,7 +79,7 @@ export function ApprovalQueue(props: ApprovalQueueProps) {
   const deliverables = new Map(data.deliverables.map((d) => [d.id, d]));
 
   return (
-    <section aria-labelledby="queue-h" className="di-card flex min-h-0 min-w-0 flex-col" data-testid="approval-queue">
+    <section aria-labelledby="queue-h" className="di-card flex min-h-0 min-w-0 flex-1 flex-col" data-testid="approval-queue">
       <header className="flex flex-col gap-3 border-b border-line px-5 pt-4 pb-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -186,7 +186,10 @@ function ProposalCard({
   const rows = beforeAfterRows(p.beforeText, p.afterText);
   const approve = approvalCheck(data, p, actingAs);
   const reject = rejectionCheck(data, p, actingAs);
-  const refusal = refusals[p.id];
+  // Governance sentences name the record by id; show the key people know it by.
+  const targetLabel = resolveRef(data, p.target)?.label ?? p.target.id;
+  const readable = (t: string | undefined) => (t && targetLabel !== p.target.id ? t.split(p.target.id).join(targetLabel) : t);
+  const refusal = readable(refusals[p.id]);
   const policy = RISK_TIER_POLICIES[p.riskTier];
   const applied = p.status === 'approved' || p.status === 'auto-applied';
   return (
@@ -278,29 +281,27 @@ function ProposalCard({
             variant="primary"
             icon={<Check />}
             onClick={() => onApprove(p.id)}
-            disabledReason={approve.ok ? undefined : approve.reason}
+            disabledReason={approve.ok ? undefined : readable(approve.reason)}
             data-testid="approve-button"
           >
             Approve
           </Button>
-          <Button size="sm" variant="secondary" icon={<X />} onClick={() => onReject(p.id)} disabledReason={reject.ok ? undefined : reject.reason} data-testid="reject-button">
+          <Button size="sm" variant="secondary" icon={<X />} onClick={() => onReject(p.id)} disabledReason={reject.ok ? undefined : readable(reject.reason)} data-testid="reject-button">
             Reject
           </Button>
-          {!approve.ok ? (
+          {!approve.ok && !refusal ? (
             <>
               <span className="flex min-w-0 flex-1 items-start gap-1.5 text-[12px] text-status-amber-fg" data-testid="approve-blocked-reason">
                 <ShieldAlert aria-hidden className="mt-px size-3.5 shrink-0" />
-                {approve.reason}
+                {readable(approve.reason)}
               </span>
-              {!refusal ? (
-                <Button size="sm" variant="ghost" onClick={() => onApprove(p.id)} data-testid="attempt-approve">
-                  Attempt anyway
-                </Button>
-              ) : null}
+              <Button size="sm" variant="ghost" onClick={() => onApprove(p.id)} data-testid="attempt-approve">
+                Attempt anyway
+              </Button>
             </>
-          ) : (
+          ) : approve.ok ? (
             <span className="text-[11.5px] text-fg-subtle">as {personName(actingAs)}</span>
-          )}
+          ) : null}
         </footer>
       ) : p.decision ? (
         <p className="text-[12px] text-fg-muted">

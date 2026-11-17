@@ -128,7 +128,8 @@ export function deriveNextStep(input: NextStepInput): NextStep | null {
   const lastStage = stage.order === PDLC_STAGES.length;
 
   // 1. The stage's agent assists first.
-  if (cur.agentId && cur.state.agentRunIds.length === 0) {
+  const stageDone = cur.reviews.length > 0 && cur.reviews.every((r) => r.state === 'approved');
+  if (cur.agentId && cur.state.agentRunIds.length === 0 && !stageDone) {
     return { target: 'run-agent', label: `Run the ${lower(agentName(cur.agentId))} agent`, detail: `${terms.agentModes[AGENT_CATALOGUE[cur.agentId].mode]}: ${lower(AGENT_CATALOGUE[cur.agentId].output)}.`, tone: 'action' };
   }
 
@@ -313,7 +314,7 @@ export function buildHistory({ data, deliverableId, run, audit, proposals }: His
       kind: 'evidence',
       actor: e.recordedById ? person(e.recordedById) : { kind: 'system', name: terms.systems[e.source] },
       title: `${terms.evidenceKinds[e.kind]}: ${terms.evidenceResults[e.result].toLowerCase()}`,
-      detail: `${e.title} · ${terms.systems[e.source]} ${e.sourceRef}`,
+      detail: e.recordedById ? `${e.title} · ${terms.systems[e.source]} ${e.sourceRef}` : `${e.title} · ${e.sourceRef}`,
       tone: e.result === 'pass' ? 'green' : e.result === 'fail' ? 'red' : 'neutral',
       provenance: e.provenance,
     });

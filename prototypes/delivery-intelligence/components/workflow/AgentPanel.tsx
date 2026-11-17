@@ -11,6 +11,7 @@ import { useAgentRun, useProposals, useStatusDrafts } from '@/lib/store';
 import type { AgentRun, ProposedChange, StatusDraft } from '@/lib/types';
 import { BeatHeader } from './bits';
 import { useTarget, useWorkflow } from './context';
+import { formatStamp } from './model';
 
 const SPEED = 1.8;
 
@@ -74,7 +75,9 @@ export function AgentPanel() {
 }
 
 function RunView({ run, playing }: { run: AgentRun; playing: boolean }) {
-  const { playing: pb, finishPlayback } = useWorkflow();
+  const { playing: pb, finishPlayback, view, evidence } = useWorkflow();
+  const at = run.completedAt ?? run.startedAt;
+  const outdated = view.run.updatedAt > at || evidence.some((e) => e.observedAt > at);
   const [now, setNow] = useState(() => performance.now());
   useEffect(() => {
     if (!playing) return;
@@ -127,7 +130,13 @@ function RunView({ run, playing }: { run: AgentRun; playing: boolean }) {
     <div className="flex flex-col gap-3" data-testid="agent-output">
       <div className="flex items-start gap-2 rounded-md bg-surface-2 px-3 py-2 text-[12.5px]">
         {run.status === 'failed' ? <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-status-red" /> : <CheckCircle2 aria-hidden className="mt-0.5 size-4 shrink-0 text-status-green" />}
-        <span className="text-fg">{run.summary}</span>
+        <span className="min-w-0 text-fg">
+          {run.summary}
+          <span className="block text-[11px] text-fg-subtle">
+            As at {formatStamp(run.completedAt ?? run.startedAt)}
+            {outdated ? '. Records have changed since; run again for the current picture.' : '.'}
+          </span>
+        </span>
       </div>
       <Disclosure summary={<span className="text-[12px] text-fg-muted">{run.steps.length} steps the agent took</span>}>{steps}</Disclosure>
       <RunOutput run={run} />
