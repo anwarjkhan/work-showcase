@@ -348,6 +348,23 @@ describe('integration with the engine', () => {
   });
 });
 
+describe('forecast plausibility', () => {
+  const result = computeAll(data, DEMO_CLOCK);
+  const slipOf = (id: string): number => result.plan.spans.find((sp) => sp.level === 'deliverable' && sp.entity.id === id)!.slipDays;
+  it('keeps every in-flight deliverable within 30 days of its planned end', () => {
+    const inFlight = data.deliverables.filter((d) => {
+      const m = result.deliverables[d.id]!.workCompletion;
+      return d.plannedStart <= DEMO_CLOCK.today && m.computable && m.value.closedPoints < m.value.totalPoints;
+    });
+    expect(inFlight.length).toBeGreaterThanOrEqual(10);
+    for (const d of inFlight) {
+      const slip = slipOf(d.id);
+      expect(slip, d.id).toBeGreaterThanOrEqual(-30);
+      expect(slip, d.id).toBeLessThanOrEqual(30);
+    }
+  });
+});
+
 describe('PDLC runs', () => {
   const order = ['ideation-requirements', 'design-specifications', 'risk-control-compliance', 'build-test-validate', 'delivery-launch'] as const;
   it('records earlier stages as approved and the current review consistently with progress', () => {

@@ -364,7 +364,7 @@ export const DELIVERABLES: DeliverableSpec[] = [
       o('Attestation evidence filed centrally each month', 'Attestations are filed in one place and retrievable for audit.'),
     ],
     objects: ['accrual schedules', 'exception sign-off records', 'account owner attestations'],
-    flags: { r1Milestone: true, completeUnaccepted: true, epicDeliverableId: 'dangling' },
+    flags: { r1Milestone: true, epicDeliverableId: 'dangling' },
   },
   {
     id: 'td-1015', n: 1015,

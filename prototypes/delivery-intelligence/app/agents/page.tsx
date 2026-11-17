@@ -1,9 +1,8 @@
-// PLACEHOLDER — replaced by the screen deliverable that owns this route (see lib/config/routes.ts, builtBy).
+import { AgentsScreen } from '@/components/agents/AgentsScreen';
 import { routeMetadata } from '@/components/shell/metadata';
-import { RoutePlaceholder } from '@/components/shell/RoutePlaceholder';
 
 export const metadata = routeMetadata('agents');
 
 export default function Page() {
-  return <RoutePlaceholder routeId="agents" />;
+  return <AgentsScreen />;
 }

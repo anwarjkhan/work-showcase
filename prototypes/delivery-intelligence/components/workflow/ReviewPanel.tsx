@@ -80,7 +80,7 @@ function ActingAs() {
 }
 
 function ReviewRow({ stage, review }: { stage: StageView; review: StageView['reviews'][number] }) {
-  const { id, deliverable, actions, act, actingAs, person, personName, next, evidence } = useWorkflow();
+  const { id, deliverable, actions, act, actingAs, person, personName, next } = useWorkflow();
   const [returning, setReturning] = useState(false);
   const [reason, setReason] = useState('');
   const def = stage.definition;
@@ -97,7 +97,6 @@ function ReviewRow({ stage, review }: { stage: StageView; review: StageView['rev
     const failing = stage.evidence.find((e) => e.latest && e.latest.result === 'fail');
     if (failing?.latest) blocked = `The ${role} review cannot be approved while the ${lower(terms.evidenceKinds[failing.kind])} (${failing.latest.sourceRef}) is failing.`;
   }
-  void evidence;
   const notNamed = review.reviewerId && review.reviewerId !== actingAs;
   const decisions = review.decisions.slice(-2);
 

@@ -7,7 +7,7 @@
  * is run until the presenter presses Run. The workspace scrolls into view.
  *   #run-<agent-id>          any agent with its default scope, e.g.
  *                            #run-raid-quality (RAID quality, the portfolio),
- *                            #run-status-reporting (Status reporting, hero deliverable),
+ *                            #run-status-reporting (Status reporting, HERO_DELIVERABLE_ID),
  *                            #run-outcome-mapping, #run-dependency-discovery,
  *                            #run-portfolio-reconciliation, #run-executive-briefing,
  *                            #run-control-evidence-check, #run-release-readiness,
@@ -16,7 +16,7 @@
  *   #outcomes-portfolio      Outcome mapping across the portfolio (shows T1 auto-applied and T4 advisory)
  *   #brief-portfolio         Executive briefing across the portfolio
  *   #reconcile-portfolio     Portfolio reconciliation across the portfolio
- *   #readiness-hero          Release readiness on the hero deliverable
+ *   #readiness-hero          Release readiness on HERO_DELIVERABLE_ID
  *   #requirements-workflow   Requirements structuring on WORKFLOW_DELIVERABLE_ID
  *   #audit, #history         open the audit trail or the run history tab
  *

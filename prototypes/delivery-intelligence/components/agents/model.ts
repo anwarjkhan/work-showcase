@@ -64,7 +64,7 @@ export function defaultScope(agentId: AgentId, data: PortfolioData): AgentRunSco
   return scopeOfKind(agentId, consoleScopeKinds(agentId)[0] ?? 'portfolio', data);
 }
 
-/** A sensible scope of the given kind for the agent (hero records first). */
+/** A sensible scope of the given kind for the agent (story records first). */
 export function scopeOfKind(agentId: AgentId, kind: ConsoleScopeKind, data: PortfolioData): AgentRunScope {
   if (kind === 'portfolio') return { kind: 'portfolio' };
   if (kind === 'programme') {
@@ -139,15 +139,15 @@ export interface Preset {
 export function presets(data: PortfolioData): Preset[] {
   const hero = data.deliverables.find((d) => d.id === HERO_DELIVERABLE_ID);
   const wf = data.deliverables.find((d) => d.id === WORKFLOW_DELIVERABLE_ID);
-  const list: Preset[] = [
-    { id: 'run-raid-quality', label: 'RAID quality across the portfolio', agentId: 'raid-quality', scope: { kind: 'portfolio' } },
-    { id: 'status-hero', label: hero ? `Status report for “${hero.title}”` : 'Status report for the hero deliverable', agentId: 'status-reporting', scope: { kind: 'deliverable', deliverableId: HERO_DELIVERABLE_ID } },
+  const list: Preset[] = [{ id: 'run-raid-quality', label: 'RAID quality across the portfolio', agentId: 'raid-quality', scope: { kind: 'portfolio' } }];
+  if (hero) list.push({ id: 'status-hero', label: `Status report for ${hero.ref} “${hero.title}”`, agentId: 'status-reporting', scope: { kind: 'deliverable', deliverableId: hero.id } });
+  list.push(
     { id: 'outcomes-portfolio', label: 'Outcome mapping across the portfolio', agentId: 'outcome-mapping', scope: { kind: 'portfolio' } },
     { id: 'brief-portfolio', label: 'Executive brief for the portfolio', agentId: 'executive-briefing', scope: { kind: 'portfolio' } },
     { id: 'reconcile-portfolio', label: `${terms.bookOfRecord} against ${terms.systems['work-tracker']}`, agentId: 'portfolio-reconciliation', scope: { kind: 'portfolio' } },
-    { id: 'readiness-hero', label: hero ? `Readiness checklist for ${hero.ref}` : 'Readiness checklist', agentId: 'release-readiness', scope: { kind: 'deliverable', deliverableId: HERO_DELIVERABLE_ID } },
-    { id: 'requirements-workflow', label: wf ? `Requirements for ${wf.ref}` : 'Requirements structuring', agentId: 'requirements-structuring', scope: { kind: 'deliverable', deliverableId: WORKFLOW_DELIVERABLE_ID } },
-  ];
+  );
+  if (hero) list.push({ id: 'readiness-hero', label: `Readiness checklist for ${hero.ref}`, agentId: 'release-readiness', scope: { kind: 'deliverable', deliverableId: hero.id } });
+  if (wf) list.push({ id: 'requirements-workflow', label: `Requirements for ${wf.ref}`, agentId: 'requirements-structuring', scope: { kind: 'deliverable', deliverableId: wf.id } });
   return list.filter((p) => isScopeValid(p.agentId, p.scope, data));
 }
 

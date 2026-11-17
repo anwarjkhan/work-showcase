@@ -12,8 +12,8 @@ import { useOpenRefs } from './RefPanel';
  */
 export function DraftDocument({ draft }: { draft: StatusDraft }) {
   const open = useOpenRefs();
-  let n = 0;
   const total = draft.sections.reduce((s, x) => s + x.sentences.length, 0);
+  const offsets = draft.sections.map((_, i) => draft.sections.slice(0, i).reduce((s, x) => s + x.sentences.length, 0));
   return (
     <article className="rounded-md border border-line bg-surface shadow-card" data-testid="draft-document" aria-label={draft.title}>
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
@@ -33,9 +33,8 @@ export function DraftDocument({ draft }: { draft: StatusDraft }) {
           <section key={`${section.heading}-${si}`} className="flex flex-col gap-1.5">
             <h5 className="text-[12px] font-semibold tracking-wide text-heading uppercase">{section.heading}</h5>
             <p className="text-[13.5px] leading-[1.7] text-fg">
-              {section.sentences.map((s) => {
-                n += 1;
-                const num = n;
+              {section.sentences.map((s, k) => {
+                const num = (offsets[si] ?? 0) + k + 1;
                 return (
                   <span key={s.id}>
                     {s.text}
