@@ -82,9 +82,9 @@ export function dependencySentence(kit: AgentKit, dep: Dependency, perspective: 
   const status = lowerFirst(terms.dependencyStatus[dep.status]);
   const lateText = late > 0 ? `, ${days(late)} late` : '';
   if (perspective === 'receiver') {
-    return `${crit} ${quote(dep.title)} from ${provider?.ref ?? dep.fromDeliverableId} (${kit.hubName(dep.fromHubId)}) is ${status}: needed by ${date(dep.needBy)}, ${committed}${lateText}.`;
+    return `${crit} ${quote(dep.title)} from ${provider?.ref ?? 'an unknown deliverable'} (${kit.hubName(dep.fromHubId)}) is ${status}: needed by ${date(dep.needBy)}, ${committed}${lateText}.`;
   }
-  return `${crit} ${quote(dep.title)} to ${receiver?.ref ?? dep.toDeliverableId} (${kit.hubName(dep.toHubId)}) is ${status}: needed by ${date(dep.needBy)}, ${committed}${lateText}.`;
+  return `${crit} ${quote(dep.title)} to ${receiver?.ref ?? 'an unknown deliverable'} (${kit.hubName(dep.toHubId)}) is ${status}: needed by ${date(dep.needBy)}, ${committed}${lateText}.`;
 }
 
 export function itemsDueSoon(kit: AgentKit, d: TechDeliverable, windowDays = 14): WorkItem[] {

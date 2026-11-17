@@ -105,7 +105,7 @@ export const executiveBriefingAgent: ScriptedAgent = {
       const receiver = kit.deliverable(k.receiverId);
       decisionSentences.push(
         kit.sentence(
-          `Decide how to protect regulatory milestone ${quote(ms?.title ?? m.milestoneId)} for ${receiver?.ref ?? k.receiverId}: a dependency ${k.lateDays} days late would move it from ${date(m.date)} to ${date(m.shiftedTo)}.`,
+          `Decide how to protect regulatory milestone ${quote(ms?.title ?? 'milestone')} for ${receiver?.ref ?? 'an unknown deliverable'}: a dependency ${k.lateDays} days late would move it from ${date(m.date)} to ${date(m.shiftedTo)}.`,
           [ref.milestone(m.milestoneId), ref.dependency(k.dependencyId), ref.deliverable(k.receiverId)],
         ),
       );

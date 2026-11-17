@@ -93,7 +93,7 @@ export function checkSimulateWorkClosed(data: PortfolioData, deliverableId: stri
   const run = data.pdlcRuns.find((r) => r.deliverableId === deliverableId);
   const d = data.deliverables.find((x) => x.id === deliverableId);
   const base = { id: 'simulate-work-closed' as const, label: 'Simulate work closed' };
-  if (!run || !d) return { ...base, enabled: false, reason: `Deliverable ${deliverableId} has no PDLC workflow.`, openItems: [] };
+  if (!run || !d) return { ...base, enabled: false, reason: 'That deliverable has no PDLC workflow.', openItems: [] };
   const clock = { today: data.meta.asOf, now: `${data.meta.asOf}T00:00:00.000Z`, timeZone: 'UTC' };
   const open = (buildContext(data, clock).storiesByDeliverable.get(d.id) ?? [])
     .filter((w) => !isClosed(w))

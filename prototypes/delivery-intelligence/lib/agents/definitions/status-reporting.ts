@@ -181,7 +181,7 @@ function deliverableStatus(kit: AgentKit, d: TechDeliverable): AgentRunOutput {
   const depSentences: DraftSentence[] = deps.slice(0, 4).map((dep) => kit.sentence(dependencySentence(kit, dep, 'receiver'), [ref.dependency(dep.id), ref.deliverable(dep.fromDeliverableId)]));
   const provides = (kit.ctx.dependenciesFrom.get(d.id) ?? []).filter((x) => x.status !== 'delivered' && x.deliveredOn === null);
   if (provides.length > 0) {
-    depSentences.push(kit.sentence(`${d.ref} provides ${plural(provides.length, 'open dependency', 'open dependencies')} to ${listPhrases([...new Set(provides.map((x) => kit.deliverable(x.toDeliverableId)?.ref ?? x.toDeliverableId))])}.`, provides.map((x) => ref.dependency(x.id))));
+    depSentences.push(kit.sentence(`${d.ref} provides ${plural(provides.length, 'open dependency', 'open dependencies')} to ${listPhrases([...new Set(provides.map((x) => kit.deliverable(x.toDeliverableId)?.ref ?? 'an unknown deliverable'))])}.`, provides.map((x) => ref.dependency(x.id))));
   }
   if (depSentences.length === 0) depSentences.push(kit.sentence(`${d.ref} has no open dependencies in either direction.`, [dRef]));
   kit.section('Dependencies', depSentences);

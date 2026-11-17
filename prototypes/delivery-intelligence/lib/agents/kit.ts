@@ -78,12 +78,12 @@ export function scopeLabel(data: PortfolioData, scope: AgentRunScope): string {
       return 'the portfolio';
     case 'programme': {
       const node = data.pmNodes.find((n) => n.id === scope.pmNodeId);
-      return node ? `${lowerFirst(terms.pmNodeLevels[node.level])} ${node.ref} ${quote(node.title)}` : scope.pmNodeId;
+      return node ? `${lowerFirst(terms.pmNodeLevels[node.level])} ${node.ref} ${quote(node.title)}` : 'an unknown programme';
     }
     case 'deliverable':
     case 'pdlc-stage': {
       const d = data.deliverables.find((x) => x.id === scope.deliverableId);
-      return d ? d.ref : scope.deliverableId;
+      return d ? d.ref : 'an unknown deliverable';
     }
   }
 }
@@ -221,7 +221,7 @@ export class AgentKit {
 
   person(id: string | null | undefined): string {
     if (!id) return 'nobody';
-    return this.ctx.idx.people.get(id)?.name ?? this.ctx.idx.agentIdentities.get(id)?.handle ?? id;
+    return this.ctx.idx.people.get(id)?.name ?? this.ctx.idx.agentIdentities.get(id)?.handle ?? 'an unknown person';
   }
 
   deliverable(id: string): TechDeliverable | undefined {

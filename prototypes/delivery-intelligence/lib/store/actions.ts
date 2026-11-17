@@ -160,7 +160,12 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
     deliverables: d.deliverables.map((x) => (x.id === run.deliverableId && x.pdlcStage !== run.currentStage ? { ...x, pdlcStage: run.currentStage } : x)),
   });
 
-  const personName = (id: string | null | undefined) => (id ? (indexPortfolio(data()).people.get(id)?.name ?? id) : 'nobody');
+  const personName = (id: string | null | undefined) => {
+    if (!id) return 'nobody';
+    const idx = indexPortfolio(data());
+    return idx.people.get(id)?.name ?? idx.agentIdentities.get(id)?.handle ?? data().agentIdentities.find((a) => a.agentId === id)?.handle ?? 'an unknown person';
+  };
+  const deliverableRef = (id: string) => indexPortfolio(data()).deliverables.get(id)?.ref ?? 'the deliverable';
 
   // ---------------------------------------------------------------------------
   // Agent runs
@@ -175,7 +180,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
     const state = store.getState();
     const by = startedById ?? state.actingAsPersonId;
     const agent = getAgent(agentId);
-    if (!agent) return fail(`There is no agent called ${agentId}.`);
+    if (!agent) return fail('That agent does not exist.');
     const who = requirePerson(state.data, by, 'start an agent run');
     if (!who.ok) return blocked(who, by, { kind: 'agent-run', id: agentId });
     const scopeProblem = checkScope(agent, scope, state.data);
@@ -274,7 +279,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
   function reviewChecks(deliverableId: string, stageId: PdlcStageId, roleId: ReviewRoleId, reviewerId: string, verb: 'approve' | 'return'): ActionResult<{ run: PdlcRun }> {
     const d = indexPortfolio(data()).deliverables.get(deliverableId);
     const run = runOf(deliverableId);
-    if (!d || !run) return fail(`Deliverable ${deliverableId} has no PDLC workflow.`);
+    if (!d || !run) return fail('That deliverable has no PDLC workflow.');
     const subject: EntityRef = { kind: 'pdlc-run', id: run.id };
     const who = requirePerson(data(), reviewerId, `${verb} a PDLC review`);
     if (!who.ok) return blocked(who, reviewerId, subject);
@@ -373,7 +378,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
     runStageAgent(deliverableId, stageId, startedById) {
       const run = runOf(deliverableId);
       const d = indexPortfolio(data()).deliverables.get(deliverableId);
-      if (!run || !d) return fail(`Deliverable ${deliverableId} has no PDLC workflow.`);
+      if (!run || !d) return fail('That deliverable has no PDLC workflow.');
       const stage = stageId ?? run.currentStage;
       if (stage !== run.currentStage) return fail(`${d.ref} is in ${stageDefinition(run.currentStage).name}; run that stage's agent instead.`);
       const agentId = stageAgentId(stage);
@@ -397,7 +402,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
         actor: { kind: 'human', personId: by },
         action: 'pdlc.stage-agent-run',
         subject: { kind: 'pdlc-run', id: run.id },
-        summary: `${getAgent(agentId)?.name ?? agentId} ran for ${d.ref} in ${stageDefinition(stage).name}; reviews requested.`,
+        summary: `${getAgent(agentId)?.name ?? 'The stage agent'} ran for ${d.ref} in ${stageDefinition(stage).name}; reviews requested.`,
         refs: [{ kind: 'pdlc-run', id: run.id }, { kind: 'agent-run', id: result.value.runId }],
         details: { stageId: stage, agentId },
       });
@@ -456,14 +461,14 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
     recordEvidence(input) {
       const idx = indexPortfolio(data());
       const d = idx.deliverables.get(input.deliverableId);
-      if (!d) return fail(`Deliverable ${input.deliverableId} does not exist.`);
+      if (!d) return fail('That deliverable does not exist.');
       const subject: EntityRef = { kind: 'deliverable', id: d.id };
       const who = requirePerson(data(), input.recordedById, 'record evidence');
       if (!who.ok) return blocked(who, input.recordedById, subject);
       if (!input.title || input.title.trim().length === 0) return fail('Evidence needs a title.');
       const outcomes = idx.outcomesByDeliverable.get(d.id) ?? [];
       let outcomeId = input.outcomeId ?? null;
-      if (outcomeId && !outcomes.some((o) => o.id === outcomeId)) return fail(`${outcomeId} is not an outcome of ${d.ref}.`);
+      if (outcomeId && !outcomes.some((o) => o.id === outcomeId)) return fail(`${idx.outcomes.get(outcomeId)?.ref ?? 'That outcome'} is not an outcome of ${d.ref}.`);
       if (!outcomeId && input.kind === 'business-acceptance' && outcomes.length === 1) outcomeId = outcomes[0]!.id;
       if (input.workItemKey && !idx.workItems.has(input.workItemKey)) return fail(`${input.workItemKey} does not exist.`);
 
@@ -532,7 +537,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
 
     simulateWorkClosed(deliverableId, actorId, options) {
       const d = indexPortfolio(data()).deliverables.get(deliverableId);
-      if (!d) return fail(`Deliverable ${deliverableId} does not exist.`);
+      if (!d) return fail('That deliverable does not exist.');
       const subject: EntityRef = { kind: 'deliverable', id: d.id };
       const who = requirePerson(data(), actorId, 'close work');
       if (!who.ok) return blocked(who, actorId, subject);
@@ -571,7 +576,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
 
     moveStage(deliverableId, direction, byPersonId, reason) {
       const run = runOf(deliverableId);
-      if (!run) return fail(`Deliverable ${deliverableId} has no PDLC workflow.`);
+      if (!run) return fail('That deliverable has no PDLC workflow.');
       const subject: EntityRef = { kind: 'pdlc-run', id: run.id };
       const who = requirePerson(data(), byPersonId, 'move a deliverable between stages');
       if (!who.ok) return blocked(who, byPersonId, subject);
@@ -586,7 +591,7 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
         actor: { kind: 'human', personId: byPersonId },
         action: direction === 'forward' ? 'pdlc.moved-forward' : 'pdlc.moved-back',
         subject,
-        summary: `${personName(byPersonId)} moved ${indexPortfolio(data()).deliverables.get(deliverableId)?.ref ?? deliverableId} ${direction === 'forward' ? 'forward' : 'back'} to ${stageDefinition(to).name}${why ? `: ${why}` : ''}.`,
+        summary: `${personName(byPersonId)} moved ${deliverableRef(deliverableId)} ${direction === 'forward' ? 'forward' : 'back'} to ${stageDefinition(to).name}${why ? `: ${why}` : ''}.`,
         refs: [subject, { kind: 'deliverable', id: deliverableId }],
         details: { from: run.currentStage, to, reason: why },
       });

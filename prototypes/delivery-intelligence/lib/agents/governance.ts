@@ -14,6 +14,7 @@
 import { RISK_TIER_POLICIES, autonomyFor } from '@/lib/config/risk-tiers';
 import { terms } from '@/lib/config/terminology';
 import { indexPortfolio } from '@/lib/store/indexes';
+import { resolveRef } from './refs';
 import type { AutonomyCeiling, PortfolioData, ProposalStatus, ProposedChange, ProposedChangeSpec, RiskTier } from '@/lib/types';
 
 export type Check = { ok: true } | { ok: false; reason: string; code: GovernanceCode };
@@ -83,8 +84,8 @@ export function checkApproval(data: PortfolioData, proposal: ProposedChange, app
   const person = requirePerson(data, approverId, 'approve a change');
   if (!person.ok) return person;
   if (proposal.assigneeId && proposal.assigneeId === approverId) {
-    const name = indexPortfolio(data).people.get(approverId)?.name ?? approverId;
-    return { ok: false, code: 'assignee-cannot-approve', reason: `${name} is the assignee of ${proposal.target.id} and cannot approve a change to their own item.` };
+    const name = indexPortfolio(data).people.get(approverId)?.name ?? 'This person';
+    return { ok: false, code: 'assignee-cannot-approve', reason: `${name} is the assignee of ${resolveRef(data, proposal.target)?.label ?? 'the item'} and cannot approve a change to their own item.` };
   }
   return { ok: true };
 }

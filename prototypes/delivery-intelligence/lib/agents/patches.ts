@@ -50,9 +50,10 @@ function applyUnchecked(data: PortfolioData, patch: ChangePatch, at: IsoDateTime
       }
       const list = listFor(data, entity);
       const index = list.findIndex((x) => (entity === 'work-item' ? (x as { key: string }).key : (x as { id: string }).id) === id);
-      if (index < 0) return { ok: false, reason: `${id} no longer exists.` };
+      const label = recordLabel(data, entity, id);
+      if (index < 0) return { ok: false, reason: `${label} no longer exists.` };
       const current = list[index] as unknown as Record<string, unknown>;
-      if (!same(current[field], patch.before)) return { ok: false, reason: `${id} has changed since the proposal was made; run the agent again.` };
+      if (!same(current[field], patch.before)) return { ok: false, reason: `${label} has changed since the proposal was made; run the agent again.` };
       const next = list.slice();
       const updated: Record<string, unknown> = { ...current, [field]: patch.after };
       if (entity === 'raid') updated.updated = at;
@@ -74,7 +75,7 @@ function applyUnchecked(data: PortfolioData, patch: ChangePatch, at: IsoDateTime
     }
     case 'add-dependency': {
       const dep = patch.dependency;
-      if (data.dependencies.some((d) => d.id === dep.id)) return { ok: false, reason: `Dependency ${dep.id} is already recorded.` };
+      if (data.dependencies.some((d) => d.id === dep.id)) return { ok: false, reason: `Dependency ${quote(dep.title)} is already recorded.` };
       const ids = new Set(data.deliverables.map((d) => d.id));
       if (!ids.has(dep.fromDeliverableId) || !ids.has(dep.toDeliverableId)) return { ok: false, reason: 'The dependency names a deliverable that does not exist.' };
       return { ok: true, data: { ...data, dependencies: [...data.dependencies, { ...dep, origin: 'agent-proposed' }] } };
@@ -93,6 +94,26 @@ function applyUnchecked(data: PortfolioData, patch: ChangePatch, at: IsoDateTime
       return { ok: false, reason: 'Unknown change.' };
   }
 }
+
+/** Human label for a record: work-item key, RAID key, dependency or milestone title. */
+function recordLabel(data: PortfolioData, entity: EditableEntityKind, id: string): string {
+  switch (entity) {
+    case 'work-item':
+      return id;
+    case 'raid':
+      return data.raid.find((r) => r.id === id)?.key ?? 'The RAID item';
+    case 'dependency': {
+      const d = data.dependencies.find((x) => x.id === id);
+      return d ? `Dependency ${quote(d.title)}` : 'The dependency';
+    }
+    case 'milestone': {
+      const m = data.milestones.find((x) => x.id === id);
+      return m ? `Milestone ${quote(m.title)}` : 'The milestone';
+    }
+  }
+}
+
+const quote = (t: string) => `“${t}”`;
 
 type Lists = { 'work-item': PortfolioData['workItems']; raid: PortfolioData['raid']; dependency: PortfolioData['dependencies']; milestone: PortfolioData['milestones'] };
 

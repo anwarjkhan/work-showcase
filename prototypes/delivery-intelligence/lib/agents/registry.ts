@@ -52,10 +52,10 @@ export function checkScope(agent: ScriptedAgent, scope: AgentRunScope, data: Por
     return `${agent.name} runs on ${kinds.join(' or ')}, not on ${scope.kind === 'pdlc-stage' ? 'a PDLC stage' : scope.kind === 'portfolio' ? 'the portfolio' : `a ${scope.kind}`}.`;
   }
   if ((scope.kind === 'deliverable' || scope.kind === 'pdlc-stage') && !data.deliverables.some((d) => d.id === scope.deliverableId)) {
-    return `Deliverable ${scope.deliverableId} does not exist.`;
+    return 'That deliverable does not exist.';
   }
   if (scope.kind === 'programme' && !data.pmNodes.some((n) => n.id === scope.pmNodeId)) {
-    return `Programme ${scope.pmNodeId} does not exist.`;
+    return 'That programme does not exist.';
   }
   return null;
 }
@@ -65,7 +65,7 @@ export type RunResult = { ok: true; output: AgentRunOutput } | { ok: false; reas
 /** Runs an agent on a snapshot. Pure and deterministic; refusals are returned, not thrown. */
 export function runAgent(agentId: AgentId, scope: AgentRunScope, input: { data: PortfolioData; results: EngineResult; clock: DemoClock }): RunResult {
   const agent = getAgent(agentId);
-  if (!agent) return { ok: false, reason: `There is no agent called ${agentId}.` };
+  if (!agent) return { ok: false, reason: 'That agent does not exist.' };
   const problem = checkScope(agent, scope, input.data);
   if (problem) return { ok: false, reason: problem };
   try {

@@ -119,7 +119,7 @@ export function fieldGapsFor(kit: AgentKit, d: TechDeliverable): ControlGap[] {
     const epic = kit.ctx.idx.workItems.get(key);
     if (!epic) continue;
     if (!epic.deliverableId || !kit.ctx.resolveDeliverable(epic.deliverableId)) {
-      gaps.push({ text: `${terms.hierarchy.epic} ${key} has ${epic.deliverableId ? `a ${terms.hierarchy.deliverableIdField} (${epic.deliverableId}) that does not exist` : `no ${terms.hierarchy.deliverableIdField}`}.`, refs: [ref.item(key)] });
+      gaps.push({ text: `${terms.hierarchy.epic} ${key} has ${epic.deliverableId ? `a ${terms.hierarchy.deliverableIdField} “${epic.deliverableId}” that does not exist` : `no ${terms.hierarchy.deliverableIdField}`}.`, refs: [ref.item(key)] });
       kit.finding('R14', 'high', ref.item(key), d.id, `${terms.hierarchy.epic} ${key} of ${d.ref} has no valid ${terms.hierarchy.deliverableIdField}.`, [dRef]);
     }
   }
