@@ -94,7 +94,7 @@ Every scripted, simulated, sample or placeholder element carries a provenance ba
 
 ## 4. Running locally
 
-Requires Node 22.12 or later and npm.
+Requires npm and a long-term-support release of Node: 22 (22.22 or later) or 24 (24.15 or later). Odd-numbered releases such as Node 25 work but make `npm install` print `EBADENGINE` warnings from the test tooling. Works on Windows, macOS and Linux.
 
 ```bash
 npm install          # install the pinned versions from the lockfile

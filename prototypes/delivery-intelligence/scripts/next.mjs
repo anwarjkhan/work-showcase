@@ -11,10 +11,15 @@ const require = createRequire(import.meta.url);
 const nextBin = require.resolve('next/dist/bin/next');
 const guard = path.join(here, 'offline-guard.cjs');
 
+// NODE_OPTIONS treats a backslash inside double quotes as an escape character,
+// so a Windows path such as D:\dev\app\scripts\offline-guard.cjs would lose its
+// separators. Escape backslashes and quotes so the path survives on every platform.
+const quotedGuard = `"${guard.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+
 const env = {
   ...process.env,
   NEXT_TELEMETRY_DISABLED: '1',
-  NODE_OPTIONS: [process.env.NODE_OPTIONS, `--require "${guard}"`].filter(Boolean).join(' '),
+  NODE_OPTIONS: [process.env.NODE_OPTIONS, `--require ${quotedGuard}`].filter(Boolean).join(' '),
 };
 
 const child = spawn(process.execPath, [nextBin, ...process.argv.slice(2)], { stdio: 'inherit', env });
