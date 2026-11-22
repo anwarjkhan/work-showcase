@@ -1,0 +1,4003 @@
+{
+  "title": "TD-1001 Counterparty exposure — stress scenario reconciliation · Technology Deliverable pack",
+  "fileName": "TD-1001-deliverable-pack-2027-03-08.pptx",
+  "footer": {
+    "text": "Prototype · synthetic data · as at 8 Mar 2027"
+  },
+  "slides": [
+    {
+      "id": "cover:deliverable:td-1001",
+      "kind": "cover",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001 Counterparty exposure — stress scenario reconciliation",
+      "subtitle": "Technology Deliverable pack",
+      "layout": "cover",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "text",
+            "text": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+            "emphasis": "body"
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "text",
+            "text": "As at 8 Mar 2027",
+            "emphasis": "body"
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "text",
+            "text": "Data source: Synthetic data for demonstration only.",
+            "emphasis": "caption"
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "callout",
+            "tone": "accent",
+            "title": "Prototype",
+            "text": "Prototype · synthetic data. Figures are generated for demonstration and describe no real work."
+          }
+        }
+      ],
+      "notes": "This deck covers TD-1001 Counterparty exposure — stress scenario reconciliation as at 8 Mar 2027. Every figure is computed from the same records the application shows.\n\nRecords: TD-1001",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "contents:deliverable:td-1001",
+      "kind": "contents",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Contents",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "two-column",
+      "blocks": [
+        {
+          "region": "left",
+          "block": {
+            "type": "bullets",
+            "items": [
+              {
+                "text": "1. Verdict"
+              },
+              {
+                "text": "2. Readiness evidence"
+              },
+              {
+                "text": "3. Outcomes"
+              },
+              {
+                "text": "4. Why the evidence says this"
+              },
+              {
+                "text": "5. Plan"
+              },
+              {
+                "text": "6. Risks, issues and dependencies"
+              },
+              {
+                "text": "7. Lifecycle position"
+              }
+            ]
+          }
+        },
+        {
+          "region": "right",
+          "block": {
+            "type": "bullets",
+            "items": [
+              {
+                "text": "8. Pod"
+              },
+              {
+                "text": "9. How it maps to Jira"
+              },
+              {
+                "text": "10. Weekly status"
+              },
+              {
+                "text": "11. Decisions and next steps"
+              },
+              {
+                "text": "12. How to read these measures"
+              },
+              {
+                "text": "13. Records cited"
+              }
+            ]
+          }
+        }
+      ],
+      "notes": "13 sections follow, from the headline to the records cited.\n\nRecords: none cited",
+      "citations": [],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-verdict:deliverable:td-1001",
+      "kind": "td-verdict",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001 is reported Green; the evidence says Red",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "kpis-over-table",
+      "blocks": [
+        {
+          "region": "top",
+          "block": {
+            "type": "rag-pair",
+            "reported": "green",
+            "reportedText": "Reported: Green",
+            "evidence": "red",
+            "evidenceText": "Evidence-based: Red",
+            "disagree": true,
+            "reason": "TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singapore) is 9 days late (needed by 27 Feb 2027, committed for 8 Mar 2027)."
+          }
+        },
+        {
+          "region": "top",
+          "block": {
+            "type": "measures",
+            "work": {
+              "label": "Work completion",
+              "value": "82%",
+              "caption": "82 of 100 points closed",
+              "computable": true
+            },
+            "accepted": {
+              "label": "Accepted outcomes",
+              "value": "1 of 4",
+              "caption": "20% of outcome weight accepted (2 of 10)",
+              "computable": true
+            },
+            "readiness": {
+              "label": "Delivery readiness",
+              "state": "not-ready",
+              "stateText": "Not ready",
+              "caption": "3 of 6 held, passing · 1 failing · 2 missing · 1 blocking dependency",
+              "tone": "red"
+            }
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "bullets",
+            "items": [
+              {
+                "text": "TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singa…",
+                "tone": "red"
+              },
+              {
+                "text": "Required test result “Reconciliation regression suite” for TD-1001 is failing (Test automation RUN-5521, 5 Mar 2027); T3 High needs it passing before…",
+                "tone": "red"
+              },
+              {
+                "text": "“Stressed market-data extract for scenario reconciliation” is committed for 8 Mar 2027, 9 days after TD-1001 needs it (27 Feb 2027); provider TD-1016.",
+                "tone": "amber"
+              },
+              {
+                "text": "2 high findings (R11: Outcome reported on track or complete with no acceptance recorded). First: Outcome “Stressed exposures reconcile between the ri…",
+                "tone": "amber"
+              }
+            ]
+          }
+        }
+      ],
+      "notes": "TD-1001 is reported Green; the evidence says Red. Work completion is 82%, 1 of 4 outcomes are accepted and readiness is not ready; each measure moves only with its own evidence.\n\nRecords: TD-1001, CCR-R-07, CCR-301, RUN-5521, CCR-203, TD-1016, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, CCR-104, CCR-105, CCR-106, CCR-201, CCR-202, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, CCR-204, CCR-205, CCR-206, CCR-207, CCR-302, CCR-303\n\nShortened on the slide:\n- TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singapore) is 9 days late (needed by 27 Feb 2027, committed for 8 Mar 2027).\n- Required test result “Reconciliation regression suite” for TD-1001 is failing (Test automation RUN-5521, 5 Mar 2027); T3 High needs it passing before release.\n- 2 high findings (R11: Outcome reported on track or complete with no acceptance recorded). First: Outcome “Stressed exposures reconcile between the risk engine and the reporting layer” (TD-1001) is reported on track in Portfolio system, due 7 days ago, with no acceptance recorded: only 0 of 3 mandatory criteria are accepted and no business acceptance record is held.",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-readiness:deliverable:td-1001",
+      "kind": "td-readiness",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001 is not ready: 1 failing and 2 missing of 6 required",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "kpis-over-table",
+      "blocks": [
+        {
+          "region": "top",
+          "block": {
+            "type": "kpis",
+            "items": [
+              {
+                "label": "Delivery readiness",
+                "value": "Not ready",
+                "caption": "T3 High",
+                "tone": "red"
+              },
+              {
+                "label": "Required",
+                "value": "6",
+                "caption": "evidence kinds"
+              },
+              {
+                "label": "Held, passing",
+                "value": "3",
+                "tone": "green"
+              },
+              {
+                "label": "Held, failing",
+                "value": "1",
+                "tone": "red"
+              },
+              {
+                "label": "Missing",
+                "value": "2",
+                "tone": "red"
+              },
+              {
+                "label": "Stale",
+                "value": "0",
+                "tone": "neutral"
+              }
+            ]
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Evidence",
+                "width": 3
+              },
+              {
+                "header": "State",
+                "width": 2
+              },
+              {
+                "header": "Latest record",
+                "width": 2,
+                "maxChars": 18
+              },
+              {
+                "header": "Observed",
+                "width": 2
+              },
+              {
+                "header": "System",
+                "width": 2
+              },
+              {
+                "header": "Note",
+                "width": 5,
+                "maxChars": 48
+              }
+            ],
+            "rows": [
+              [
+                "Requirements sign-off",
+                {
+                  "text": "Held, passing",
+                  "tone": "green"
+                },
+                "DOC-1120",
+                "27 Jan 2027",
+                "Document store",
+                "Requirements sign-off for the reconciliation sc…"
+              ],
+              [
+                "Design review",
+                {
+                  "text": "Held, passing",
+                  "tone": "green"
+                },
+                "DOC-1138",
+                "3 Feb 2027",
+                "Document store",
+                "Design review of the reconciliation approach"
+              ],
+              [
+                "Control assessment",
+                {
+                  "text": "Missing",
+                  "tone": "red"
+                },
+                "—",
+                "—",
+                "—",
+                ""
+              ],
+              [
+                "Test result",
+                {
+                  "text": "Held, failing",
+                  "tone": "red"
+                },
+                "RUN-5521",
+                "5 Mar 2027",
+                "Test automation",
+                "Reconciliation regression suite"
+              ],
+              [
+                "Business acceptance",
+                {
+                  "text": "Held, passing",
+                  "tone": "green"
+                },
+                "DOC-118",
+                "12 Feb 2027",
+                "Document store",
+                "Scenario set acceptance"
+              ],
+              [
+                "Release checklist",
+                {
+                  "text": "Missing",
+                  "tone": "red"
+                },
+                "—",
+                "—",
+                "—",
+                ""
+              ],
+              [
+                "Dependency",
+                {
+                  "text": "Blocking",
+                  "tone": "red"
+                },
+                "CCR-R-07",
+                "—",
+                "Jira",
+                "Needed by 27 Feb 2027: Stressed market-data ext…"
+              ]
+            ]
+          }
+        }
+      ],
+      "notes": "TD-1001 is not ready: 1 failing and 2 missing of 6 required. Readiness is one of three states and never a percentage; it needs every kind T3 High requires held and passing.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118, CCR-R-07\n\nWhy: Required evidence is failing: test result. Critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 is not yet delivered (late, needed by 27 Feb 2027, 9 days late). Required evidence for T3 High is missing: control assessment and release checklist.\n\nShortened on the slide:\n- Requirements sign-off for the reconciliation scope\n- Needed by 27 Feb 2027: Stressed market-data extract for scenario reconciliation",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-rs"
+          },
+          "label": "DOC-1120",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-dr"
+          },
+          "label": "DOC-1138",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-ba"
+          },
+          "label": "DOC-118",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-outcomes:deliverable:td-1001",
+      "kind": "td-outcomes",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "1 of 4 outcomes accepted; 2 reported on track without it",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "table",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Outcome",
+                "width": 2
+              },
+              {
+                "header": "Title",
+                "width": 5,
+                "maxChars": 46
+              },
+              {
+                "header": "Weight",
+                "width": 1,
+                "align": "right"
+              },
+              {
+                "header": "Due",
+                "width": 2
+              },
+              {
+                "header": "Reported",
+                "width": 2
+              },
+              {
+                "header": "Acceptance",
+                "width": 2
+              },
+              {
+                "header": "Work completion",
+                "width": 2,
+                "align": "right"
+              },
+              {
+                "header": "Gaps",
+                "width": 4,
+                "maxChars": 40
+              }
+            ],
+            "rows": [
+              [
+                "OC-1001-1",
+                "Quarter-end stress scenario set agreed and lo…",
+                "2",
+                "12 Feb 2027",
+                {
+                  "text": "Complete",
+                  "tone": "green"
+                },
+                {
+                  "text": "Accepted",
+                  "tone": "green"
+                },
+                "100%",
+                "—"
+              ],
+              [
+                "OC-1001-2",
+                "Stressed exposures reconcile between the risk…",
+                "3",
+                "1 Mar 2027",
+                {
+                  "text": "On track",
+                  "tone": "green"
+                },
+                {
+                  "text": "Not accepted",
+                  "tone": "red"
+                },
+                "83%",
+                "Reported on track, not accepted; Past d…"
+              ],
+              [
+                "OC-1001-3",
+                "Reconciliation breaks explained to risk users",
+                "3",
+                "5 Mar 2027",
+                {
+                  "text": "On track",
+                  "tone": "green"
+                },
+                {
+                  "text": "Not accepted",
+                  "tone": "red"
+                },
+                "71%",
+                "Reported on track, not accepted; Past d…"
+              ],
+              [
+                "OC-1001-4",
+                "Control evidence filed for model validation a…",
+                "2",
+                "31 Mar 2027",
+                {
+                  "text": "At risk",
+                  "tone": "amber"
+                },
+                {
+                  "text": "Not accepted",
+                  "tone": "red"
+                },
+                "78%",
+                "—"
+              ]
+            ],
+            "emptyText": "TD-1001 has no outcomes recorded."
+          }
+        }
+      ],
+      "notes": "Reported status sits beside acceptance for each outcome. Accepted outcomes is 1 of 4, 20% of outcome weight; work completion does not accept an outcome.\n\nRecords: TD-1001, OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4\n\nShortened on the slide:\n- Quarter-end stress scenario set agreed and loaded\n- Stressed exposures reconcile between the risk engine and the reporting layer\n- Reported on track, not accepted; Past due\n- Reported on track, not accepted; Past due\n- Control evidence filed for model validation and reporting sign-off",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-1"
+          },
+          "label": "OC-1001-1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-4"
+          },
+          "label": "OC-1001-4",
+          "system": "Portfolio system"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-findings:deliverable:td-1001",
+      "kind": "td-findings",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001: 2 critical, 3 high and 2 other findings",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "table",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Severity",
+                "width": 2
+              },
+              {
+                "header": "Rule",
+                "width": 1
+              },
+              {
+                "header": "Finding",
+                "width": 10,
+                "maxChars": 120
+              },
+              {
+                "header": "Records",
+                "width": 3,
+                "maxChars": 40
+              }
+            ],
+            "rows": [
+              [
+                {
+                  "text": "Critical",
+                  "tone": "red"
+                },
+                "R5",
+                "TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario recon…",
+                "TD-1001, CCR-R-07, CCR-301"
+              ],
+              [
+                {
+                  "text": "Critical",
+                  "tone": "red"
+                },
+                "R13",
+                "Required test result “Reconciliation regression suite” for TD-1001 is failing (Test automation RUN-5521, 5 Mar 2027); T…",
+                "RUN-5521, TD-1001, CCR-203"
+              ],
+              [
+                {
+                  "text": "High",
+                  "tone": "amber"
+                },
+                "R6",
+                "“Stressed market-data extract for scenario reconciliation” is committed for 8 Mar 2027, 9 days after TD-1001 needs it (…",
+                "CCR-R-07, TD-1001, TD-1016"
+              ],
+              [
+                {
+                  "text": "High",
+                  "tone": "amber"
+                },
+                "R11",
+                "Outcome “Stressed exposures reconcile between the risk engine and the reporting layer” (TD-1001) is reported on track i…",
+                "OC-1001-2, OC-1001-2 criterion 1, OC-10…"
+              ],
+              [
+                {
+                  "text": "High",
+                  "tone": "amber"
+                },
+                "R11",
+                "Outcome “Reconciliation breaks explained to risk users” (TD-1001) is reported on track in Portfolio system, due 3 days…",
+                "OC-1001-3, OC-1001-3 criterion 1, OC-10…"
+              ],
+              [
+                {
+                  "text": "Medium",
+                  "tone": "neutral"
+                },
+                "R3",
+                "CCR-301 “Consume the stressed market-data extract from the shared data platform” was due on 27 Feb 2027 (9 days ago) an…",
+                "CCR-301"
+              ],
+              [
+                {
+                  "text": "Medium",
+                  "tone": "neutral"
+                },
+                "R4",
+                "Risk CCR-R-07 “Stressed market data arrives late from the Singapore data hub” (High) has no update for 23 days.",
+                "CCR-R-07"
+              ]
+            ],
+            "emptyText": "The engine raised no findings for TD-1001."
+          }
+        }
+      ],
+      "notes": "These findings drive the evidence-based status: critical findings make it Red, high findings Amber. Most severe first.\n\nRecords: TD-1001, CCR-R-07, CCR-301, RUN-5521, CCR-203, TD-1016, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, CCR-104, CCR-105, CCR-106, CCR-201, CCR-202, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, CCR-204, CCR-205, CCR-206, CCR-207, CCR-302, CCR-303, CCR-R-07\n\nShortened on the slide:\n- TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singapore) is 9 days late (needed by 27 Feb 2027, committed for 8 Mar 2027).\n- Required test result “Reconciliation regression suite” for TD-1001 is failing (Test automation RUN-5521, 5 Mar 2027); T3 High needs it passing before release.\n- “Stressed market-data extract for scenario reconciliation” is committed for 8 Mar 2027, 9 days after TD-1001 needs it (27 Feb 2027); provider TD-1016.\n- Outcome “Stressed exposures reconcile between the risk engine and the reporting layer” (TD-1001) is reported on track in Portfolio system, due 7 days ago, with no acceptance recorded: only 0 of 3 mandatory criteria are accepted and no business acceptance record is held.\n- OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, CCR-104, CCR-105, CCR-106, CCR-201, CCR-202, CCR-203, CCR-301\n- Outcome “Reconciliation breaks explained to risk users” (TD-1001) is reported on track in Portfolio system, due 3 days ago, with no acceptance recorded: only 0 of 2 mandatory criteria are accepted and no business acceptance record is held.\n- OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, CCR-204, CCR-205, CCR-206, CCR-207, CCR-302, CCR-303\n- CCR-301 “Consume the stressed market-data extract from the shared data platform” was due on 27 Feb 2027 (9 days ago) and is still in progress.",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-1"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-plan:deliverable:td-1001",
+      "kind": "td-plan",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Late input from TD-1016 could move TD-1001’s end to 9 Apr 2027",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "timeline",
+      "blocks": [
+        {
+          "region": "top",
+          "block": {
+            "type": "kpis",
+            "items": [
+              {
+                "label": "Planned end",
+                "value": "31 Mar 2027"
+              },
+              {
+                "label": "Forecast end",
+                "value": "19 Mar 2027",
+                "caption": "From recent throughput",
+                "tone": "neutral"
+              },
+              {
+                "label": "With knock-on",
+                "value": "9 Apr 2027",
+                "caption": "9 days late input",
+                "tone": "red"
+              },
+              {
+                "label": "Days beyond plan",
+                "value": "9",
+                "tone": "red"
+              }
+            ]
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "timeline",
+            "window": {
+              "start": "2026-12-28",
+              "end": "2027-04-23"
+            },
+            "today": "2027-03-08",
+            "rows": [
+              {
+                "label": "TD-1001",
+                "plannedStart": "2027-01-04",
+                "plannedEnd": "2027-03-31",
+                "projectedEnd": "2027-04-09",
+                "completion": 0.82,
+                "tone": "red",
+                "milestones": [
+                  {
+                    "date": "2027-02-27",
+                    "label": "Needs input from TD-1016",
+                    "regulatory": false,
+                    "tone": "red"
+                  },
+                  {
+                    "date": "2027-03-19",
+                    "label": "Quarter-end stress run",
+                    "regulatory": true,
+                    "tone": "amber"
+                  },
+                  {
+                    "date": "2027-03-26",
+                    "label": "Needs input from TD-1003",
+                    "regulatory": false,
+                    "tone": "neutral"
+                  },
+                  {
+                    "date": "2027-03-31",
+                    "label": "Reconciliation sign-off to the risk committee",
+                    "regulatory": false,
+                    "tone": "amber"
+                  }
+                ],
+                "note": "+9d knock-on from TD-1016"
+              },
+              {
+                "label": "CCR-100 Stress scenario ingestion and v…",
+                "plannedStart": "2027-01-04",
+                "plannedEnd": "2027-03-31"
+              },
+              {
+                "label": "CCR-200 Exposure reconciliation engine",
+                "plannedStart": "2027-01-04",
+                "plannedEnd": "2027-03-31",
+                "projectedEnd": "2027-03-18"
+              },
+              {
+                "label": "CCR-300 Break reporting and sign-off",
+                "plannedStart": "2027-01-04",
+                "plannedEnd": "2027-03-31"
+              }
+            ]
+          }
+        }
+      ],
+      "notes": "Late input from TD-1016 could move TD-1001’s end to 9 Apr 2027. 18 points remain; 74 points closed in the last 42 days (12.3 a week) puts the end at 19 Mar 2027, against 31 Mar 2027 planned.\n\nRecords: TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, CCR-R-07, CCR-100, CCR-200, CCR-300\n\nKnock-on:\n- “Stressed market-data extract for scenario reconciliation” is 9 days late for TD-1001; passing the delay through moves its planned end from 31 Mar 2027 to 9 Apr 2027 and 2 milestones with it.",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-1"
+          },
+          "label": "TD-1001 milestone 19 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-2"
+          },
+          "label": "TD-1001 milestone 31 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-100"
+          },
+          "label": "CCR-100",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-200"
+          },
+          "label": "CCR-200",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-300"
+          },
+          "label": "CCR-300",
+          "system": "Jira"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-raid:deliverable:td-1001",
+      "kind": "td-raid",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001: 3 open RAID items, 1 late dependency",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "two-column",
+      "blocks": [
+        {
+          "region": "left",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Key",
+                "width": 2
+              },
+              {
+                "header": "Kind",
+                "width": 2
+              },
+              {
+                "header": "Title",
+                "width": 5,
+                "maxChars": 40
+              },
+              {
+                "header": "Severity",
+                "width": 2
+              },
+              {
+                "header": "Owner",
+                "width": 3,
+                "maxChars": 20
+              },
+              {
+                "header": "Age",
+                "width": 1,
+                "align": "right"
+              },
+              {
+                "header": "Status",
+                "width": 2
+              }
+            ],
+            "rows": [
+              [
+                "CCR-R-07",
+                "Risk",
+                "Stressed market data arrives late from…",
+                {
+                  "text": "High",
+                  "tone": "amber"
+                },
+                "Priya Raman",
+                "49d",
+                "Open"
+              ],
+              [
+                "CCR-R-04",
+                "Assumption",
+                "Scenario library stays frozen until qua…",
+                {
+                  "text": "Medium",
+                  "tone": "neutral"
+                },
+                "Imogen Pemberton",
+                "55d",
+                "Open"
+              ],
+              [
+                "CCR-R-11",
+                "Issue",
+                "Break volumes above the agreed review c…",
+                {
+                  "text": "Medium",
+                  "tone": "neutral"
+                },
+                "Rosalind Mercado",
+                "14d",
+                "Mitigating"
+              ]
+            ],
+            "emptyText": "No RAID items are recorded for TD-1001."
+          }
+        },
+        {
+          "region": "right",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Direction",
+                "width": 3
+              },
+              {
+                "header": "Dependency",
+                "width": 5,
+                "maxChars": 40
+              },
+              {
+                "header": "Need by",
+                "width": 2
+              },
+              {
+                "header": "Status",
+                "width": 2
+              },
+              {
+                "header": "Late",
+                "width": 1,
+                "align": "right"
+              }
+            ],
+            "rows": [
+              [
+                "In from TD-1016",
+                "Stressed market-data extract for scenar…",
+                "27 Feb 2027",
+                {
+                  "text": "Late",
+                  "tone": "red"
+                },
+                "9d"
+              ],
+              [
+                "In from TD-1003",
+                "Collateral dispute log feeding exposure…",
+                "26 Mar 2027",
+                {
+                  "text": "On track",
+                  "tone": "green"
+                },
+                "—"
+              ]
+            ],
+            "emptyText": "TD-1001 has no dependencies recorded."
+          }
+        }
+      ],
+      "notes": "TD-1001 has 3 open RAID items and 1 late or blocked dependency. Age counts days since each item was raised.\n\nRecords: TD-1001, CCR-R-07, CCR-R-04, CCR-R-11, CCR-R-07, CCR-106\n\nShortened on the slide:\n- Stressed market data arrives late from the Singapore data hub\n- Scenario library stays frozen until quarter-end\n- Break volumes above the agreed review capacity for risk users\n- Stressed market-data extract for scenario reconciliation\n- Collateral dispute log feeding exposure adjustments",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-1"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-2"
+          },
+          "label": "CCR-R-04",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-3"
+          },
+          "label": "CCR-R-11",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-11"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-pdlc:deliverable:td-1001",
+      "kind": "td-pdlc",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001 is in Build, Test & Validate; independent validator pending",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "rail",
+      "blocks": [
+        {
+          "region": "top",
+          "block": {
+            "type": "stage-rail",
+            "stages": [
+              {
+                "stageId": "ideation-requirements",
+                "name": "Ideation & Requirements",
+                "state": "done",
+                "detail": "Approved by Priya Raman · 1 record"
+              },
+              {
+                "stageId": "design-specifications",
+                "name": "Design & Specifications",
+                "state": "done",
+                "detail": "Approved by Priya Raman · 1 record"
+              },
+              {
+                "stageId": "risk-control-compliance",
+                "name": "Risk, Control & Compliance Reviews",
+                "state": "done",
+                "detail": "Approved by Jordan Ellis · 0 records"
+              },
+              {
+                "stageId": "build-test-validate",
+                "name": "Build, Test & Validate",
+                "state": "current",
+                "detail": "Current · Independent validator pending (Mei Lin Tan)"
+              },
+              {
+                "stageId": "delivery-launch",
+                "name": "Delivery & Launch",
+                "state": "not-started",
+                "detail": "Not started"
+              }
+            ]
+          }
+        },
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Stage",
+                "width": 3
+              },
+              {
+                "header": "Status",
+                "width": 2
+              },
+              {
+                "header": "Reviews",
+                "width": 5,
+                "maxChars": 70
+              },
+              {
+                "header": "Evidence left",
+                "width": 5,
+                "maxChars": 70
+              }
+            ],
+            "rows": [
+              [
+                "Ideation & Requirements",
+                "Approved",
+                "Requirements owner approved (Priya Raman)",
+                "Requirements sign-off: pass"
+              ],
+              [
+                "Design & Specifications",
+                "Approved",
+                "Design reviewer approved (Priya Raman)",
+                "Design review: pass"
+              ],
+              [
+                "Risk, Control & Compliance Reviews",
+                "Approved",
+                "Control owner approved (Jordan Ellis)",
+                "Control assessment: missing"
+              ],
+              [
+                "Build, Test & Validate",
+                "In review",
+                "Independent validator pending (Mei Lin Tan)",
+                "Test result: fail"
+              ],
+              [
+                "Delivery & Launch",
+                "Not started",
+                "Business owner not requested (Alexis Merrow); Release owner not reque…",
+                "Business acceptance: pass; Release checklist: missing"
+              ]
+            ]
+          }
+        }
+      ],
+      "notes": "TD-1001 is in Build, Test & Validate; independent validator pending. Moving to Delivery & Launch needs the independent validator review (pending) approved first.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Business owner not requested (Alexis Merrow); Release owner not requested (Priya Raman)",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-rs"
+          },
+          "label": "DOC-1120",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-dr"
+          },
+          "label": "DOC-1138",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-ba"
+          },
+          "label": "DOC-118",
+          "system": "Document store"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-pod:deliverable:td-1001",
+      "kind": "td-pod",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Counterparty risk analytics: 4 people, 2 agent identities",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "two-column",
+      "blocks": [
+        {
+          "region": "left",
+          "block": {
+            "type": "kpis",
+            "items": [
+              {
+                "label": "People",
+                "value": "4",
+                "caption": "Lead: Imogen Pemberton"
+              },
+              {
+                "label": "Agent identities",
+                "value": "2"
+              },
+              {
+                "label": "Agent share of items",
+                "value": "4%",
+                "caption": "1 of 23 items assigned to agents"
+              }
+            ]
+          }
+        },
+        {
+          "region": "left",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Name",
+                "width": 3
+              },
+              {
+                "header": "Title",
+                "width": 3,
+                "maxChars": 28
+              },
+              {
+                "header": "Hub",
+                "width": 2
+              }
+            ],
+            "rows": [
+              [
+                "Imogen Pemberton",
+                "Delivery lead",
+                "London"
+              ],
+              [
+                "Aoife Ashcroft",
+                "Engineer",
+                "London"
+              ],
+              [
+                "Dominik Sorensen",
+                "Engineer",
+                "London"
+              ],
+              [
+                "Ines Reinholt",
+                "Data engineer",
+                "London"
+              ]
+            ],
+            "emptyText": "No people are recorded in this pod."
+          }
+        },
+        {
+          "region": "right",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Identity",
+                "width": 3
+              },
+              {
+                "header": "Agent",
+                "width": 3
+              },
+              {
+                "header": "Accountable owner",
+                "width": 3
+              }
+            ],
+            "rows": [
+              [
+                "agent-status-01",
+                "Status reporting",
+                "Imogen Pemberton"
+              ],
+              [
+                "agent-ctrl-01",
+                "Control evidence check",
+                "Imogen Pemberton"
+              ]
+            ],
+            "emptyText": "No agent identities are attached to this pod."
+          }
+        }
+      ],
+      "notes": "Counterparty risk analytics in London delivers TD-1001. Agents carry 1 of 23 items; each agent identity has a named accountable owner.\n\nRecords: TD-1001",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-jira-map:deliverable:td-1001",
+      "kind": "td-jira-map",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001 maps to 3 Epics in Jira by Deliverable ID",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "two-column",
+      "blocks": [
+        {
+          "region": "left",
+          "block": {
+            "type": "text",
+            "text": "Above the book-of-record boundary: Portfolio system",
+            "emphasis": "caption"
+          }
+        },
+        {
+          "region": "left",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Field",
+                "width": 2
+              },
+              {
+                "header": "Value",
+                "width": 5,
+                "maxChars": 60
+              }
+            ],
+            "rows": [
+              [
+                "Deliverable ID",
+                "TD-1001"
+              ],
+              [
+                "Title",
+                "Counterparty exposure — stress scenario reconciliation"
+              ],
+              [
+                "Path",
+                "IR-2027-001 › PG-CCR"
+              ],
+              [
+                "Reported",
+                {
+                  "text": "Green",
+                  "tone": "green"
+                }
+              ],
+              [
+                "Template",
+                "Advanced template"
+              ],
+              [
+                "Outcomes",
+                "OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4"
+              ]
+            ]
+          }
+        },
+        {
+          "region": "right",
+          "block": {
+            "type": "text",
+            "text": "Below the boundary: Jira",
+            "emphasis": "caption"
+          }
+        },
+        {
+          "region": "right",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Epic",
+                "width": 2
+              },
+              {
+                "header": "Summary",
+                "width": 4,
+                "maxChars": 32
+              },
+              {
+                "header": "Deliverable ID",
+                "width": 3
+              },
+              {
+                "header": "Items",
+                "width": 1,
+                "align": "right"
+              },
+              {
+                "header": "Outcome ID",
+                "width": 2
+              }
+            ],
+            "rows": [
+              [
+                "CCR-100",
+                "Stress scenario ingestion and v…",
+                {
+                  "text": "TD-1001",
+                  "tone": "green"
+                },
+                "6",
+                "6 of 6"
+              ],
+              [
+                "CCR-200",
+                "Exposure reconciliation engine",
+                {
+                  "text": "TD-1001",
+                  "tone": "green"
+                },
+                "7",
+                "7 of 7"
+              ],
+              [
+                "CCR-300",
+                "Break reporting and sign-off",
+                {
+                  "text": "TD-1001",
+                  "tone": "green"
+                },
+                "6",
+                "6 of 6"
+              ]
+            ],
+            "emptyText": "No Epics are linked to TD-1001."
+          }
+        }
+      ],
+      "notes": "TD-1001 is the Portfolio system record; in Jira each Epic carries its Deliverable ID, and story-level items carry an Outcome ID linking work to outcomes.\n\nRecords: TD-1001, CCR-100, CCR-200, CCR-300, OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4\n\nShortened on the slide:\n- Stress scenario ingestion and validation",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-100"
+          },
+          "label": "CCR-100",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-200"
+          },
+          "label": "CCR-200",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-300"
+          },
+          "label": "CCR-300",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-1"
+          },
+          "label": "OC-1001-1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-4"
+          },
+          "label": "OC-1001-4",
+          "system": "Portfolio system"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "reported",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "td-status:deliverable:td-1001",
+      "kind": "td-status",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "TD-1001 weekly status: no draft generated yet",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "statement",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "callout",
+            "tone": "neutral",
+            "title": "No draft yet",
+            "text": "No weekly status draft has been generated for TD-1001 yet. In the app, open TD-1001 in Deliverable detail or the Agent centre, run the Status reporting agent, then build this slide again."
+          }
+        }
+      ],
+      "notes": "No scripted status draft exists for TD-1001 yet, so no narrative is shown. In the app, open TD-1001 in Deliverable detail or the Agent centre, run the Status reporting agent, then build this slide again.\n\nRecords: TD-1001",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "decisions:deliverable:td-1001",
+      "kind": "decisions",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Decisions and next steps for TD-1001",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "title-only",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "bullets",
+            "items": [
+              {
+                "text": "[Decision needed] Agree recovery for the late critical dependency into TD-1001, or re-report its status. Owner: [name]. By: [date].",
+                "tone": "red"
+              },
+              {
+                "text": "[Decision needed] Decide whether to fix and repeat RUN-5521 on TD-1001 before release. Owner: [name]. By: [date].",
+                "tone": "red"
+              },
+              {
+                "text": "[Decision needed] Agree a committed date for CCR-R-07 that meets the need-by date. Owner: [name]. By: [date].",
+                "tone": "amber"
+              },
+              {
+                "text": "[Decision needed] Ask the acceptance owner to accept OC-1001-2, or re-report its status. Owner: [name]. By: [date].",
+                "tone": "amber"
+              },
+              {
+                "text": "[Decision needed] Ask the acceptance owner to accept OC-1001-3, or re-report its status. Owner: [name]. By: [date].",
+                "tone": "amber"
+              },
+              {
+                "text": "[Decision needed] [Describe the decision]. Owner: [name]. By: [date]."
+              },
+              {
+                "text": "[Next step] [Describe the action]. Owner: [name]. By: [date]."
+              }
+            ]
+          }
+        }
+      ],
+      "notes": "Edit these before the meeting. The first 5 items come from the most severe findings that name an action; the rest are blank placeholders.\n\nRecords: TD-1001, CCR-R-07, CCR-301, RUN-5521, CCR-203, TD-1016, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, CCR-104, CCR-105, CCR-106, CCR-201, CCR-202, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, CCR-204, CCR-205, CCR-206, CCR-207, CCR-302, CCR-303",
+      "citations": [
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "how-to-read:deliverable:td-1001",
+      "kind": "how-to-read",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "How to read these measures: three answers, kept separate",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "two-column",
+      "blocks": [
+        {
+          "region": "left",
+          "block": {
+            "type": "bullets",
+            "items": [
+              {
+                "text": "Work completion: story points closed out of points estimated, across the Epics in Jira."
+              },
+              {
+                "text": "Accepted outcomes: outcomes a named person has accepted, with a business acceptance record, counted and weighted."
+              },
+              {
+                "text": "Delivery readiness: Ready, Not ready or Unknown, from the evidence the risk tier requires. Never a percentage."
+              },
+              {
+                "text": "The three move independently: closed work does not accept an outcome, and accepted outcomes do not make a deliverable ready."
+              }
+            ]
+          }
+        },
+        {
+          "region": "right",
+          "block": {
+            "type": "bullets",
+            "items": [
+              {
+                "text": "Reported: the status recorded in Portfolio system, the book of record. Never changed here."
+              },
+              {
+                "text": "Evidence-based: computed from findings and dates. Red for critical findings or missed dates, Amber for high findings or stale reports."
+              },
+              {
+                "text": "Not computable: there is not enough data to compute the measure, for example no estimated work. It is never shown as zero; the reason is given."
+              },
+              {
+                "text": "Scripted agent draft: text from a deterministic scripted agent, not a person or a language model. Each sentence cites its records."
+              }
+            ]
+          }
+        }
+      ],
+      "notes": "Three measures answer three different questions, and reported status always sits beside the status the evidence supports.\n\nRecords: none cited",
+      "citations": [],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08"
+    },
+    {
+      "id": "record-index:deliverable:td-1001",
+      "kind": "record-index",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Records cited: 38",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "table",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Record",
+                "width": 3,
+                "maxChars": 30
+              },
+              {
+                "header": "Type",
+                "width": 3
+              },
+              {
+                "header": "System",
+                "width": 3
+              },
+              {
+                "header": "Title",
+                "width": 9,
+                "maxChars": 70
+              }
+            ],
+            "rows": [
+              [
+                "OC-1001-1",
+                "Outcome",
+                "Portfolio system",
+                "Quarter-end stress scenario set agreed and loaded"
+              ],
+              [
+                "OC-1001-2",
+                "Outcome",
+                "Portfolio system",
+                "Stressed exposures reconcile between the risk engine and the reportin…"
+              ],
+              [
+                "OC-1001-2 criterion 1",
+                "Acceptance criterion",
+                "Portfolio system",
+                "Stressed exposures agree between the risk engine and the reporting la…"
+              ],
+              [
+                "OC-1001-2 criterion 2",
+                "Acceptance criterion",
+                "Portfolio system",
+                "Differences above tolerance are listed with the netting set and the c…"
+              ],
+              [
+                "OC-1001-2 criterion 3",
+                "Acceptance criterion",
+                "Portfolio system",
+                "Reconciliation reruns reproduce the same result"
+              ],
+              [
+                "OC-1001-3",
+                "Outcome",
+                "Portfolio system",
+                "Reconciliation breaks explained to risk users"
+              ],
+              [
+                "OC-1001-3 criterion 1",
+                "Acceptance criterion",
+                "Portfolio system",
+                "Every break above tolerance carries a classified cause"
+              ],
+              [
+                "OC-1001-3 criterion 2",
+                "Acceptance criterion",
+                "Portfolio system",
+                "Risk users confirm the explanation view answers their questions"
+              ],
+              [
+                "OC-1001-4",
+                "Outcome",
+                "Portfolio system",
+                "Control evidence filed for model validation and reporting sign-off"
+              ],
+              [
+                "TD-1001",
+                "Technology deliverable",
+                "Portfolio system",
+                "Counterparty exposure — stress scenario reconciliation"
+              ]
+            ],
+            "emptyText": "No records are cited."
+          }
+        }
+      ],
+      "notes": "Every record cited in this deck, by key, with the system it lives in: Portfolio system above the book-of-record boundary, Jira below it.\n\nRecords: OC-1001-1, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, OC-1001-4, TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, TD-1016, CCR-100, CCR-104, CCR-105, CCR-106, CCR-106, CCR-200, CCR-201, CCR-202, CCR-203, CCR-204, CCR-205, CCR-206, CCR-207, CCR-300, CCR-301, CCR-302, CCR-303, CCR-R-04, CCR-R-07, CCR-R-07, CCR-R-11, DOC-118, DOC-1120, DOC-1138, RUN-5521\n\nShortened on the slide:\n- Stressed exposures reconcile between the risk engine and the reporting layer\n- Stressed exposures agree between the risk engine and the reporting layer within tolerance for all netting sets\n- Differences above tolerance are listed with the netting set and the cause",
+      "citations": [
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-1"
+          },
+          "label": "OC-1001-1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-4"
+          },
+          "label": "OC-1001-4",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-1"
+          },
+          "label": "TD-1001 milestone 19 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-2"
+          },
+          "label": "TD-1001 milestone 31 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-100"
+          },
+          "label": "CCR-100",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-11"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-200"
+          },
+          "label": "CCR-200",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-300"
+          },
+          "label": "CCR-300",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-2"
+          },
+          "label": "CCR-R-04",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-1"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-3"
+          },
+          "label": "CCR-R-11",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-ba"
+          },
+          "label": "DOC-118",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-rs"
+          },
+          "label": "DOC-1120",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-dr"
+          },
+          "label": "DOC-1138",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08",
+      "page": {
+        "index": 1,
+        "of": 4
+      }
+    },
+    {
+      "id": "record-index:deliverable:td-1001:p2",
+      "kind": "record-index",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Records cited: 38 (continued, 2 of 4)",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "table",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Record",
+                "width": 3,
+                "maxChars": 30
+              },
+              {
+                "header": "Type",
+                "width": 3
+              },
+              {
+                "header": "System",
+                "width": 3
+              },
+              {
+                "header": "Title",
+                "width": 9,
+                "maxChars": 70
+              }
+            ],
+            "rows": [
+              [
+                "TD-1001 milestone 19 Mar 2027",
+                "Regulatory milestone",
+                "Portfolio system",
+                "Quarter-end stress run"
+              ],
+              [
+                "TD-1001 milestone 31 Mar 2027",
+                "Milestone",
+                "Portfolio system",
+                "Reconciliation sign-off to the risk committee"
+              ],
+              [
+                "TD-1016",
+                "Technology deliverable",
+                "Portfolio system",
+                "Stressed market-data extract service"
+              ],
+              [
+                "CCR-100",
+                "Epic",
+                "Jira",
+                "Stress scenario ingestion and validation"
+              ],
+              [
+                "CCR-104",
+                "Story",
+                "Jira",
+                "Map stressed risk factors to reporting-layer identifiers"
+              ],
+              [
+                "CCR-105",
+                "Bug",
+                "Jira",
+                "Fix currency mapping for stressed FX shocks"
+              ],
+              [
+                "CCR-106",
+                "Story",
+                "Jira",
+                "Handle missing tenor points in stressed curves"
+              ],
+              [
+                "CCR-106",
+                "Dependency",
+                "Jira",
+                "Collateral dispute log feeding exposure adjustments (TD-1003 to TD-10…"
+              ],
+              [
+                "CCR-200",
+                "Epic",
+                "Jira",
+                "Exposure reconciliation engine"
+              ],
+              [
+                "CCR-201",
+                "Story",
+                "Jira",
+                "Compute stressed exposure deltas per netting set"
+              ]
+            ],
+            "emptyText": "No records are cited."
+          }
+        }
+      ],
+      "notes": "Every record cited in this deck, by key, with the system it lives in: Portfolio system above the book-of-record boundary, Jira below it.\n\nRecords: OC-1001-1, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, OC-1001-4, TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, TD-1016, CCR-100, CCR-104, CCR-105, CCR-106, CCR-106, CCR-200, CCR-201, CCR-202, CCR-203, CCR-204, CCR-205, CCR-206, CCR-207, CCR-300, CCR-301, CCR-302, CCR-303, CCR-R-04, CCR-R-07, CCR-R-07, CCR-R-11, DOC-118, DOC-1120, DOC-1138, RUN-5521\n\nShortened on the slide:\n- Collateral dispute log feeding exposure adjustments (TD-1003 to TD-1001)",
+      "citations": [
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-1"
+          },
+          "label": "OC-1001-1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-4"
+          },
+          "label": "OC-1001-4",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-1"
+          },
+          "label": "TD-1001 milestone 19 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-2"
+          },
+          "label": "TD-1001 milestone 31 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-100"
+          },
+          "label": "CCR-100",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-11"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-200"
+          },
+          "label": "CCR-200",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-300"
+          },
+          "label": "CCR-300",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-2"
+          },
+          "label": "CCR-R-04",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-1"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-3"
+          },
+          "label": "CCR-R-11",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-ba"
+          },
+          "label": "DOC-118",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-rs"
+          },
+          "label": "DOC-1120",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-dr"
+          },
+          "label": "DOC-1138",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08",
+      "page": {
+        "index": 2,
+        "of": 4
+      }
+    },
+    {
+      "id": "record-index:deliverable:td-1001:p3",
+      "kind": "record-index",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Records cited: 38 (continued, 3 of 4)",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "table",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Record",
+                "width": 3,
+                "maxChars": 30
+              },
+              {
+                "header": "Type",
+                "width": 3
+              },
+              {
+                "header": "System",
+                "width": 3
+              },
+              {
+                "header": "Title",
+                "width": 9,
+                "maxChars": 70
+              }
+            ],
+            "rows": [
+              [
+                "CCR-202",
+                "Story",
+                "Jira",
+                "Aggregate stressed exposures to counterparty and legal entity"
+              ],
+              [
+                "CCR-203",
+                "Story",
+                "Jira",
+                "Reconcile stressed potential future exposure between the risk engine…"
+              ],
+              [
+                "CCR-204",
+                "New Feature",
+                "Jira",
+                "Classify breaks by cause: valuation, static data or timing"
+              ],
+              [
+                "CCR-205",
+                "Bug",
+                "Jira",
+                "Fix break tolerance applied in the wrong currency"
+              ],
+              [
+                "CCR-206",
+                "Story",
+                "Jira",
+                "Build the break explanation view for risk users"
+              ],
+              [
+                "CCR-207",
+                "Story",
+                "Jira",
+                "Add break tolerance settings by asset class"
+              ],
+              [
+                "CCR-300",
+                "Epic",
+                "Jira",
+                "Break reporting and sign-off"
+              ],
+              [
+                "CCR-301",
+                "Task",
+                "Jira",
+                "Consume the stressed market-data extract from the shared data platform"
+              ],
+              [
+                "CCR-302",
+                "Story",
+                "Jira",
+                "Agree the break report layout with desk heads"
+              ],
+              [
+                "CCR-303",
+                "Story",
+                "Jira",
+                "Distribute the daily break report to risk users"
+              ]
+            ],
+            "emptyText": "No records are cited."
+          }
+        }
+      ],
+      "notes": "Every record cited in this deck, by key, with the system it lives in: Portfolio system above the book-of-record boundary, Jira below it.\n\nRecords: OC-1001-1, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, OC-1001-4, TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, TD-1016, CCR-100, CCR-104, CCR-105, CCR-106, CCR-106, CCR-200, CCR-201, CCR-202, CCR-203, CCR-204, CCR-205, CCR-206, CCR-207, CCR-300, CCR-301, CCR-302, CCR-303, CCR-R-04, CCR-R-07, CCR-R-07, CCR-R-11, DOC-118, DOC-1120, DOC-1138, RUN-5521\n\nShortened on the slide:\n- Reconcile stressed potential future exposure between the risk engine and the reporting layer",
+      "citations": [
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-1"
+          },
+          "label": "OC-1001-1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-4"
+          },
+          "label": "OC-1001-4",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-1"
+          },
+          "label": "TD-1001 milestone 19 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-2"
+          },
+          "label": "TD-1001 milestone 31 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-100"
+          },
+          "label": "CCR-100",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-11"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-200"
+          },
+          "label": "CCR-200",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-300"
+          },
+          "label": "CCR-300",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-2"
+          },
+          "label": "CCR-R-04",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-1"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-3"
+          },
+          "label": "CCR-R-11",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-ba"
+          },
+          "label": "DOC-118",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-rs"
+          },
+          "label": "DOC-1120",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-dr"
+          },
+          "label": "DOC-1138",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08",
+      "page": {
+        "index": 3,
+        "of": 4
+      }
+    },
+    {
+      "id": "record-index:deliverable:td-1001:p4",
+      "kind": "record-index",
+      "scope": {
+        "kind": "deliverable",
+        "deliverableId": "td-1001"
+      },
+      "title": "Records cited: 38 (continued, 4 of 4)",
+      "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+      "layout": "table",
+      "blocks": [
+        {
+          "region": "main",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Record",
+                "width": 3,
+                "maxChars": 30
+              },
+              {
+                "header": "Type",
+                "width": 3
+              },
+              {
+                "header": "System",
+                "width": 3
+              },
+              {
+                "header": "Title",
+                "width": 9,
+                "maxChars": 70
+              }
+            ],
+            "rows": [
+              [
+                "CCR-R-04",
+                "Assumption",
+                "Jira",
+                "Scenario library stays frozen until quarter-end"
+              ],
+              [
+                "CCR-R-07",
+                "Dependency",
+                "Jira",
+                "Stressed market-data extract for scenario reconciliation (TD-1016 to…"
+              ],
+              [
+                "CCR-R-07",
+                "Risk",
+                "Jira",
+                "Stressed market data arrives late from the Singapore data hub"
+              ],
+              [
+                "CCR-R-11",
+                "Issue",
+                "Jira",
+                "Break volumes above the agreed review capacity for risk users"
+              ],
+              [
+                "DOC-118",
+                "Business acceptance",
+                "Document store",
+                "Scenario set acceptance"
+              ],
+              [
+                "DOC-1120",
+                "Requirements sign-off",
+                "Document store",
+                "Requirements sign-off for the reconciliation scope"
+              ],
+              [
+                "DOC-1138",
+                "Design review",
+                "Document store",
+                "Design review of the reconciliation approach"
+              ],
+              [
+                "RUN-5521",
+                "Test result",
+                "Test automation",
+                "Reconciliation regression suite"
+              ]
+            ],
+            "emptyText": "No records are cited."
+          }
+        }
+      ],
+      "notes": "Every record cited in this deck, by key, with the system it lives in: Portfolio system above the book-of-record boundary, Jira below it.\n\nRecords: OC-1001-1, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, OC-1001-4, TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, TD-1016, CCR-100, CCR-104, CCR-105, CCR-106, CCR-106, CCR-200, CCR-201, CCR-202, CCR-203, CCR-204, CCR-205, CCR-206, CCR-207, CCR-300, CCR-301, CCR-302, CCR-303, CCR-R-04, CCR-R-07, CCR-R-07, CCR-R-11, DOC-118, DOC-1120, DOC-1138, RUN-5521\n\nShortened on the slide:\n- Stressed market-data extract for scenario reconciliation (TD-1016 to TD-1001)",
+      "citations": [
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-1"
+          },
+          "label": "OC-1001-1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-2"
+          },
+          "label": "OC-1001-2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-1"
+          },
+          "label": "OC-1001-2 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-2"
+          },
+          "label": "OC-1001-2 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-2-3"
+          },
+          "label": "OC-1001-2 criterion 3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-3"
+          },
+          "label": "OC-1001-3",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-1"
+          },
+          "label": "OC-1001-3 criterion 1",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "criterion",
+            "id": "ac-oc-1001-3-2"
+          },
+          "label": "OC-1001-3 criterion 2",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "outcome",
+            "id": "oc-1001-4"
+          },
+          "label": "OC-1001-4",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1001"
+          },
+          "label": "TD-1001",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-1"
+          },
+          "label": "TD-1001 milestone 19 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "milestone",
+            "id": "ms-1001-2"
+          },
+          "label": "TD-1001 milestone 31 Mar 2027",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "deliverable",
+            "id": "td-1016"
+          },
+          "label": "TD-1016",
+          "system": "Portfolio system"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-100"
+          },
+          "label": "CCR-100",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-104"
+          },
+          "label": "CCR-104",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-105"
+          },
+          "label": "CCR-105",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-106"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-11"
+          },
+          "label": "CCR-106",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-200"
+          },
+          "label": "CCR-200",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-201"
+          },
+          "label": "CCR-201",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-202"
+          },
+          "label": "CCR-202",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-203"
+          },
+          "label": "CCR-203",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-204"
+          },
+          "label": "CCR-204",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-205"
+          },
+          "label": "CCR-205",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-206"
+          },
+          "label": "CCR-206",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-207"
+          },
+          "label": "CCR-207",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-300"
+          },
+          "label": "CCR-300",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-301"
+          },
+          "label": "CCR-301",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-302"
+          },
+          "label": "CCR-302",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "work-item",
+            "id": "CCR-303"
+          },
+          "label": "CCR-303",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-2"
+          },
+          "label": "CCR-R-04",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "dependency",
+            "id": "dep-01"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-1"
+          },
+          "label": "CCR-R-07",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "raid",
+            "id": "raid-1001-3"
+          },
+          "label": "CCR-R-11",
+          "system": "Jira"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-ba"
+          },
+          "label": "DOC-118",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-rs"
+          },
+          "label": "DOC-1120",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-dr"
+          },
+          "label": "DOC-1138",
+          "system": "Document store"
+        },
+        {
+          "ref": {
+            "kind": "evidence",
+            "id": "ev-1001-tr"
+          },
+          "label": "RUN-5521",
+          "system": "Test automation"
+        }
+      ],
+      "provenance": [
+        "computed",
+        "sample"
+      ],
+      "asOf": "2027-03-08",
+      "page": {
+        "index": 4,
+        "of": 4
+      }
+    }
+  ]
+}
