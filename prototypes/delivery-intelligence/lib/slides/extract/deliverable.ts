@@ -83,7 +83,7 @@ export interface DeliverableFacts {
 
 /** The verdict statement for a status pair. */
 export function verdictSentence(ref: string, rag: EvidenceRag): string {
-  if (rag.evidence === 'unknown') return `${ref} is reported ${ragWord(rag.reported)}; evidence is too thin to judge`;
+  if (rag.evidence === 'unknown') return `${ref} is reported ${ragWord(rag.reported)}; evidence too thin to judge`;
   if (rag.disagrees) return `${ref} is reported ${ragWord(rag.reported)}; the evidence says ${ragWord(rag.evidence)}`;
   return `${ref} is ${ragWord(rag.reported)}, as reported and on evidence`;
 }

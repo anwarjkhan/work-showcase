@@ -3,6 +3,7 @@
  * outcomes, findings and plan (docs/SLIDES_PLAN.md section 4).
  */
 import { addDays, daysBetween } from '@/lib/config/clock';
+import { workCompletionOf } from '@/lib/engine';
 import { terms } from '@/lib/config/terminology';
 import type { EntityRef, EvidenceHeldState } from '@/lib/types';
 import {
@@ -17,7 +18,7 @@ import {
 } from '../../extract';
 import type { Block, Cell, TimelineRow, Tone } from '../../types';
 import { at, bullets, col, makeSlide, table, toned, type BuildInput, type SlideBuilder } from '../kit';
-import { expandRefs, measures, ragPairOf, refLabels, severityCell } from './shared';
+import { expandRefs, fitTimelineRows, measures, ragPairOf, refLabels, severityCell } from './shared';
 
 export function factsOf(input: BuildInput): DeliverableFacts {
   if (input.scope.kind !== 'deliverable') throw new Error('This slide needs a deliverable scope.');
@@ -35,7 +36,9 @@ function reasonTone(code: string, fallback: Tone): Tone {
 
 export const tdVerdict: SlideBuilder = (input) => {
   const f = factsOf(input);
-  const reasons = f.rag.reasons.slice(0, 4);
+  // Three reasons fit under the measures; the rest go to the notes.
+  const reasons = f.rag.reasons.slice(0, 3);
+  const more = f.rag.reasons.slice(3);
   const v = f.views;
   return [
     makeSlide(input, {
@@ -46,8 +49,9 @@ export const tdVerdict: SlideBuilder = (input) => {
       say:
         `${f.verdict}. ${v.work.label} is ${v.work.value}, ${v.accepted.value} outcomes are accepted and readiness is ${v.readiness.stateText.toLowerCase()}; ` +
         `each measure moves only with its own evidence.`,
-      refs: [dRef(f), ...expandRefs(input.env, reasons.flatMap((r) => r.refs))],
+      refs: [dRef(f), ...expandRefs(input.env, f.rag.reasons.flatMap((r) => r.refs))],
       provenance: ['computed', 'reported'],
+      extraNotes: more.length > 0 ? [`Further reasons:\n${more.map((r) => `- ${r.message}`).join('\n')}`] : [],
     }),
   ];
 };
@@ -65,8 +69,8 @@ export const tdReadiness: SlideBuilder = (input) => {
     r.state === 'ready'
       ? `${ref} is ready: all ${r.requiredEvidence.length} required evidence kinds pass`
       : r.state === 'not-ready'
-        ? `${ref} is not ready: ${problems.length > 0 ? listPhrases(problems) : 'a blocking dependency'} of ${r.requiredEvidence.length} required`
-        : `${ref} readiness is unknown: ${problems.length > 0 ? listPhrases(problems) : 'evidence pending'} of ${r.requiredEvidence.length} required`;
+        ? `${ref} not ready: ${problems.length > 0 ? `${problems.join(', ')} of ${r.requiredEvidence.length}` : 'a blocking dependency'}`
+        : `${ref} readiness unknown: ${problems.length > 0 ? `${problems.join(', ')} of ${r.requiredEvidence.length}` : 'evidence pending'}`;
   const simulated = r.held.some((h) => h.evidenceId && env.idx.evidence.get(h.evidenceId)?.provenance === 'simulated');
   const rows: Cell[][] = r.held.map((h) => {
     const e = h.evidenceId ? env.idx.evidence.get(h.evidenceId) : undefined;
@@ -119,7 +123,7 @@ export const tdOutcomes: SlideBuilder = (input) => {
   const title = !acc.computable
     ? `${ref} accepted outcomes are not computable`
     : onTrackNotAccepted > 0
-      ? `${acc.value.acceptedCount} of ${acc.value.totalCount} outcomes accepted; ${onTrackNotAccepted} reported on track without it`
+      ? `${acc.value.acceptedCount} of ${acc.value.totalCount} outcomes accepted; ${onTrackNotAccepted} on track without acceptance`
       : `${acc.value.acceptedCount} of ${acc.value.totalCount} ${ref} outcomes are accepted`;
   const rows: Cell[][] = f.outcomes.map((o) => [
     o.outcome.ref,
@@ -127,7 +131,7 @@ export const tdOutcomes: SlideBuilder = (input) => {
     String(o.outcome.weight),
     date(o.outcome.dueDate),
     toned(outcomeStatusWord(o.outcome.reportedStatus), outcomeStatusTone(o.outcome.reportedStatus)),
-    toned(o.accepted ? 'Accepted' : 'Not accepted', o.accepted ? 'green' : 'red'),
+    toned(o.accepted ? terms.acceptance.accepted : terms.acceptance.notAccepted, o.accepted ? 'green' : 'red'),
     o.measures ? (o.measures.workCompletion.computable ? `${o.measures.workCompletion.value.percent}%` : terms.measures.notComputable) : terms.measures.notComputable,
     o.gaps.join('; ') || '—',
   ]);
@@ -198,7 +202,7 @@ export const tdPlan: SlideBuilder = (input) => {
 
   let title: string;
   if (fc?.method === 'complete') title = `${d.ref} work is complete; last item closed ${date(fc.forecastEnd)}`;
-  else if (knockEnd) title = `Late input from ${provider} could move ${d.ref}’s end to ${date(knockEnd)}`;
+  else if (knockEnd) title = `${provider} input could move ${d.ref}’s end to ${date(knockEnd)}`;
   else if (fc && fc.slipDays > 0) title = `${d.ref} is forecast to finish ${date(fc.forecastEnd)}, ${plural(fc.slipDays, 'day')} late`;
   else if (fc?.atRisk) title = `${d.ref} is at risk of slipping beyond ${date(d.plannedEnd)}`;
   else title = `${d.ref} is forecast to finish on plan, ${date(forecastEnd)}`;
@@ -226,8 +230,12 @@ export const tdPlan: SlideBuilder = (input) => {
     },
   ];
   const epicSpans = env.result.plan.spans.filter((s) => s.level === 'epic' && s.parentId === d.id);
-  for (const s of epicSpans.slice(0, 11)) {
+  // The deliverable row plus up to five Epics fit under the headline figures.
+  for (const s of epicSpans.slice(0, 5)) {
+    const stories = (env.eng.childrenOf.get(s.entity.id) ?? []).filter((w) => w.epicKey === s.entity.id && w.type !== 'sub-task');
+    const epicWork = workCompletionOf(stories, [s.entity.id]);
     rows.push({
+      ...(epicWork.computable ? { completion: epicWork.value.ratio } : {}),
       label: s.label.length > 40 ? `${s.label.slice(0, 39).trimEnd()}…` : s.label,
       plannedStart: s.plannedStart,
       plannedEnd: s.plannedEnd,
@@ -238,6 +246,7 @@ export const tdPlan: SlideBuilder = (input) => {
   const start = addDays(allDates.reduce((a, b) => (b < a ? b : a), d.plannedStart), -7);
   const end = addDays(allDates.reduce((a, b) => (b > a ? b : a), d.plannedEnd), 14);
   const slip = daysBetween(d.plannedEnd, projected);
+  const fitted = fitTimelineRows(rows, { start, end });
   const kpis: Block = {
     type: 'kpis',
     items: [
@@ -252,11 +261,11 @@ export const tdPlan: SlideBuilder = (input) => {
       kind: 'td-plan',
       title,
       layout: 'timeline',
-      blocks: [at('top', kpis), at('main', { type: 'timeline', window: { start, end }, today: env.asOf, rows })],
+      blocks: [at('top', kpis), at('main', { type: 'timeline', window: { start, end }, today: env.asOf, rows: fitted.rows })],
       say: `${title}. ${fc ? fc.explanation : ''}`.trim(),
       refs: [dRef(f), ...f.milestones.map((m) => ({ kind: 'milestone' as const, id: m.id })), ...f.knockOnInto.map((k) => ({ kind: 'dependency' as const, id: k.dependencyId })), ...epicSpans.map((s) => s.entity)],
       provenance: ['computed', 'reported'],
-      extraNotes: f.knockOnInto.length > 0 ? [`Knock-on:\n${f.knockOnInto.map((k) => `- ${k.explanation}`).join('\n')}`] : [],
+      extraNotes: [...fitted.notes, ...(f.knockOnInto.length > 0 ? [`Knock-on:\n${f.knockOnInto.map((k) => `- ${k.explanation}`).join('\n')}`] : [])],
     }),
   ];
 };

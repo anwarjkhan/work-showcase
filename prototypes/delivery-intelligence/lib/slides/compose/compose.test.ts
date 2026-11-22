@@ -80,6 +80,35 @@ describe('statement titles and wording rules', () => {
     expect(s.citations.some((c) => c.system === 'Jira')).toBe(true);
   });
 
+  it('the verdict keeps three reasons on the slide and the rest in notes', () => {
+    const s = one(td, 'td-verdict');
+    const list = s.blocks.find((b) => b.block.type === 'bullets')?.block;
+    expect(list?.type === 'bullets' ? list.items.length : 0).toBe(3);
+    expect(s.notes).toContain('Further reasons:\n- 2 high findings (R11');
+  });
+
+  it('the plan labels one milestone per 10 days on a row, lists all in notes and fills Epic bars', () => {
+    const s = one(td, 'td-plan');
+    const tl = s.blocks.find((b) => b.block.type === 'timeline')?.block;
+    if (tl?.type !== 'timeline') throw new Error('no timeline');
+    const row = tl.rows[0];
+    expect(row?.milestones?.map((m) => m.label)).toEqual(['Needs input from TD-1016', 'Quarter-end stress run']);
+    expect(s.notes).toContain('- TD-1001: 26 Mar 2027 Needs input from TD-1003');
+    expect(s.notes).toContain('- TD-1001: 31 Mar 2027 Reconciliation sign-off to the risk committee');
+    expect(s.notes).toContain('- TD-1001: 19 Mar 2027 Quarter-end stress run (regulatory)');
+    expect(tl.rows.slice(1).every((r) => typeof r.completion === 'number')).toBe(true);
+  });
+
+  it('table columns are wide enough for short headers and values', () => {
+    const s = one(td, 'td-raid');
+    const left = s.blocks.find((b) => b.region === 'left')?.block;
+    if (left?.type !== 'table') throw new Error('no table');
+    const w = Object.fromEntries(left.columns.map((c) => [c.header, c.width]));
+    expect(w.Kind).toBeGreaterThanOrEqual('Assumption'.length * 0.095);
+    expect(w.Severity).toBeGreaterThanOrEqual('Severity'.length * 0.11);
+    expect(w.Age).toBeGreaterThanOrEqual(3 * 0.11);
+  });
+
   it('OC-1001-2 summary says reported on track but not accepted', () => {
     expect(one({ kind: 'outcome', outcomeId: 'oc-1001-2' }, 'outcome-summary').title).toBe('OC-1001-2 is reported on track but not accepted');
   });

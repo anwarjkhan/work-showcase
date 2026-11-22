@@ -12,7 +12,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "TD-1001 Counterparty exposure — stress scenario reconciliation",
+      "title": "TD-1001",
       "subtitle": "Technology Deliverable pack",
       "layout": "cover",
       "blocks": [
@@ -20,7 +20,7 @@
           "region": "main",
           "block": {
             "type": "text",
-            "text": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
+            "text": "TD-1001 Counterparty exposure — stress scenario reconciliation\nIR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
             "emphasis": "body"
           }
         },
@@ -28,15 +28,7 @@
           "region": "main",
           "block": {
             "type": "text",
-            "text": "As at 8 Mar 2027",
-            "emphasis": "body"
-          }
-        },
-        {
-          "region": "main",
-          "block": {
-            "type": "text",
-            "text": "Data source: Synthetic data for demonstration only.",
+            "text": "As at 8 Mar 2027 · Data source: Synthetic data for demonstration only.",
             "emphasis": "caption"
           }
         },
@@ -46,7 +38,7 @@
             "type": "callout",
             "tone": "accent",
             "title": "Prototype",
-            "text": "Prototype · synthetic data. Figures are generated for demonstration and describe no real work."
+            "text": "Synthetic data: figures describe no real work."
           }
         }
       ],
@@ -162,7 +154,7 @@
             "evidence": "red",
             "evidenceText": "Evidence-based: Red",
             "disagree": true,
-            "reason": "TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singapore) is 9 days late (needed by 27 Feb 2027, committed for 8 Mar 2027)."
+            "reason": "TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scen…"
           }
         },
         {
@@ -206,16 +198,12 @@
               {
                 "text": "“Stressed market-data extract for scenario reconciliation” is committed for 8 Mar 2027, 9 days after TD-1001 needs it (27 Feb 2027); provider TD-1016.",
                 "tone": "amber"
-              },
-              {
-                "text": "2 high findings (R11: Outcome reported on track or complete with no acceptance recorded). First: Outcome “Stressed exposures reconcile between the ri…",
-                "tone": "amber"
               }
             ]
           }
         }
       ],
-      "notes": "TD-1001 is reported Green; the evidence says Red. Work completion is 82%, 1 of 4 outcomes are accepted and readiness is not ready; each measure moves only with its own evidence.\n\nRecords: TD-1001, CCR-R-07, CCR-301, RUN-5521, CCR-203, TD-1016, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, CCR-104, CCR-105, CCR-106, CCR-201, CCR-202, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, CCR-204, CCR-205, CCR-206, CCR-207, CCR-302, CCR-303\n\nShortened on the slide:\n- TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singapore) is 9 days late (needed by 27 Feb 2027, committed for 8 Mar 2027).\n- Required test result “Reconciliation regression suite” for TD-1001 is failing (Test automation RUN-5521, 5 Mar 2027); T3 High needs it passing before release.\n- 2 high findings (R11: Outcome reported on track or complete with no acceptance recorded). First: Outcome “Stressed exposures reconcile between the risk engine and the reporting layer” (TD-1001) is reported on track in Portfolio system, due 7 days ago, with no acceptance recorded: only 0 of 3 mandatory criteria are accepted and no business acceptance record is held.",
+      "notes": "TD-1001 is reported Green; the evidence says Red. Work completion is 82%, 1 of 4 outcomes are accepted and readiness is not ready; each measure moves only with its own evidence.\n\nRecords: TD-1001, CCR-R-07, CCR-301, RUN-5521, CCR-203, TD-1016, OC-1001-2, OC-1001-2 criterion 1, OC-1001-2 criterion 2, OC-1001-2 criterion 3, CCR-104, CCR-105, CCR-106, CCR-201, CCR-202, OC-1001-3, OC-1001-3 criterion 1, OC-1001-3 criterion 2, CCR-204, CCR-205, CCR-206, CCR-207, CCR-302, CCR-303\n\nFurther reasons:\n- 2 high findings (R11: Outcome reported on track or complete with no acceptance recorded). First: Outcome “Stressed exposures reconcile between the risk engine and the reporting layer” (TD-1001) is reported on track in Portfolio system, due 7 days ago, with no acceptance recorded: only 0 of 3 mandatory criteria are accepted and no business acceptance record is held.\n\nShortened on the slide:\n- TD-1001 is reported Green in Portfolio system, but critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 (Singapore) is 9 days late (needed by 27 Feb 2027, committed for 8 Mar 2027).\n- Required test result “Reconciliation regression suite” for TD-1001 is failing (Test automation RUN-5521, 5 Mar 2027); T3 High needs it passing before release.",
       "citations": [
         {
           "ref": {
@@ -424,7 +412,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "TD-1001 is not ready: 1 failing and 2 missing of 6 required",
+      "title": "TD-1001 not ready: 1 failing, 2 missing of 6",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "kpis-over-table",
       "blocks": [
@@ -474,28 +462,28 @@
             "columns": [
               {
                 "header": "Evidence",
-                "width": 3
+                "width": 2.22
               },
               {
                 "header": "State",
-                "width": 2
+                "width": 1.98
               },
               {
                 "header": "Latest record",
-                "width": 2,
+                "width": 1.91,
                 "maxChars": 18
               },
               {
                 "header": "Observed",
-                "width": 2
+                "width": 1.26
               },
               {
                 "header": "System",
-                "width": 2
+                "width": 1.65
               },
               {
                 "header": "Note",
-                "width": 5,
+                "width": 3.31,
                 "maxChars": 48
               }
             ],
@@ -581,7 +569,7 @@
           }
         }
       ],
-      "notes": "TD-1001 is not ready: 1 failing and 2 missing of 6 required. Readiness is one of three states and never a percentage; it needs every kind T3 High requires held and passing.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118, CCR-R-07\n\nWhy: Required evidence is failing: test result. Critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 is not yet delivered (late, needed by 27 Feb 2027, 9 days late). Required evidence for T3 High is missing: control assessment and release checklist.\n\nShortened on the slide:\n- Requirements sign-off for the reconciliation scope\n- Needed by 27 Feb 2027: Stressed market-data extract for scenario reconciliation",
+      "notes": "TD-1001 not ready: 1 failing, 2 missing of 6. Readiness is one of three states and never a percentage; it needs every kind T3 High requires held and passing.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118, CCR-R-07\n\nWhy: Required evidence is failing: test result. Critical dependency “Stressed market-data extract for scenario reconciliation” from TD-1016 is not yet delivered (late, needed by 27 Feb 2027, 9 days late). Required evidence for T3 High is missing: control assessment and release checklist.\n\nShortened on the slide:\n- Requirements sign-off for the reconciliation scope\n- Needed by 27 Feb 2027: Stressed market-data extract for scenario reconciliation",
       "citations": [
         {
           "ref": {
@@ -645,7 +633,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "1 of 4 outcomes accepted; 2 reported on track without it",
+      "title": "1 of 4 outcomes accepted; 2 on track without acceptance",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "table",
       "blocks": [
@@ -656,45 +644,45 @@
             "columns": [
               {
                 "header": "Outcome",
-                "width": 2
+                "width": 1.08
               },
               {
                 "header": "Title",
-                "width": 5,
-                "maxChars": 46
+                "width": 2.08,
+                "maxChars": 39
               },
               {
                 "header": "Weight",
-                "width": 1,
+                "width": 0.88,
                 "align": "right"
               },
               {
                 "header": "Due",
-                "width": 2
+                "width": 1.26
               },
               {
                 "header": "Reported",
-                "width": 2
+                "width": 1.43
               },
               {
                 "header": "Acceptance",
-                "width": 2
+                "width": 1.87
               },
               {
                 "header": "Work completion",
-                "width": 2,
+                "width": 1.87,
                 "align": "right"
               },
               {
                 "header": "Gaps",
-                "width": 4,
-                "maxChars": 40
+                "width": 1.86,
+                "maxChars": 34
               }
             ],
             "rows": [
               [
                 "OC-1001-1",
-                "Quarter-end stress scenario set agreed and lo…",
+                "Quarter-end stress scenario set agreed…",
                 "2",
                 "12 Feb 2027",
                 {
@@ -710,7 +698,7 @@
               ],
               [
                 "OC-1001-2",
-                "Stressed exposures reconcile between the risk…",
+                "Stressed exposures reconcile between t…",
                 "3",
                 "1 Mar 2027",
                 {
@@ -722,11 +710,11 @@
                   "tone": "red"
                 },
                 "83%",
-                "Reported on track, not accepted; Past d…"
+                "Reported on track, not accepted;…"
               ],
               [
                 "OC-1001-3",
-                "Reconciliation breaks explained to risk users",
+                "Reconciliation breaks explained to ris…",
                 "3",
                 "5 Mar 2027",
                 {
@@ -738,11 +726,11 @@
                   "tone": "red"
                 },
                 "71%",
-                "Reported on track, not accepted; Past d…"
+                "Reported on track, not accepted;…"
               ],
               [
                 "OC-1001-4",
-                "Control evidence filed for model validation a…",
+                "Control evidence filed for model valid…",
                 "2",
                 "31 Mar 2027",
                 {
@@ -761,7 +749,7 @@
           }
         }
       ],
-      "notes": "Reported status sits beside acceptance for each outcome. Accepted outcomes is 1 of 4, 20% of outcome weight; work completion does not accept an outcome.\n\nRecords: TD-1001, OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4\n\nShortened on the slide:\n- Quarter-end stress scenario set agreed and loaded\n- Stressed exposures reconcile between the risk engine and the reporting layer\n- Reported on track, not accepted; Past due\n- Reported on track, not accepted; Past due\n- Control evidence filed for model validation and reporting sign-off",
+      "notes": "Reported status sits beside acceptance for each outcome. Accepted outcomes is 1 of 4, 20% of outcome weight; work completion does not accept an outcome.\n\nRecords: TD-1001, OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4\n\nShortened on the slide:\n- Quarter-end stress scenario set agreed and loaded\n- Stressed exposures reconcile between the risk engine and the reporting layer\n- Reported on track, not accepted; Past due\n- Reconciliation breaks explained to risk users\n- Reported on track, not accepted; Past due\n- Control evidence filed for model validation and reporting sign-off",
       "citations": [
         {
           "ref": {
@@ -829,20 +817,20 @@
             "columns": [
               {
                 "header": "Severity",
-                "width": 2
+                "width": 1.43
               },
               {
                 "header": "Rule",
-                "width": 1
+                "width": 0.66
               },
               {
                 "header": "Finding",
-                "width": 10,
+                "width": 7.35,
                 "maxChars": 120
               },
               {
                 "header": "Records",
-                "width": 3,
+                "width": 2.9,
                 "maxChars": 40
               }
             ],
@@ -1131,7 +1119,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "Late input from TD-1016 could move TD-1001’s end to 9 Apr 2027",
+      "title": "TD-1016 input could move TD-1001’s end to 9 Apr 2027",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "timeline",
       "blocks": [
@@ -1193,34 +1181,25 @@
                     "label": "Quarter-end stress run",
                     "regulatory": true,
                     "tone": "amber"
-                  },
-                  {
-                    "date": "2027-03-26",
-                    "label": "Needs input from TD-1003",
-                    "regulatory": false,
-                    "tone": "neutral"
-                  },
-                  {
-                    "date": "2027-03-31",
-                    "label": "Reconciliation sign-off to the risk committee",
-                    "regulatory": false,
-                    "tone": "amber"
                   }
                 ],
                 "note": "+9d knock-on from TD-1016"
               },
               {
+                "completion": 0.896551724137931,
                 "label": "CCR-100 Stress scenario ingestion and v…",
                 "plannedStart": "2027-01-04",
                 "plannedEnd": "2027-03-31"
               },
               {
+                "completion": 0.8181818181818182,
                 "label": "CCR-200 Exposure reconciliation engine",
                 "plannedStart": "2027-01-04",
                 "plannedEnd": "2027-03-31",
                 "projectedEnd": "2027-03-18"
               },
               {
+                "completion": 0.7407407407407407,
                 "label": "CCR-300 Break reporting and sign-off",
                 "plannedStart": "2027-01-04",
                 "plannedEnd": "2027-03-31"
@@ -1229,7 +1208,7 @@
           }
         }
       ],
-      "notes": "Late input from TD-1016 could move TD-1001’s end to 9 Apr 2027. 18 points remain; 74 points closed in the last 42 days (12.3 a week) puts the end at 19 Mar 2027, against 31 Mar 2027 planned.\n\nRecords: TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, CCR-R-07, CCR-100, CCR-200, CCR-300\n\nKnock-on:\n- “Stressed market-data extract for scenario reconciliation” is 9 days late for TD-1001; passing the delay through moves its planned end from 31 Mar 2027 to 9 Apr 2027 and 2 milestones with it.",
+      "notes": "TD-1016 input could move TD-1001’s end to 9 Apr 2027. 18 points remain; 74 points closed in the last 42 days (12.3 a week) puts the end at 19 Mar 2027, against 31 Mar 2027 planned.\n\nRecords: TD-1001, TD-1001 milestone 19 Mar 2027, TD-1001 milestone 31 Mar 2027, CCR-R-07, CCR-100, CCR-200, CCR-300\n\nMilestones:\n- TD-1001: 27 Feb 2027 Needs input from TD-1016\n- TD-1001: 19 Mar 2027 Quarter-end stress run (regulatory)\n- TD-1001: 26 Mar 2027 Needs input from TD-1003\n- TD-1001: 31 Mar 2027 Reconciliation sign-off to the risk committee\n\nKnock-on:\n- “Stressed market-data extract for scenario reconciliation” is 9 days late for TD-1001; passing the delay through moves its planned end from 31 Mar 2027 to 9 Apr 2027 and 2 milestones with it.",
       "citations": [
         {
           "ref": {
@@ -1313,75 +1292,67 @@
             "columns": [
               {
                 "header": "Key",
-                "width": 2
+                "width": 0.98
               },
               {
                 "header": "Kind",
-                "width": 2
+                "width": 1.17
               },
               {
                 "header": "Title",
-                "width": 5,
-                "maxChars": 40
+                "width": 0.98,
+                "maxChars": 16
               },
               {
                 "header": "Severity",
-                "width": 2
+                "width": 1.21
               },
               {
                 "header": "Owner",
-                "width": 3,
-                "maxChars": 20
+                "width": 1.13
               },
               {
                 "header": "Age",
-                "width": 1,
+                "width": 0.55,
                 "align": "right"
-              },
-              {
-                "header": "Status",
-                "width": 2
               }
             ],
             "rows": [
               [
                 "CCR-R-07",
                 "Risk",
-                "Stressed market data arrives late from…",
+                "Stressed market…",
                 {
                   "text": "High",
                   "tone": "amber"
                 },
                 "Priya Raman",
-                "49d",
-                "Open"
+                "49d"
               ],
               [
                 "CCR-R-04",
                 "Assumption",
-                "Scenario library stays frozen until qua…",
+                "Scenario librar…",
                 {
                   "text": "Medium",
                   "tone": "neutral"
                 },
                 "Imogen Pemberton",
-                "55d",
-                "Open"
+                "55d"
               ],
               [
                 "CCR-R-11",
                 "Issue",
-                "Break volumes above the agreed review c…",
+                "Break volumes a…",
                 {
                   "text": "Medium",
                   "tone": "neutral"
                 },
                 "Rosalind Mercado",
-                "14d",
-                "Mitigating"
+                "14d"
               ]
             ],
-            "emptyText": "No RAID items are recorded for TD-1001."
+            "emptyText": "No open RAID items are recorded for TD-1001."
           }
         },
         {
@@ -1391,31 +1362,31 @@
             "columns": [
               {
                 "header": "Direction",
-                "width": 3
+                "width": 1.55
               },
               {
                 "header": "Dependency",
-                "width": 5,
-                "maxChars": 40
+                "width": 1.32,
+                "maxChars": 23
               },
               {
                 "header": "Need by",
-                "width": 2
+                "width": 1.13
               },
               {
                 "header": "Status",
-                "width": 2
+                "width": 1.36
               },
               {
                 "header": "Late",
-                "width": 1,
+                "width": 0.66,
                 "align": "right"
               }
             ],
             "rows": [
               [
                 "In from TD-1016",
-                "Stressed market-data extract for scenar…",
+                "Stressed market-data e…",
                 "27 Feb 2027",
                 {
                   "text": "Late",
@@ -1425,7 +1396,7 @@
               ],
               [
                 "In from TD-1003",
-                "Collateral dispute log feeding exposure…",
+                "Collateral dispute log…",
                 "26 Mar 2027",
                 {
                   "text": "On track",
@@ -1438,7 +1409,7 @@
           }
         }
       ],
-      "notes": "TD-1001 has 3 open RAID items and 1 late or blocked dependency. Age counts days since each item was raised.\n\nRecords: TD-1001, CCR-R-07, CCR-R-04, CCR-R-11, CCR-R-07, CCR-106\n\nShortened on the slide:\n- Stressed market data arrives late from the Singapore data hub\n- Scenario library stays frozen until quarter-end\n- Break volumes above the agreed review capacity for risk users\n- Stressed market-data extract for scenario reconciliation\n- Collateral dispute log feeding exposure adjustments",
+      "notes": "TD-1001 has 3 open RAID items and 1 late or blocked dependency. Age counts days since each item was raised.\n\nRecords: TD-1001, CCR-R-07, CCR-R-04, CCR-R-11, CCR-R-07, CCR-106\n\nShortened on the slide:\n- Stressed market data arrives late from the Singapore data hub\n- Scenario library stays frozen until quarter-end\n- Break volumes above the agreed review capacity for risk users (mitigating)\n- Stressed market-data extract for scenario reconciliation\n- Collateral dispute log feeding exposure adjustments",
       "citations": [
         {
           "ref": {
@@ -1503,7 +1474,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "TD-1001 is in Build, Test & Validate; independent validator pending",
+      "title": "TD-1001 in Build & test; independent validator pending",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "rail",
       "blocks": [
@@ -1552,20 +1523,20 @@
             "columns": [
               {
                 "header": "Stage",
-                "width": 3
+                "width": 2.6
               },
               {
                 "header": "Status",
-                "width": 2
+                "width": 1.26
               },
               {
                 "header": "Reviews",
-                "width": 5,
+                "width": 4.18,
                 "maxChars": 70
               },
               {
                 "header": "Evidence left",
-                "width": 5,
+                "width": 4.29,
                 "maxChars": 70
               }
             ],
@@ -1604,7 +1575,7 @@
           }
         }
       ],
-      "notes": "TD-1001 is in Build, Test & Validate; independent validator pending. Moving to Delivery & Launch needs the independent validator review (pending) approved first.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Business owner not requested (Alexis Merrow); Release owner not requested (Priya Raman)",
+      "notes": "TD-1001 in Build & test; independent validator pending. Moving to Delivery & Launch needs the independent validator review (pending) approved first.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Business owner not requested (Alexis Merrow); Release owner not requested (Priya Raman)",
       "citations": [
         {
           "ref": {
@@ -1661,7 +1632,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "Counterparty risk analytics: 4 people, 2 agent identities",
+      "title": "Counterparty risk analytics: 4 people, 2 agents",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "two-column",
       "blocks": [
@@ -1694,16 +1665,16 @@
             "columns": [
               {
                 "header": "Name",
-                "width": 3
+                "width": 1.74
               },
               {
                 "header": "Title",
-                "width": 3,
+                "width": 3.49,
                 "maxChars": 28
               },
               {
                 "header": "Hub",
-                "width": 2
+                "width": 0.79
               }
             ],
             "rows": [
@@ -1738,15 +1709,15 @@
             "columns": [
               {
                 "header": "Identity",
-                "width": 3
+                "width": 1.65
               },
               {
                 "header": "Agent",
-                "width": 3
+                "width": 2.29
               },
               {
                 "header": "Accountable owner",
-                "width": 3
+                "width": 2.08
               }
             ],
             "rows": [
@@ -1809,11 +1780,11 @@
             "columns": [
               {
                 "header": "Field",
-                "width": 2
+                "width": 1.55
               },
               {
                 "header": "Value",
-                "width": 5,
+                "width": 4.47,
                 "maxChars": 60
               }
             ],
@@ -1863,31 +1834,31 @@
             "columns": [
               {
                 "header": "Epic",
-                "width": 2
+                "width": 0.89
               },
               {
                 "header": "Summary",
-                "width": 4,
-                "maxChars": 32
+                "width": 1.28,
+                "maxChars": 22
               },
               {
                 "header": "Deliverable ID",
-                "width": 3
+                "width": 1.76
               },
               {
                 "header": "Items",
-                "width": 1,
+                "width": 0.77,
                 "align": "right"
               },
               {
                 "header": "Outcome ID",
-                "width": 2
+                "width": 1.32
               }
             ],
             "rows": [
               [
                 "CCR-100",
-                "Stress scenario ingestion and v…",
+                "Stress scenario inges…",
                 {
                   "text": "TD-1001",
                   "tone": "green"
@@ -1897,7 +1868,7 @@
               ],
               [
                 "CCR-200",
-                "Exposure reconciliation engine",
+                "Exposure reconciliati…",
                 {
                   "text": "TD-1001",
                   "tone": "green"
@@ -1907,7 +1878,7 @@
               ],
               [
                 "CCR-300",
-                "Break reporting and sign-off",
+                "Break reporting and s…",
                 {
                   "text": "TD-1001",
                   "tone": "green"
@@ -1920,7 +1891,7 @@
           }
         }
       ],
-      "notes": "TD-1001 is the Portfolio system record; in Jira each Epic carries its Deliverable ID, and story-level items carry an Outcome ID linking work to outcomes.\n\nRecords: TD-1001, CCR-100, CCR-200, CCR-300, OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4\n\nShortened on the slide:\n- Stress scenario ingestion and validation",
+      "notes": "TD-1001 is the Portfolio system record; in Jira each Epic carries its Deliverable ID, and story-level items carry an Outcome ID linking work to outcomes.\n\nRecords: TD-1001, CCR-100, CCR-200, CCR-300, OC-1001-1, OC-1001-2, OC-1001-3, OC-1001-4\n\nShortened on the slide:\n- Stress scenario ingestion and validation\n- Exposure reconciliation engine\n- Break reporting and sign-off",
       "citations": [
         {
           "ref": {
@@ -2286,7 +2257,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "How to read these measures: three answers, kept separate",
+      "title": "How to read these measures: three answers",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "two-column",
       "blocks": [
@@ -2357,20 +2328,20 @@
             "columns": [
               {
                 "header": "Record",
-                "width": 3,
+                "width": 2.56,
                 "maxChars": 30
               },
               {
                 "header": "Type",
-                "width": 3
+                "width": 2.31
               },
               {
                 "header": "System",
-                "width": 3
+                "width": 1.74
               },
               {
                 "header": "Title",
-                "width": 9,
+                "width": 5.72,
                 "maxChars": 70
               }
             ],
@@ -2775,20 +2746,20 @@
             "columns": [
               {
                 "header": "Record",
-                "width": 3,
+                "width": 2.56,
                 "maxChars": 30
               },
               {
                 "header": "Type",
-                "width": 3
+                "width": 2.31
               },
               {
                 "header": "System",
-                "width": 3
+                "width": 1.74
               },
               {
                 "header": "Title",
-                "width": 9,
+                "width": 5.72,
                 "maxChars": 70
               }
             ],
@@ -3193,20 +3164,20 @@
             "columns": [
               {
                 "header": "Record",
-                "width": 3,
+                "width": 2.56,
                 "maxChars": 30
               },
               {
                 "header": "Type",
-                "width": 3
+                "width": 2.31
               },
               {
                 "header": "System",
-                "width": 3
+                "width": 1.74
               },
               {
                 "header": "Title",
-                "width": 9,
+                "width": 5.72,
                 "maxChars": 70
               }
             ],
@@ -3611,20 +3582,20 @@
             "columns": [
               {
                 "header": "Record",
-                "width": 3,
+                "width": 2.56,
                 "maxChars": 30
               },
               {
                 "header": "Type",
-                "width": 3
+                "width": 2.31
               },
               {
                 "header": "System",
-                "width": 3
+                "width": 1.74
               },
               {
                 "header": "Title",
-                "width": 9,
+                "width": 5.72,
                 "maxChars": 70
               }
             ],

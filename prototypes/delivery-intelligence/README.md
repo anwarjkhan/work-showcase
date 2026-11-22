@@ -126,6 +126,44 @@ npm run e2e          # builds, serves out/ on port 4173, runs the Playwright bro
 - An approval in the Agent centre clearing a finding on a named deliverable's page, and reset bringing it back.
 - The workflow walk-through to Ready, including the failing test and the move back, then reset.
 - Plan zooms and side panel, the focused dependency view and list view on Global, and the three Epics under the main storyline deliverable on Hierarchy.
+- Slides: the TD-1001 pack, the basket (three slides from three screens, reorder, export, Reset clears it), the builder by hash and search, and pack dialogs, each checked by opening the downloaded file.
+
+## Slides
+
+The application turns what it already knows into editable PowerPoint, in two ways. **Single slides** are one view (a deliverable's verdict, an outcome's acceptance state, the portfolio's status disagreements). **Packs** are a complete, ordered deck for one scope. Both are built from the same data and engine results the screens show, as native tables, charts and text, so a slide and its screen never disagree. Specifications are deterministic: the same state and clock give the same deck.
+
+**Where the buttons are**
+
+- The small slides icon (*Add to slides*) sits on the portfolio headline, reported-against-evidence card, disagreements list, programme table, stage card and findings card; on programme, project and deliverable rows of the hierarchy explorer; on the deliverable page (verdict, readiness, the active tab, "Why the evidence says this", weekly status) and on each outcome; on the plan summary, the global region strip and the lifecycle board. Pressing it announces "Added to slides (n)".
+- The **Slides** control in the top bar shows the basket count and opens a drawer: live previews, reorder with up and down buttons, remove, a deck name, *Open in builder* and *Export .pptx*. The basket lives in session storage and Reset demo clears it.
+- *Export pack* buttons open a small dialog with the pack's options: on the deliverable header, each outcome, programme and project rows, and the portfolio headline.
+
+**The builder** is `/slides`: choose a scope type and a record (searchable), then a pack or "Pick slides", set options, check the live preview and export. It reads hashes on load and when they change: `#scope=deliverable:td-1001`, `#scope=pm-node:pm-ccr&pack=programme`, `#scope=outcome:<id>`, `#scope=portfolio`, and `#basket` for the basket's slides.
+
+**From the command line** (Node 22.15 or later, no browser):
+
+```
+npm run slides -- --scope deliverable:td-1001
+npm run slides -- --scope pm-node:pm-ccr --pack programme
+npm run slides -- --scope portfolio --no-agent-narrative
+npm run slides -- --scope deliverable:td-1001 --kinds td-verdict,td-plan
+```
+
+Files are written to `out/slides/` (replaced by `npm run build`) and named `<scope ref>-<pack>-pack-<as-at date>.pptx`, for example `TD-1001-deliverable-pack-2027-03-08.pptx`.
+
+**Packs**
+
+| Pack | Contents |
+|---|---|
+| Outcome | cover, outcome summary, acceptance, work, evidence, how to read, records cited |
+| Technology Deliverable | cover, contents, verdict, readiness evidence, outcomes, findings, plan, RAID, lifecycle position, pod, how it maps to the work tracker, weekly status, decisions, how to read, records cited. Options: an outcome summary per outcome; omit the agent narrative |
+| Project | cover, contents, overview, deliverables, disagreements, plan, risks and dependencies, decisions, how to read, records cited. Options: append verdict slides (none, disagreeing, all); table row cap |
+| Programme | as Project, for programmes and initiatives |
+| Portfolio | cover, contents, status disagreements, reported against evidence, disagreeing deliverables, programmes, this quarter, lifecycle, regions, findings, executive brief, decisions, how to read, records cited. Options: omit the agent brief; table row cap |
+
+**Guardrails.** Every slide carries a footer ("Prototype · synthetic data · as at 8 Mar 2027", or the source systems and extraction date for real data) that cannot be turned off, and the builder and basket show it. Reported status always sits beside evidence-based status. The three measures stay separate and readiness is never a percentage. A measure that cannot be computed says so with its reason. Agent drafts are labelled as scripted. The Pilot evidence placeholders are not exportable. No slide text contains an internal id.
+
+**Corporate template.** The look is matched in `lib/slides/render/theme.ts`; the library cannot open an existing `.potx`. To use the corporate master, open the generated deck, select all slides and paste them into a file built on the template with "Use destination theme". A template-based renderer would need a small server and its own approval (see `docs/SLIDES_PLAN.md` section 7).
 
 ## 5. Project structure
 

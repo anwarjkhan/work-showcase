@@ -8,8 +8,8 @@ import { terms } from '@/lib/config/terminology';
 import type { EntityRef, Severity } from '@/lib/types';
 import { date, nodeFacts, plural, ragMix, verdictSentence, type NodeDeliverableLine, type NodeFacts } from '../../extract';
 import type { Cell, TimelineRow, Tone } from '../../types';
-import { at, bullets, callout, col, makeSlide, table, toned, type BuildInput, type SlideBuilder, TIMELINE_ROWS_PER_SLIDE } from '../kit';
-import { measures, ragCell, ragPairOf, readinessCell, severityCell } from './shared';
+import { at, callout, col, makeSlide, table, toned, type BuildInput, type SlideBuilder, TIMELINE_ROWS_PER_SLIDE } from '../kit';
+import { fitTimelineRows, measures, ragCell, ragPairOf, readinessCell, severityCell } from './shared';
 
 function factsOf(input: BuildInput): NodeFacts {
   if (input.scope.kind !== 'pm-node') throw new Error('This slide needs a programme, project or initiative scope.');
@@ -81,7 +81,7 @@ export const nodeDeliverables: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'node-deliverables',
-      title: `${plural(f.deliverables.length, 'deliverable')} under ${f.node.ref}: ${ragMix(f.rollup.evidenceRag)} on evidence`,
+      title: `${f.node.ref}: ${plural(f.deliverables.length, 'deliverable')}; ${f.rollup.evidenceRag.red} ${terms.rag.red}, ${f.rollup.evidenceRag.amber} ${terms.rag.amber} on evidence`,
       layout: 'table',
       blocks: [
         at(
@@ -93,7 +93,7 @@ export const nodeDeliverables: SlideBuilder = (input) => {
           ),
         ),
       ],
-      say: `Each deliverable under ${f.node.ref} with its reported and evidence-based status and the three measures, kept separate. Forecast ends come from recent throughput where there is enough history.`,
+      say: `${ragMix(f.rollup.evidenceRag)} on evidence. Each deliverable under ${f.node.ref} with its reported and evidence-based status and the three measures, kept separate. Forecast ends come from recent throughput where there is enough history.`,
       refs: [nRef(f), ...dRefs(f.deliverables)],
       provenance: ['computed', 'reported'],
     }),
@@ -138,13 +138,14 @@ export const nodePlan: SlideBuilder = (input) => {
   const dates = rows.flatMap((r) => [r.plannedStart, r.plannedEnd, r.projectedEnd ?? r.plannedEnd, ...(r.milestones ?? []).map((m) => m.date)]);
   const start = addDays(dates.reduce((a, b) => (b < a ? b : a), f.node.plannedStart), -14);
   const end = addDays(dates.reduce((a, b) => (b > a ? b : a), f.node.plannedEnd), 14);
+  const fitted = fitTimelineRows(rows, { start, end });
   const regulatory = f.milestones.filter((m) => m.regulatory && m.status !== 'met');
   const atRisk = regulatory.filter((m) => m.status === 'missed' || m.date < env.asOf || pushed.has(m.id));
   const slipping = f.deliverables.filter((l) => l.forecast && (l.forecast.slipDays > 0 || l.forecast.atRisk) && l.forecast.method !== 'complete');
   const title =
     atRisk.length > 0
-      ? `${f.node.ref}: ${plural(atRisk.length, 'regulatory milestone')} at risk, ${slipping.length} forecast to slip`
-      : `${f.node.ref}: ${plural(slipping.length, 'deliverable')} forecast to slip, ${plural(f.knockOn.length, 'knock-on')}`;
+      ? `${f.node.ref}: ${plural(atRisk.length, 'regulatory milestone')} at risk, ${slipping.length} slipping`
+      : `${f.node.ref}: ${slipping.length} slipping, ${plural(f.knockOn.length, 'late input')}`;
   return [
     makeSlide(input, {
       kind: 'node-plan',
@@ -161,12 +162,12 @@ export const nodePlan: SlideBuilder = (input) => {
             { label: 'Late inputs', value: String(f.knockOn.length), tone: f.knockOn.length > 0 ? 'red' : 'green' },
           ],
         }),
-        at('main', { type: 'timeline', window: { start, end }, today: env.asOf, rows }),
+        at('main', { type: 'timeline', window: { start, end }, today: env.asOf, rows: fitted.rows }),
       ],
       say: `Planned bars for each deliverable under ${f.node.ref}, with forecast or knock-on ends where they differ and milestones marked; regulatory milestones are flagged.${rows.length > TIMELINE_ROWS_PER_SLIDE ? ' The timeline continues on the next slide.' : ''}`,
       refs: [nRef(f), ...dRefs(f.deliverables), ...f.milestones.map((m) => ({ kind: 'milestone' as const, id: m.id })), ...f.knockOn.map((k) => ({ kind: 'dependency' as const, id: k.dependencyId }))],
       provenance: ['computed', 'reported'],
-      extraNotes: f.knockOn.length > 0 ? [`Knock-on:\n${f.knockOn.map((k) => `- ${k.explanation}`).join('\n')}`] : [],
+      extraNotes: [...fitted.notes, ...(f.knockOn.length > 0 ? [`Knock-on:\n${f.knockOn.map((k) => `- ${k.explanation}`).join('\n')}`] : [])],
     }),
   ];
 };
@@ -188,16 +189,28 @@ export const nodeRisks: SlideBuilder = (input) => {
     ]),
   ];
   const top = f.findings.slice(0, 5);
+  const critical = f.findings.filter((x) => x.severity === 'critical').length;
+  const high = f.findings.filter((x) => x.severity === 'high').length;
   return [
     makeSlide(input, {
       kind: 'node-risks',
       title: `${f.node.ref}: ${plural(openRaid.length, 'open RAID item')}, ${plural(f.troubledDependencies.length, 'late dependency', 'late dependencies')}`,
-      layout: 'two-column',
+      // Full-width table under the counts: six columns do not fit half a slide. The top findings are spoken from the notes.
+      layout: 'kpis-over-table',
       blocks: [
-        at('left', table([col('Key', 2), col('Kind', 2), col(terms.hierarchy.deliverableShort, 3, { maxChars: 20 }), col('Title', 5, { maxChars: 40 }), col('Severity', 2), col('Age', 1, { align: 'right' })], rows, `No open RAID items or late dependencies under ${f.node.ref}.`)),
-        at('right', bullets(top.length > 0 ? top.map((x) => ({ text: `${terms.severity[x.severity]}: ${x.message}`, tone: x.severity === 'critical' ? ('red' as const) : x.severity === 'high' ? ('amber' as const) : ('neutral' as const) })) : [`No findings under ${f.node.ref}.`])),
+        at('top', {
+          type: 'kpis',
+          items: [
+            { label: 'Open RAID items', value: String(openRaid.length) },
+            { label: 'Late or blocked dependencies', value: String(f.troubledDependencies.length), tone: f.troubledDependencies.length > 0 ? 'red' : 'green' },
+            { label: `${terms.severity.critical} findings`, value: String(critical), tone: critical > 0 ? 'red' : 'green' },
+            { label: `${terms.severity.high} findings`, value: String(high), tone: high > 0 ? 'amber' : 'green' },
+          ],
+        }),
+        at('main', table([col('Key', 2), col('Kind', 2), col(terms.hierarchy.deliverableShort, 3, { maxChars: 24 }), col('Title', 7, { maxChars: 70 }), col('Severity', 2), col('Age', 1, { align: 'right' })], rows, `No open RAID items or late dependencies under ${f.node.ref}.`)),
       ],
-      say: `Open RAID items and late or blocked dependencies across the deliverables under ${f.node.ref}, most severe first, with the top findings beside them.`,
+      say: `Open RAID items and late or blocked dependencies across the deliverables under ${f.node.ref}, most severe first. ${top[0] ? `The most severe finding: ${top[0].message}` : `There are no findings under ${f.node.ref}.`}`,
+      extraNotes: top.length > 0 ? [`Top findings:\n${top.map((x) => `- ${terms.severity[x.severity]}: ${x.message}`).join('\n')}`] : [],
       refs: [nRef(f), ...openRaid.map((r) => ({ kind: 'raid' as const, id: r.id })), ...f.troubledDependencies.map((d) => ({ kind: 'dependency' as const, id: d.dependency.id })), ...top.flatMap((x) => [x.subject, ...x.evidence])],
       provenance: ['computed', 'reported'],
     }),
@@ -207,7 +220,7 @@ export const nodeRisks: SlideBuilder = (input) => {
 export const nodeDisagreements: SlideBuilder = (input) => {
   const f = factsOf(input);
   const n = f.disagreeing.length;
-  const title = n === 0 ? `Every deliverable under ${f.node.ref} is reported as its evidence says` : `${n} of ${f.deliverables.length} deliverables under ${f.node.ref} disagree with evidence`;
+  const title = n === 0 ? `${f.node.ref}: reported status matches evidence` : `${f.node.ref}: ${n} of ${f.deliverables.length} deliverables disagree with evidence`;
   const block =
     n === 0
       ? callout('green', `${terms.ragKinds.reported} and ${terms.ragKinds.evidence.toLowerCase()} status agree for all ${plural(f.deliverables.length, 'deliverable')}, or evidence is too thin to judge.`)

@@ -10,18 +10,12 @@ import { terms } from '@/lib/config/terminology';
 import type { EntityRef, PdlcStageStatus, ReviewState, Severity } from '@/lib/types';
 import { date, personName, plural } from '../../extract';
 import type { Cell, StageView, Tone } from '../../types';
-import { at, callout, col, makeSlide, table, text, toned, type SlideBuilder } from '../kit';
+import { at, callout, col, makeSlide, table, text, TITLE_TARGET, toned, type SlideBuilder } from '../kit';
 import { factsOf } from './deliverable';
 import { draftDocument, ragCell, severityCell } from './shared';
 
-const STAGE_STATUS: Record<PdlcStageStatus, string> = {
-  'not-started': 'Not started',
-  'in-progress': 'In progress',
-  'in-review': 'In review',
-  approved: 'Approved',
-  returned: 'Returned',
-};
-const REVIEW_STATE: Record<ReviewState, string> = { 'not-requested': 'not requested', pending: 'pending', approved: 'approved', returned: 'returned' };
+const STAGE_STATUS: Record<PdlcStageStatus, string> = terms.pdlcStageStatus;
+const reviewState = (s: ReviewState): string => terms.reviewStates[s].toLowerCase();
 const DEP_TONE: Record<string, Tone> = { 'on-track': 'green', 'at-risk': 'amber', late: 'red', blocked: 'red', delivered: 'green' };
 const SEV_RANK: Record<Severity, number> = { critical: 4, high: 3, medium: 2, low: 1 };
 
@@ -34,15 +28,18 @@ export const tdRaid: SlideBuilder = (input) => {
     .sort((a, b) => Number(a.status === 'closed') - Number(b.status === 'closed') || SEV_RANK[b.severity] - SEV_RANK[a.severity] || a.key.localeCompare(b.key, 'en', { numeric: true }));
   const open = raid.filter((r) => r.status !== 'closed').length;
   const troubled = f.dependencies.filter((d) => d.troubled).length;
-  const raidRows: Cell[][] = raid.map((r) => [
-    r.key,
-    terms.raidKinds[r.kind],
-    r.title,
-    severityCell(r.severity),
-    personName(env, r.ownerId),
-    `${daysBetween(r.created, env.asOf)}d`,
-    r.status === 'closed' ? 'Closed' : r.status === 'mitigating' ? 'Mitigating' : 'Open',
-  ]);
+  // Open and mitigating items only, so the half-width table keeps room for its columns; closed items are listed in notes.
+  const raidRows: Cell[][] = raid
+    .filter((r) => r.status !== 'closed')
+    .map((r) => [
+      r.key,
+      terms.raidKinds[r.kind],
+      r.status === 'mitigating' ? `${r.title} (${terms.raidStatus.mitigating.toLowerCase()})` : r.title,
+      severityCell(r.severity),
+      personName(env, r.ownerId),
+      `${daysBetween(r.created, env.asOf)}d`,
+    ]);
+  const closed = raid.filter((r) => r.status === 'closed');
   const depRows: Cell[][] = f.dependencies.map((d) => [
     d.direction === 'inbound' ? `In from ${d.other?.ref ?? '?'}` : `Out to ${d.other?.ref ?? '?'}`,
     d.dependency.title,
@@ -56,12 +53,13 @@ export const tdRaid: SlideBuilder = (input) => {
       title: `${ref}: ${plural(open, 'open RAID item')}, ${plural(troubled, 'late dependency', 'late dependencies')}`,
       layout: 'two-column',
       blocks: [
-        at('left', table([col('Key', 2), col('Kind', 2), col('Title', 5, { maxChars: 40 }), col('Severity', 2), col('Owner', 3, { maxChars: 20 }), col('Age', 1, { align: 'right' }), col('Status', 2)], raidRows, `No RAID items are recorded for ${ref}.`)),
+        at('left', table([col('Key', 2), col('Kind', 2), col('Title', 5, { maxChars: 60 }), col('Severity', 2), col('Owner', 3), col('Age', 1, { align: 'right' })], raidRows, `No open RAID items are recorded for ${ref}.`)),
         at('right', table([col('Direction', 3), col('Dependency', 5, { maxChars: 40 }), col('Need by', 2), col('Status', 2), col('Late', 1, { align: 'right' })], depRows, `${ref} has no dependencies recorded.`)),
       ],
       say: `${ref} has ${plural(open, 'open RAID item')} and ${plural(troubled, 'late or blocked dependency', 'late or blocked dependencies')}. Age counts days since each item was raised.`,
       refs: [{ kind: 'deliverable', id: f.deliverable.id }, ...raid.map((r) => ({ kind: 'raid' as const, id: r.id })), ...f.dependencies.map((d) => ({ kind: 'dependency' as const, id: d.dependency.id }))],
       provenance: ['computed', 'reported'],
+      extraNotes: closed.length > 0 ? [`${terms.raidStatus.closed}:\n${closed.map((r) => `- ${r.key} ${r.title}`).join('\n')}`] : [],
     }),
   ];
 };
@@ -87,7 +85,7 @@ export const tdPdlc: SlideBuilder = (input) => {
   const currentIndex = wf.stages.findIndex((s) => s.current);
   const backInto = new Map<string, string>();
   for (const m of wf.run.moves) if (m.direction === 'back') backInto.set(m.to, stageDefinition(m.from).name);
-  const reviewText = (r: (typeof wf.stages)[number]['reviews'][number]) => `${terms.reviewRoles[r.roleId]} ${REVIEW_STATE[r.state]} (${personName(env, r.reviewerId)})`;
+  const reviewText = (r: (typeof wf.stages)[number]['reviews'][number]) => `${terms.reviewRoles[r.roleId]} ${reviewState(r.state)} (${personName(env, r.reviewerId)})`;
   const stages: StageView[] = wf.stages.map((s, i) => {
     const state = s.current ? 'current' : i < currentIndex ? 'done' : 'not-started';
     const approvedBy = s.reviews.flatMap((r) => r.decisions.filter((d) => d.decision === 'approved').map((d) => personName(env, d.reviewerId)));
@@ -97,16 +95,20 @@ export const tdPdlc: SlideBuilder = (input) => {
         ? `${approvedBy.length > 0 ? `Approved by ${[...new Set(approvedBy)].join(', ')}` : STAGE_STATUS[s.state.status]} · ${plural(held, 'record')}`
         : state === 'current'
           ? `Current · ${s.reviews.filter((r) => r.state !== 'approved').map(reviewText).join('; ') || 'reviews approved'}`
-          : 'Not started';
+          : terms.pdlcStageStatus['not-started'];
     const view: StageView = { stageId: s.definition.id, name: s.definition.name, state, detail };
     const back = backInto.get(s.definition.id);
     return back ? { ...view, movedBackFrom: back } : view;
   });
   const current = wf.stages[currentIndex];
   const next = current?.reviews.find((r) => r.next);
-  const titleWith = (stage: string) => `${ref} is in ${stage}${next ? `; ${terms.reviewRoles[next.roleId].toLowerCase()} ${REVIEW_STATE[next.state]}` : ''}`;
-  // Use the stage's short name when the full name would not fit in a title.
-  const title = !current ? `${ref} lifecycle position` : titleWith(current.definition.name).length <= 70 ? titleWith(current.definition.name) : titleWith(current.definition.shortName);
+  // The first wording that fits on one line wins: full stage name, short name, then without the review state.
+  const role = next ? terms.reviewRoles[next.roleId].toLowerCase() : '';
+  const candidates = current
+    ? [current.definition.name, current.definition.shortName].flatMap((stage) => (next ? [`${ref} in ${stage}; ${role} ${reviewState(next.state)}`, `${ref} in ${stage}; ${role} review next`] : [`${ref} in ${stage}; all reviews approved`]))
+    : [`${ref} lifecycle position`];
+  if (current) candidates.push(`${ref} in ${current.definition.shortName}`);
+  const title = candidates.find((t) => t.length <= TITLE_TARGET) ?? (candidates.at(-1) as string);
   const rows: Cell[][] = wf.stages.map((s) => [
     s.definition.name,
     STAGE_STATUS[s.state.status],
@@ -152,7 +154,7 @@ export const tdPod: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'td-pod',
-      title: `${f.pod.name}: ${plural(f.members.length, 'person', 'people')}, ${plural(f.agents.length, 'agent identity', 'agent identities')}`,
+      title: `${f.pod.name}: ${plural(f.members.length, 'person', 'people')}, ${plural(f.agents.length, 'agent')}`,
       layout: 'two-column',
       blocks: [
         at('left', {

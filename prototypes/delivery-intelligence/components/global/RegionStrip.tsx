@@ -2,6 +2,7 @@
 
 import { Sun } from 'lucide-react';
 import { ragSegments, StackedBar } from '@/components/charts';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { RagPill, cx } from '@/components/ui';
 import { CONTINENT_LABEL, type GlobalModel } from './model';
 
@@ -15,6 +16,7 @@ export function RegionStrip({ model, selectedHubId, onSelectHub }: { model: Glob
       <div className="flex items-center gap-2 border-b border-line px-4 py-2.5">
         <Sun aria-hidden className="size-3.5 text-fg-subtle" />
         <h3 className="di-eyebrow">Follow the sun · west to east by UTC offset</h3>
+        <span className="ml-auto"><AddToSlides kind="portfolio-hubs" scope={{ kind: 'portfolio' }} /></span>
       </div>
       <ol className="grid grid-cols-2 divide-line md:grid-cols-3 xl:grid-cols-6 xl:divide-x">
         {model.regions.map((r) => (

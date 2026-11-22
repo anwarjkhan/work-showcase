@@ -109,12 +109,14 @@ describe('pagination in real packs', () => {
     }
   });
 
-  it('a timeline with more than 12 rows continues in the timeline layout', () => {
+  it('a timeline continues at 6 rows under headline figures (10 alone), in the timeline layout', () => {
     const rows = Array.from({ length: 15 }, (_, i) => ({ label: `TD-${3000 + i}`, plannedStart: '2027-01-04', plannedEnd: '2027-03-31' }));
     const s = spec(0, { layout: 'timeline', blocks: [{ region: 'top', block: { type: 'kpis', items: [] } }, { region: 'main', block: { type: 'timeline', window: { start: '2027-01-01', end: '2027-03-31' }, today: '2027-03-08', rows } }] });
     const pages = paginate(s);
-    expect(pages.map((p) => p.layout)).toEqual(['timeline', 'timeline']);
-    expect(pages.map((p) => p.blocks.find((b) => b.block.type === 'timeline')?.block).map((t) => (t?.type === 'timeline' ? t.rows.length : 0))).toEqual([12, 3]);
+    expect(pages.map((p) => p.layout)).toEqual(['timeline', 'timeline', 'timeline']);
+    expect(pages.map((p) => p.blocks.find((b) => b.block.type === 'timeline')?.block).map((t) => (t?.type === 'timeline' ? t.rows.length : 0))).toEqual([6, 6, 3]);
+    const alone = paginate({ ...s, blocks: s.blocks.filter((b) => b.region === 'main') });
+    expect(alone.map((p) => (p.blocks[0]?.block.type === 'timeline' ? p.blocks[0].block.rows.length : 0))).toEqual([10, 5]);
     for (const slide of buildSlides({ kind: 'portfolio' }, ['portfolio-quarter'], ctx)) for (const b of slide.blocks) if (b.block.type === 'timeline') expect(b.block.rows.length).toBeLessThanOrEqual(12);
   });
 });

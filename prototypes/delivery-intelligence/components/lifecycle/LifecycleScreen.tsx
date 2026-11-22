@@ -4,6 +4,7 @@ import { ArrowRight, Footprints, Info } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, useMemo, useState } from 'react';
 import { ProvenanceBadges } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Badge, Card, Chip, cx, Section } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { PDLC_STAGES } from '@/lib/config/pdlc';
@@ -54,7 +55,12 @@ export function LifecycleScreen() {
       <Section
         title={terms.app.lifecycleModel}
         description="Agents assist, a named human reviews, evidence is recorded. Work moves forward and back between neighbouring stages; it is iterative, not a waterfall."
-        actions={<ProvenanceBadges kinds={['computed', 'scripted-agent', 'sample']} size="sm" />}
+        actions={
+          <>
+            <AddToSlides kind="portfolio-stages" scope={{ kind: 'portfolio' }} label="the lifecycle board" />
+            <ProvenanceBadges kinds={['computed', 'scripted-agent', 'sample']} size="sm" />
+          </>
+        }
       >
         <div className="flex flex-col gap-4">
           <Link

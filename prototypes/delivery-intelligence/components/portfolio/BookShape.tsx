@@ -1,3 +1,4 @@
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Card, RagPair } from '@/components/ui';
 import { cx } from '@/components/ui/cx';
 import { READINESS_ICON, READINESS_TONE, SEVERITY_TONE, StatusGlyph, TONE } from '@/components/ui/status';
@@ -96,7 +97,7 @@ function ProgrammeLine({ p }: { p: ProgrammeRow }) {
 export function ProgrammeHealth({ view }: { view: PortfolioView }) {
   const th = 'pb-2 pr-3 text-[11px] font-semibold tracking-wide text-fg-subtle uppercase';
   return (
-    <Card title="Health by programme" description="Reported against evidence-based status, with the three measures rolled up from deliverables." padding="none">
+    <Card title="Health by programme" description="Reported against evidence-based status, with the three measures rolled up from deliverables." padding="none" actions={<AddToSlides kind="portfolio-programmes" scope={{ kind: 'portfolio' }} />}>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] table-fixed border-separate border-spacing-0 text-left">
           <caption className="sr-only">Health by programme</caption>
@@ -123,7 +124,7 @@ export function ProgrammeHealth({ view }: { view: PortfolioView }) {
 export function StageDistribution({ view }: { view: PortfolioView }) {
   const max = Math.max(1, ...view.stages.map((s) => s.count));
   return (
-    <Card title="Across the five lifecycle stages" description="Deliverables by current PDLC stage." padding="sm" bodyClassName="flex flex-col gap-2.5">
+    <Card title="Across the five lifecycle stages" description="Deliverables by current PDLC stage." padding="sm" actions={<AddToSlides kind="portfolio-stages" scope={{ kind: 'portfolio' }} />} bodyClassName="flex flex-col gap-2.5">
       {view.stages.map((s, i) => (
         <div key={s.id} data-testid={`stage-${s.id}`} className="grid grid-cols-[110px_minmax(0,1fr)_28px] items-center gap-3 text-[13px]">
           <span className="truncate text-fg-muted"><span className="mr-1.5 text-fg-subtle tabular-nums">{i + 1}</span>{s.name}</span>
@@ -140,7 +141,7 @@ export function StageDistribution({ view }: { view: PortfolioView }) {
 export function TopFindings({ view }: { view: PortfolioView }) {
   const shown = view.rules.slice(0, 6);
   return (
-    <Card title="Top findings by rule" description={`${view.findingsTotal} findings across ${view.rules.length} rules, most severe first.`} padding="sm" bodyClassName="flex flex-col gap-2">
+    <Card title="Top findings by rule" description={`${view.findingsTotal} findings across ${view.rules.length} rules, most severe first.`} padding="sm" actions={<AddToSlides kind="portfolio-findings" scope={{ kind: 'portfolio' }} />} bodyClassName="flex flex-col gap-2">
       {shown.length === 0 ? <p className="text-sm text-fg-muted">No findings.</p> : null}
       {shown.map((r) => (
         <div key={r.ruleId} data-testid={`rule-${r.ruleId}`} className="grid grid-cols-[34px_minmax(0,1fr)_auto_28px] items-center gap-3 text-[13px]">

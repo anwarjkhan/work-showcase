@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LayoutTemplate,
   Network,
+  Presentation,
   Route,
   Workflow,
   type LucideIcon,
@@ -25,5 +26,6 @@ export const NAV_ICONS: Record<RouteIcon, LucideIcon> = {
   agents: Bot,
   blueprint: LayoutTemplate,
   evidence: FlaskConical,
+  slides: Presentation,
   about: Info,
 };

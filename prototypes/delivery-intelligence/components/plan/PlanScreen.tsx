@@ -3,6 +3,7 @@
 import { CalendarCheck2, CalendarClock, ChevronLeft, ChevronRight, ChevronsDownUp, ChevronsUpDown, CircleDot, Landmark, Link2Off, TrendingUp, Diamond } from 'lucide-react';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { ProvenanceBadge, ProvenanceBadges } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Button, Chip, IconButton, StatTile, Tabs, cx } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 
@@ -101,7 +102,10 @@ export function PlanScreen() {
             </h2>
             <p className="text-[13.5px] leading-relaxed text-fg-muted">{insight.detail}</p>
           </div>
-          <ProvenanceBadges kinds={['computed', 'reported', 'sample']} size="sm" />
+          <div className="flex items-center gap-2">
+            <AddToSlides kind="portfolio-quarter" scope={{ kind: 'portfolio' }} />
+            <ProvenanceBadges kinds={['computed', 'reported', 'sample']} size="sm" />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 xl:grid-cols-4" data-testid="plan-summary">

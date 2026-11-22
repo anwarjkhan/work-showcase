@@ -1,5 +1,7 @@
 import { GitCompareArrows } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { AddToSlides } from '@/components/slides/AddToSlides';
+import { ExportPack } from '@/components/slides/ExportPack';
 import { ProgressBar } from '@/components/ui';
 import { READINESS_ICON, READINESS_TONE, TONE } from '@/components/ui/status';
 import { cx } from '@/components/ui/cx';
@@ -27,7 +29,11 @@ export function Headline({ view }: { view: PortfolioView }) {
   const readinessTotal = READINESS_ORDER.reduce((s, k) => s + summary.readiness[k], 0);
   return (
     <div className="di-card grid grid-cols-1 overflow-hidden xl:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] 2xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-      <div className="flex items-center gap-4 2xl:gap-6 border-b border-line bg-status-amber-soft/40 p-6 xl:border-r xl:border-b-0">
+      <div className="relative flex items-center gap-4 2xl:gap-6 border-b border-line bg-status-amber-soft/40 p-6 xl:border-r xl:border-b-0">
+        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+          <AddToSlides kind="portfolio-headline" scope={{ kind: 'portfolio' }} />
+          <ExportPack scope={{ kind: 'portfolio' }} />
+        </div>
         <div className="flex flex-col items-start">
           <div className="di-eyebrow flex items-center gap-1.5">
             <GitCompareArrows aria-hidden className="size-3.5 text-status-amber" strokeWidth={2.2} />

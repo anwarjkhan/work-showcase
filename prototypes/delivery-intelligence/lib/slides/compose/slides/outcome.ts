@@ -38,7 +38,7 @@ export const outcomeSummary: SlideBuilder = (input) => {
           type: 'kpis',
           items: [
             { label: terms.ragKinds.reported, value: outcomeStatusWord(o.reportedStatus), caption: terms.systems['portfolio-system'], tone: outcomeStatusTone(o.reportedStatus) },
-            { label: 'Acceptance', value: a.accepted ? 'Accepted' : 'Not accepted', caption: `${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria`, tone: a.accepted ? 'green' : 'red' },
+            { label: 'Acceptance', value: a.accepted ? terms.acceptance.accepted : terms.acceptance.notAccepted, caption: `${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria`, tone: a.accepted ? 'green' : 'red' },
             { label: 'Weight', value: `${f.weight.own} of ${f.weight.total}`, caption: `Across ${f.deliverable?.ref ?? 'the deliverable'}` },
             { label: 'Due', value: date(o.dueDate), tone: !a.accepted && o.dueDate < input.env.asOf ? 'amber' : 'neutral' },
             { label: 'Acceptance owner', value: f.owner?.name ?? 'Not named' },
@@ -70,7 +70,7 @@ export const outcomeCriteria: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'outcome-criteria',
-      title: `${o.ref}: ${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria accepted${ba ? '' : ', no business acceptance'}`,
+      title: `${o.ref}: ${a.mandatoryAccepted} of ${a.mandatoryCount} mandatory criteria accepted`,
       layout: 'kpis-over-table',
       blocks: [
         at('top', {
@@ -79,7 +79,7 @@ export const outcomeCriteria: SlideBuilder = (input) => {
             { label: 'Mandatory accepted', value: `${a.mandatoryAccepted} of ${a.mandatoryCount}`, tone: a.mandatoryAccepted === a.mandatoryCount ? 'green' : 'red' },
             { label: terms.evidenceKinds['business-acceptance'], value: ba ? ba.sourceRef || 'Held' : 'None held', caption: ba ? `${terms.evidenceResults[ba.result]} · ${date(ba.observedAt)}` : undefined, tone: ba ? 'green' : 'red' },
             { label: 'Acceptance owner', value: f.owner?.name ?? 'Not named' },
-            { label: 'Outcome', value: a.accepted ? 'Accepted' : 'Not accepted', tone: a.accepted ? 'green' : 'red' },
+            { label: 'Outcome', value: a.accepted ? terms.acceptance.accepted : terms.acceptance.notAccepted, tone: a.accepted ? 'green' : 'red' },
           ],
         }),
         at('main', table([col('#', 1, { align: 'right' }), col('Criterion', 9, { maxChars: 80 }), col('Mandatory', 2), col('State', 2), col('Accepted by', 3), col('When', 2)], rows, `No acceptance criteria are recorded for ${o.ref}.`)),

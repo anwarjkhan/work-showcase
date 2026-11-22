@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProvenanceBadge } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Card, RagPair, ReadinessPill } from '@/components/ui';
 import { hrefs } from '@/lib/config/routes';
 import { terms } from '@/lib/config/terminology';
@@ -65,7 +66,12 @@ export function Disagreements({ view }: { view: PortfolioView }) {
       description="Widest gap first. Each row opens the deliverable with its evidence."
       padding="none"
       level={2}
-      actions={<ProvenanceBadge kind="computed" size="sm" />}
+      actions={
+        <>
+          <AddToSlides kind="portfolio-disagreements" scope={{ kind: 'portfolio' }} />
+          <ProvenanceBadge kind="computed" size="sm" />
+        </>
+      }
     >
       {view.disagreements.length === 0 ? (
         <p className="px-5 pb-5 text-sm text-fg-muted">No disagreements: reported and evidence-based status match everywhere the evidence is sufficient.</p>

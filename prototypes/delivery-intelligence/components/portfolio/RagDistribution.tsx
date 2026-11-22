@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { StatusGlyph, TONE } from '@/components/ui/status';
 import { cx } from '@/components/ui/cx';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Card } from '@/components/ui';
 import { terms } from '@/lib/config/terminology';
 import type { EvidenceRagStatus, RagCounts } from '@/lib/types';
@@ -41,7 +42,7 @@ function Row({ label, counts, testId }: { label: string; counts: RagCounts; test
 
 export function RagDistribution({ reported, evidence, total }: { reported: RagCounts; evidence: RagCounts; total: number }) {
   return (
-    <Card title="Reported against evidence-based status" description={`All ${total} deliverables on one scale: the gap between the bars is the finding.`} padding="sm" bodyClassName="flex flex-col gap-3">
+    <Card title="Reported against evidence-based status" description={`All ${total} deliverables on one scale: the gap between the bars is the finding.`} padding="sm" bodyClassName="flex flex-col gap-3" actions={<AddToSlides kind="portfolio-rag" scope={{ kind: 'portfolio' }} />}>
       <div className="grid grid-cols-[132px_minmax(0,1fr)_auto] items-center gap-4" aria-hidden>
         <span />
         <span />

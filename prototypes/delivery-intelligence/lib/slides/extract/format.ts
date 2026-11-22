@@ -38,18 +38,9 @@ export function readinessTone(s: ReadinessState): Tone {
   return READINESS_TONE[s];
 }
 
-/** Outcome reported status words. On track and at risk reuse the shared status words. */
+/** Outcome reported status words. */
 export function outcomeStatusWord(s: Outcome['reportedStatus']): string {
-  switch (s) {
-    case 'on-track':
-      return terms.dependencyStatus['on-track'];
-    case 'at-risk':
-      return terms.dependencyStatus['at-risk'];
-    case 'off-track':
-      return 'Off track';
-    case 'complete':
-      return 'Complete';
-  }
+  return terms.outcomeStatus[s];
 }
 
 export function outcomeStatusTone(s: Outcome['reportedStatus']): Tone {
@@ -92,7 +83,7 @@ export function readinessView(r: ReadinessAssessment): ReadinessView {
   return { label: terms.measures.readiness, state: r.state, stateText: terms.readiness[r.state], caption: parts.join(' · '), tone: readinessTone(r.state) };
 }
 
-/** Readiness of a set of deliverables: counts per state, never a percentage. */
+/** Readiness of a set of deliverables: counts per state, never a percentage. A count is not a status, so the tone is neutral. */
 export function readinessRollupView(counts: MeasureRollup['readiness']): ReadinessView {
   const total = counts.ready + counts['not-ready'] + counts.unknown;
   const state: ReadinessState = counts['not-ready'] > 0 ? 'not-ready' : counts.unknown > 0 || total === 0 ? 'unknown' : 'ready';
@@ -101,7 +92,7 @@ export function readinessRollupView(counts: MeasureRollup['readiness']): Readine
     state,
     stateText: `${counts.ready} of ${total} ${terms.readiness.ready.toLowerCase()}`,
     caption: `${counts['not-ready']} ${terms.readiness['not-ready'].toLowerCase()} · ${counts.unknown} ${terms.readiness.unknown.toLowerCase()}`,
-    tone: readinessTone(state),
+    tone: 'neutral',
   };
 }
 
@@ -173,7 +164,7 @@ export function recordInfo(env: SlideEnv, ref: EntityRef): RecordInfo | null {
       const x = idx.milestones.get(ref.id);
       if (!x) return null;
       const d = idx.deliverables.get(x.deliverableId);
-      return { label: `${d?.ref ?? ''} milestone ${date(x.date)}`.trim(), system: PTS(), type: x.regulatory ? 'Regulatory milestone' : 'Milestone', description: x.title };
+      return { label: `${d?.ref ?? ''} milestone ${date(x.date)}`.trim(), system: PTS(), type: x.regulatory ? terms.milestones.regulatory : terms.milestones.milestone, description: x.title };
     }
     case 'work-item': {
       const x = idx.workItems.get(ref.id);

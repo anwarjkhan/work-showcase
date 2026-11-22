@@ -12,6 +12,7 @@ export type RouteId =
   | 'deliverable'
   | 'blueprint'
   | 'evidence'
+  | 'slides'
   | 'about';
 
 export type NavGroup = 'portfolio' | 'delivery' | 'adoption' | 'build';
@@ -28,6 +29,7 @@ export type RouteIcon =
   | 'deliverable'
   | 'blueprint'
   | 'evidence'
+  | 'slides'
   | 'about';
 
 export interface RouteDefinition {
@@ -55,7 +57,7 @@ export const NAV_GROUP_LABELS: Record<NavGroup, string> = {
   build: 'This build',
 };
 
-/** All eleven routes of design section 4, in navigation order. */
+/** All routes of design section 4 plus the slide builder, in navigation order. */
 export const ROUTES: readonly RouteDefinition[] = [
   {
     id: 'portfolio',
@@ -152,6 +154,18 @@ export const ROUTES: readonly RouteDefinition[] = [
     icon: 'agents',
     provenance: ['scripted-agent', 'computed'],
     builtBy: 'D12',
+  },
+  {
+    id: 'slides',
+    pattern: '/slides',
+    navHref: '/slides',
+    title: 'Slide builder',
+    navLabel: 'Slides',
+    description: 'Turn any scope into editable PowerPoint: one slide, a hand-picked set or a complete pack.',
+    group: 'portfolio',
+    icon: 'slides',
+    provenance: ['computed', 'sample'],
+    builtBy: 'S6',
   },
   {
     id: 'blueprint',

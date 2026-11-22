@@ -9,7 +9,8 @@ import { computeAll } from '@/lib/engine';
 import type { AgentId, PortfolioData, StatusDraft } from '@/lib/types';
 import type { SlideContext } from '../extract';
 import type { Block, SlideSpec } from '../types';
-import { BULLETS_PER_SLIDE, CHART_MAX_CATEGORIES, LAYOUT_REGIONS, TABLE_ROWS_PER_SLIDE, TIMELINE_ROWS_PER_SLIDE, TITLE_MAX, cellText } from './kit';
+import { BULLETS_PER_SLIDE, CHART_MAX_CATEGORIES, LAYOUT_REGIONS, TABLE_ROWS_PER_SLIDE, TIMELINE_ROWS_PER_SLIDE, TIMELINE_ROWS_WITH_TOP, TITLE_MAX, TITLE_TARGET, cellText } from './kit';
+import { regionWidth } from './columns';
 import { DRAFT_LABEL } from './slides/shared';
 
 export function syntheticContext(withDrafts = false): SlideContext {
@@ -61,7 +62,7 @@ export function visibleStrings(value: unknown, key = ''): string[] {
   return [];
 }
 
-function blockProblems(b: Block): string[] {
+function blockProblems(b: Block, hasTop: boolean): string[] {
   const out: string[] = [];
   if (b.type === 'table') {
     if (b.rows.length > TABLE_ROWS_PER_SLIDE) out.push(`table has ${b.rows.length} rows`);
@@ -72,10 +73,18 @@ function blockProblems(b: Block): string[] {
         if (max && cellText(c).length > max) out.push(`cell over ${max} chars`);
       });
     }
+    // Fitted widths are inches: headers hold their longest word (0.11 in a character); short columns their longest value word (0.095).
+    b.columns.forEach((c, i) => {
+      const words = (t: string) => Math.max(0, ...t.split(/\s+/).map((w) => w.length));
+      const header = words(c.header) * 0.11;
+      const value = c.maxChars === undefined ? Math.max(0, ...b.rows.map((r) => (r[i] === undefined ? 0 : words(cellText(r[i] as never))))) * 0.095 : 0;
+      if (c.width < Math.max(header, value)) out.push(`column "${c.header}" too narrow`);
+    });
   }
   if (b.type === 'bullets' && b.items.length > BULLETS_PER_SLIDE) out.push(`${b.items.length} bullets`);
   if (b.type === 'timeline') {
     if (b.rows.length > TIMELINE_ROWS_PER_SLIDE) out.push(`${b.rows.length} timeline rows`);
+    if (b.rows.length > TIMELINE_ROWS_WITH_TOP && hasTop) out.push(`${b.rows.length} timeline rows under headline figures`);
     if (b.window.start > b.window.end) out.push('timeline window reversed');
   }
   if ((b.type === 'bar' || b.type === 'stacked-bar') && b.categories.length > CHART_MAX_CATEGORIES) out.push('too many chart categories');
@@ -92,11 +101,17 @@ function blockProblems(b: Block): string[] {
 export function specProblems(spec: SlideSpec, data: PortfolioData): string[] {
   const out: string[] = [];
   if (spec.title.length > TITLE_MAX) out.push(`title over ${TITLE_MAX}: ${spec.title}`);
+  // Page 1 titles aim at one line; continuation suffixes may use the rest of the hard cap.
+  if ((!spec.page || spec.page.index === 1) && spec.title.length > TITLE_TARGET) out.push(`title over ${TITLE_TARGET}: ${spec.title}`);
   if (!spec.title.trim()) out.push('empty title');
   const regions = LAYOUT_REGIONS[spec.layout];
   for (const p of spec.blocks) {
     if (!regions.includes(p.region)) out.push(`block ${p.block.type} in region ${p.region} of ${spec.layout}`);
-    out.push(...blockProblems(p.block));
+    out.push(...blockProblems(p.block, spec.blocks.some((x) => x.region === 'top')));
+    if (p.block.type === 'table') {
+      const total = p.block.columns.reduce((s, c) => s + c.width, 0);
+      if (total > regionWidth(spec.layout, p.region) + 0.05) out.push(`table columns need ${total.toFixed(2)} in, more than the region`);
+    }
   }
   if (!spec.notes.includes('Records:') || spec.notes.trim().startsWith('Records:')) out.push('notes missing talk track or records line');
   for (const c of spec.citations) {

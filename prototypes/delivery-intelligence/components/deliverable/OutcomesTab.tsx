@@ -2,6 +2,8 @@
 
 import { CircleCheck, CircleDot, CircleX, TriangleAlert } from 'lucide-react';
 import { ProvenanceBadge } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
+import { ExportPack } from '@/components/slides/ExportPack';
 import { Badge, Card, EmptyState, ProgressBar, cx, type BadgeTone } from '@/components/ui';
 import { formatDate } from '@/lib/config/clock';
 import { terms } from '@/lib/config/terminology';
@@ -39,6 +41,12 @@ function OutcomeCard({ row, today }: { row: OutcomeRow; today: string }) {
         </span>
       }
       title={outcome.title}
+      actions={
+        <>
+          <AddToSlides kind="outcome-summary" scope={{ kind: 'outcome', outcomeId: outcome.id }} label={`the outcome slide for ${outcome.ref}`} />
+          <ExportPack scope={{ kind: 'outcome', outcomeId: outcome.id }} label={`${outcome.ref} pack`} />
+        </>
+      }
     >
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,15rem)_minmax(0,15rem)_1fr]">
         <div className="flex flex-col gap-1.5">

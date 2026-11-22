@@ -9,7 +9,7 @@ import type { EntityRef, Finding, RuleId } from '@/lib/types';
 import { catalogueEntry, PACKS } from '../../catalogue';
 import { recordInfo, scopeName, scopePath, scopeRecord, scopeRef, type Citation, type SlideEnv } from '../../extract';
 import type { SlideScope } from '../../types';
-import { at, bullets, callout, col, makeSlide, table, text, type SlideBuilder } from '../kit';
+import { at, bullets, callout, col, makeSlide, table, text, TITLE_TARGET, type SlideBuilder } from '../kit';
 import { DRAFT_LABEL } from './shared';
 
 const pts = () => terms.systems['portfolio-system'];
@@ -23,9 +23,11 @@ export const cover: SlideBuilder = (input) => {
   const record = scopeRecord(scope);
   const name = scopeName(env, scope);
   // A name too long for a title moves into the body; the title keeps the ref.
-  const title = name.length <= 70 ? name : scopeRef(env, scope);
-  const blocks = [...(title !== name ? [at('main', text(name, 'statement'))] : []), at('main', text(scopePath(env, scope), 'body')), at('main', text(`As at ${asOf}`, 'body')), at('main', text(`Data source: ${source}`, 'caption'))];
-  if (env.synthetic) blocks.push(at('main', callout('accent', 'Prototype · synthetic data. Figures are generated for demonstration and describe no real work.', 'Prototype')));
+  const title = name.length <= TITLE_TARGET ? name : scopeRef(env, scope);
+  // The scope (and its full name when the title keeps only the ref) and path share one text block, so the cover region holds everything.
+  const lead = title !== name ? `${name}\n${scopePath(env, scope)}` : scopePath(env, scope);
+  const blocks = [at('main', text(lead, 'body')), at('main', text(`As at ${asOf} · Data source: ${source}`, 'caption'))];
+  if (env.synthetic) blocks.push(at('main', callout('accent', 'Synthetic data: figures describe no real work.', 'Prototype')));
   return [
     makeSlide(input, {
       kind: 'cover',
@@ -72,7 +74,7 @@ export const howToRead: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'how-to-read',
-      title: 'How to read these measures: three answers, kept separate',
+      title: 'How to read these measures: three answers',
       layout: 'two-column',
       blocks: [
         at(

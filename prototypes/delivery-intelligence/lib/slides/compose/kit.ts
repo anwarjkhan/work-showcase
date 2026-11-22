@@ -23,10 +23,27 @@ export const LAYOUT_REGIONS: Readonly<Record<LayoutId, readonly RegionId[]>> = {
   document: ['main'],
 };
 
+/** Hard cap on title length; the composer shortens beyond it. */
 export const TITLE_MAX = 70;
+/** What fits on one line at 26 pt; builders aim titles at this. */
+export const TITLE_TARGET = 55;
 export const TABLE_ROWS_PER_SLIDE = 10;
 export const BULLETS_PER_SLIDE = 8;
 export const TIMELINE_ROWS_PER_SLIDE = 12;
+/**
+ * Timeline rows the renderer's region holds at its minimum row height
+ * (render/theme.ts and pptx-blocks.ts): 6 under a row of headline figures,
+ * 10 when the timeline has the slide to itself. Both are within the 12-row cap.
+ */
+export const TIMELINE_ROWS_WITH_TOP = 6;
+export const TIMELINE_ROWS_ALONE = 10;
+
+/** Label lines the renderer gives each timeline row: two when rows are tall, one at minimum height. */
+export function timelineLabelLines(rowCount: number, hasTop: boolean): number {
+  const area = (hasTop ? 3.75 : 5.15) - 0.64;
+  const rowH = Math.max(0.45, Math.min(0.78, area / Math.max(1, rowCount)));
+  return rowH >= 0.75 ? 2 : 1;
+}
 export const BULLET_MAX_CHARS = 150;
 export const CHART_MAX_CATEGORIES = 8;
 

@@ -4,6 +4,8 @@ import { ArrowRight, ChevronLeft, ChevronRight, GitCompareArrows, Globe2, Calend
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ProvenanceBadges } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
+import { ExportPack } from '@/components/slides/ExportPack';
 import { AvatarLabel, Badge, IconButton, MeasureTriple, RagPill, ReadinessPill, cx } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { formatDate } from '@/lib/config/clock';
@@ -125,11 +127,14 @@ function MeasureExplanations({ model }: { model: DeliverableModel }) {
           ? `An outcome counts only when a named human has accepted every mandatory criterion and a business acceptance record exists. Weight accepted: ${ao.value.acceptedWeight} of ${ao.value.totalWeight}.`
           : ao.detail}
       </p>
-      <p className="p-4 text-xs leading-relaxed text-fg-muted">
-        <strong className="font-semibold text-fg">Is there verified evidence it can be released.</strong>{' '}
-        {tier} requires {r.requiredEvidence.length} kinds of evidence: {heldPassing} held and passing
-        {parts.length > 0 ? `; ${parts.join(', ')}` : ''}. Never a percentage.
-      </p>
+      <div className="flex items-start justify-between gap-3 p-4">
+        <p className="text-xs leading-relaxed text-fg-muted">
+          <strong className="font-semibold text-fg">Is there verified evidence it can be released.</strong>{' '}
+          {tier} requires {r.requiredEvidence.length} kinds of evidence: {heldPassing} held and passing
+          {parts.length > 0 ? `; ${parts.join(', ')}` : ''}. Never a percentage.
+        </p>
+        <AddToSlides kind="td-readiness" scope={{ kind: 'deliverable', deliverableId: deliverable.id }} label={`the readiness slide for ${deliverable.ref}`} />
+      </div>
     </div>
   );
 }
@@ -181,6 +186,8 @@ export function VerdictHeader({ model }: { model: DeliverableModel }) {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <AddToSlides kind="td-verdict" scope={{ kind: 'deliverable', deliverableId: d.id }} label={`the verdict slide for ${d.ref}`} />
+            <ExportPack text scope={{ kind: 'deliverable', deliverableId: d.id }} />
             <Link href={hrefs.workflow(d.id)} className={linkClass} data-testid="link-workflow">
               <Workflow aria-hidden className="size-3.5" />
               Workflow

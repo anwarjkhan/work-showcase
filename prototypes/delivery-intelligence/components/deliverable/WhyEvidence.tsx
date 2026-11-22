@@ -3,6 +3,7 @@
 import { ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { ProvenanceBadges } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Button, EmptyState, SectionHeading, SeverityBadge, cx } from '@/components/ui';
 import { terms } from '@/lib/config/terminology';
 import { RULE_DESCRIPTIONS } from '@/lib/config/thresholds';
@@ -29,7 +30,12 @@ export function WhyEvidence({ model }: { model: DeliverableModel }) {
             ? `${findings.length} finding${findings.length === 1 ? '' : 's'} from the rules, most severe first. Every record is clickable.`
             : undefined
         }
-        actions={<ProvenanceBadges kinds={['computed']} />}
+        actions={
+          <>
+            <AddToSlides kind="td-findings" scope={{ kind: 'deliverable', deliverableId: model.deliverable.id }} label="the findings slide" />
+            <ProvenanceBadges kinds={['computed']} />
+          </>
+        }
       />
       {findings.length === 0 ? (
         <EmptyState

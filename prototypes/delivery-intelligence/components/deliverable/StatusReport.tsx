@@ -10,6 +10,7 @@ import { Check, ClipboardCopy, FileText, Play, RefreshCw } from 'lucide-react';
 import { useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ProvenanceBadge } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { Badge, Button, Card, Disclosure, SectionHeading, Timeline, cx, type TimelineStep } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { playbackAt, playbackDuration, resolveRef } from '@/lib/agents';
@@ -209,6 +210,7 @@ export function StatusReport({ deliverableId }: { deliverableId: string }) {
         actions={
           <>
             <ProvenanceBadge kind="scripted-agent" />
+            <AddToSlides kind="td-status" scope={{ kind: 'deliverable', deliverableId }} label="the weekly status slide" />
             <Button
               variant="primary"
               icon={draft ? <RefreshCw className="size-4" /> : <Play className="size-4" />}

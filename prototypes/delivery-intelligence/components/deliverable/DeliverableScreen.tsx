@@ -15,6 +15,7 @@
 import { CalendarDays, FileCheck2, Network, SquareKanban, Target, Users } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PageMeta } from '@/components/shell';
+import { AddToSlides } from '@/components/slides/AddToSlides';
 import { EmptyState, SectionHeading, TabPanel, Tabs } from '@/components/ui';
 import { terms } from '@/lib/config/terminology';
 import { useClock, useEngineResult, usePortfolioData } from '@/lib/store';
@@ -30,6 +31,7 @@ import { WhyEvidence } from './WhyEvidence';
 import { WorkTab } from './WorkTab';
 import { buildDeliverableModel } from './model';
 
+const TAB_SLIDE_KIND = { outcomes: 'td-outcomes', raid: 'td-raid', milestones: 'td-plan', pod: 'td-pod' } as const;
 const TAB_IDS = ['outcomes', 'work', 'evidence', 'raid', 'milestones', 'pod'] as const;
 type TabId = (typeof TAB_IDS)[number];
 
@@ -97,7 +99,9 @@ export function DeliverableScreen({ id }: { id: string }) {
         </div>
 
         <section id="detail" aria-labelledby="detail-heading" className="flex min-w-0 scroll-mt-20 flex-col gap-4">
-          <SectionHeading id="detail-heading" title="The records behind the verdict" description="Outcomes, work, evidence, risks, dependencies, milestones and the pod. Click any row for the full record." />
+          <SectionHeading id="detail-heading" title="The records behind the verdict" description="Outcomes, work, evidence, risks, dependencies, milestones and the pod. Click any row for the full record."
+            actions={tab in TAB_SLIDE_KIND ? <AddToSlides kind={TAB_SLIDE_KIND[tab as keyof typeof TAB_SLIDE_KIND]} scope={{ kind: 'deliverable', deliverableId: id }} label={`the ${tabs.find((t) => t.id === tab)?.label ?? ''} tab`} /> : undefined}
+          />
           <Tabs ariaLabel="Deliverable sections" items={tabs} value={tab} onChange={(v) => setTab(v as TabId)}>
             <TabPanel id="outcomes">
               <OutcomesTab model={model} />

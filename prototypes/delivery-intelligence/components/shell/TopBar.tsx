@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { NAV_GROUP_LABELS, routeForPath } from '@/lib/config/routes';
+import { BasketControl } from '@/components/slides/BasketControl';
 import { DemoControlSlot } from './DemoSlot';
 import { useCurrentPageMeta } from './page-meta';
 import { ProvenanceBadges } from './ProvenanceBadge';
@@ -38,6 +39,7 @@ export function TopBar() {
       <div className="flex shrink-0 items-center gap-2.5">
         <DemoControlSlot />
         <span aria-hidden className="mx-0.5 h-6 w-px bg-line" />
+        <BasketControl />
         <ThemeSwitch />
         <ResetDemoButton />
       </div>

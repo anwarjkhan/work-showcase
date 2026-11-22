@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { Boxes, Check, CircleDashed, FileText, Flag, FolderTree, Layers, ListChecks, Route, SquareSplitHorizontal, Target, ArrowUpRight, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { AddToSlides } from '@/components/slides/AddToSlides';
+import { ExportPack } from '@/components/slides/ExportPack';
 import { Avatar, Badge, Button, EmptyState, RagPair, ReadinessPill, Tabs, Tree, TreeRow, cx } from '@/components/ui';
 import { PDLC_STAGES } from '@/lib/config/pdlc';
 import { HERO_DELIVERABLE_ID } from '@/lib/config/story';
@@ -389,6 +391,7 @@ export function ExplorerTree({ view, onViewChange }: { view: ExplorerView; onVie
                 {d.epicKeys.length} {terms.hierarchy.epic}
                 {d.epicKeys.length === 1 ? '' : 's'}
               </span>
+              <AddToSlides kind="td-verdict" scope={{ kind: 'deliverable', deliverableId: d.id }} label={`the verdict slide for ${d.ref}`} />
               <Link
                 href={hrefs.deliverable(d.id)}
                 data-detail-link
@@ -481,6 +484,8 @@ export function ExplorerTree({ view, onViewChange }: { view: ExplorerView; onVie
             <>
               <span className="text-[11px] text-fg-muted tabular-nums">{pmCount.get(p.id) ?? 0} {pmCount.get(p.id) === 1 ? 'deliverable' : 'deliverables'}</span>
               {rag ? <RagPair reported={rag.reported} evidence={rag.evidence} disagrees={rag.disagrees} size="sm" /> : null}
+              <AddToSlides kind="node-overview" scope={{ kind: 'pm-node', pmNodeId: p.id }} label={`the overview slide for ${p.ref}`} />
+              <ExportPack scope={{ kind: 'pm-node', pmNodeId: p.id }} label={`${p.ref} pack`} />
             </>
           }
         />

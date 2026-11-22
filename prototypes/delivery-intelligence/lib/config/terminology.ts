@@ -19,10 +19,14 @@ import type {
   EvidenceKind,
   EvidenceRagStatus,
   EvidenceResult,
+  Outcome,
+  PdlcStageStatus,
   PmNodeLevel,
   Provenance,
   RaidKind,
+  RaidStatus,
   ReadinessState,
+  ReviewState,
   ReviewRoleId,
   RiskTier,
   Severity,
@@ -184,6 +188,40 @@ export const baseTerminology = {
     issue: 'Issue',
     dependency: 'Dependency',
   } satisfies Record<RaidKind, string>,
+  /** Outcome status as reported in the portfolio system. */
+  outcomeStatus: {
+    'on-track': 'On track',
+    'at-risk': 'At risk',
+    'off-track': 'Off track',
+    complete: 'Complete',
+  } satisfies Record<Outcome['reportedStatus'], string>,
+  /** Acceptance state of an outcome (accepted outcomes measure). */
+  acceptance: {
+    accepted: 'Accepted',
+    notAccepted: 'Not accepted',
+  },
+  raidStatus: {
+    open: 'Open',
+    mitigating: 'Mitigating',
+    closed: 'Closed',
+  } satisfies Record<RaidStatus, string>,
+  pdlcStageStatus: {
+    'not-started': 'Not started',
+    'in-progress': 'In progress',
+    'in-review': 'In review',
+    approved: 'Approved',
+    returned: 'Returned',
+  } satisfies Record<PdlcStageStatus, string>,
+  reviewStates: {
+    'not-requested': 'Not requested',
+    pending: 'Pending',
+    approved: 'Approved',
+    returned: 'Returned',
+  } satisfies Record<ReviewState, string>,
+  milestones: {
+    milestone: 'Milestone',
+    regulatory: 'Regulatory milestone',
+  },
   dependencyStatus: {
     'on-track': 'On track',
     'at-risk': 'At risk',

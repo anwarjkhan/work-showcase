@@ -10,7 +10,7 @@ import { date, plural } from '../../extract';
 import type { Cell, TimelineRow, Tone } from '../../types';
 import { at, callout, col, makeSlide, table, TIMELINE_ROWS_PER_SLIDE, toned, type SlideBuilder } from '../kit';
 import { factsOf } from './portfolio';
-import { draftDocument, severityCell } from './shared';
+import { draftDocument, fitTimelineRows, severityCell } from './shared';
 
 const SEVERITIES: Severity[] = ['critical', 'high', 'medium', 'low'];
 const SEV_TONE: Record<Severity, Tone> = { critical: 'red', high: 'amber', medium: 'neutral', low: 'neutral' };
@@ -78,6 +78,7 @@ export const portfolioQuarter: SlideBuilder = (input) => {
     };
   });
   const end = rows.reduce((a, r) => (r.projectedEnd && r.projectedEnd > a ? r.projectedEnd : a), q.end);
+  const fitted = fitTimelineRows(rows, { start: q.start, end });
   const knockLines = env.knockOn.map((k) => `- ${k.explanation}`);
   const hidden = due.slice(TIMELINE_ROWS_PER_SLIDE).map((l) => l.deliverable.ref);
   return [
@@ -95,7 +96,7 @@ export const portfolioQuarter: SlideBuilder = (input) => {
             { label: 'Late or blocked inputs', value: String(env.knockOn.length), tone: env.knockOn.length > 0 ? 'red' : 'green' },
           ],
         }),
-        at('main', { type: 'timeline', window: { start: q.start, end }, today: env.asOf, rows }),
+        at('main', { type: 'timeline', window: { start: q.start, end }, today: env.asOf, rows: fitted.rows }),
       ],
       say: `Deliverables planned to finish in ${q.label} (${date(q.start)} to ${date(q.end)}), most at risk first, with forecast and knock-on ends where they differ from plan.`,
       refs: [
@@ -105,6 +106,7 @@ export const portfolioQuarter: SlideBuilder = (input) => {
       ],
       provenance: ['computed', 'reported'],
       extraNotes: [
+        ...fitted.notes,
         ...(q.regulatoryAtRisk.length > 0 ? [`Regulatory milestones at risk:\n${q.regulatoryAtRisk.map((r) => `- ${r.deliverable?.ref ?? ''} ${r.milestone.title}, ${date(r.milestone.date)}: ${r.why}`).join('\n')}`] : []),
         ...(knockLines.length > 0 ? [`Knock-on:\n${knockLines.join('\n')}`] : []),
         ...(hidden.length > 0 ? [`Also due this quarter, not shown: ${hidden.join(', ')}`] : []),

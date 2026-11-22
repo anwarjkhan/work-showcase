@@ -1,20 +1,24 @@
 /**
  * Text fitting (docs/SLIDES_PLAN.md section 6): tables longer than 10 body
- * rows, bullet lists longer than 8 items and timelines longer than 12 rows
+ * rows, bullet lists longer than 8 items and timelines longer than the
+ * renderer holds (6 rows under headline figures, 10 alone; never over 12)
  * continue on further slides with the same columns, titled
  * "<title> (continued, 2 of 3)", with `page` set and ids suffixed `:p2`.
  * Cell text beyond a column's `maxChars` and long bullets are shortened with
- * "…"; the full text goes into that page's notes.
+ * "…"; the full text goes into that page's notes. Column widths are fitted
+ * first (compose/columns.ts) so headers and short values never break mid-word.
  */
+import { fitTable, regionWidth } from './columns';
 import type { Block, Cell, LayoutId, PlacedBlock, SlideSpec } from '../types';
-import { BULLET_MAX_CHARS, BULLETS_PER_SLIDE, cellText, shorten, TABLE_ROWS_PER_SLIDE, TIMELINE_ROWS_PER_SLIDE, TITLE_MAX } from './kit';
+import { BULLET_MAX_CHARS, BULLETS_PER_SLIDE, cellText, shorten, TABLE_ROWS_PER_SLIDE, TIMELINE_ROWS_ALONE, TIMELINE_ROWS_PER_SLIDE, TIMELINE_ROWS_WITH_TOP, TITLE_MAX } from './kit';
 
 type Splittable = Extract<Block, { type: 'table' | 'bullets' | 'timeline' }>;
 
-function capacity(block: Block): number | null {
+function capacity(block: Block, hasTop = false): number | null {
   if (block.type === 'table') return TABLE_ROWS_PER_SLIDE;
   if (block.type === 'bullets') return BULLETS_PER_SLIDE;
-  if (block.type === 'timeline') return TIMELINE_ROWS_PER_SLIDE;
+  // Under headline figures the timeline region holds fewer rows; continuation pages keep the same split.
+  if (block.type === 'timeline') return Math.min(TIMELINE_ROWS_PER_SLIDE, hasTop ? TIMELINE_ROWS_WITH_TOP : TIMELINE_ROWS_ALONE);
   return null;
 }
 
@@ -28,14 +32,14 @@ function slice(block: Splittable, from: number, to: number): Splittable {
   return { ...block, items: block.items.slice(from, to) };
 }
 
-const overflows = (b: Block): b is Splittable => {
-  const cap = capacity(b);
+const overflows = (b: Block, hasTop = false): b is Splittable => {
+  const cap = capacity(b, hasTop);
   return cap !== null && length(b as Splittable) > cap;
 };
 
 /** Cuts any block beyond its capacity, listing what was dropped. Used for a second overflowing block on one slide. */
-function truncate(block: Splittable, dropped: string[]): Splittable {
-  const cap = capacity(block) as number;
+function truncate(block: Splittable, dropped: string[], hasTop: boolean): Splittable {
+  const cap = capacity(block, hasTop) as number;
   if (block.type === 'table') for (const r of block.rows.slice(cap)) dropped.push(r.map(cellText).join(' · '));
   else if (block.type === 'timeline') for (const r of block.rows.slice(cap)) dropped.push(r.label);
   else for (const i of block.items.slice(cap)) dropped.push(i.text);
@@ -91,15 +95,21 @@ export function pageTitle(title: string, index: number, of: number): string {
 }
 
 /** Splits one slide into pages and fits its text. Returns one or more specs. */
-export function paginate(spec: SlideSpec): SlideSpec[] {
-  const first = spec.blocks.findIndex((p) => overflows(p.block));
+export function paginate(input: SlideSpec): SlideSpec[] {
+  // Column widths are fitted once for the whole table, so every page keeps the same columns.
+  const spec: SlideSpec = {
+    ...input,
+    blocks: input.blocks.map((p) => (p.block.type === 'table' ? { ...p, block: fitTable(p.block, regionWidth(input.layout, p.region)) } : p)),
+  };
+  const hasTop = spec.blocks.some((p) => p.region === 'top');
+  const first = spec.blocks.findIndex((p) => overflows(p.block, hasTop));
   if (first < 0) return [withFitText(spec)];
 
   // Only one block per slide is paginated; any other overflowing block is cut and listed in notes.
   const dropped: string[] = [];
-  const blocks: PlacedBlock[] = spec.blocks.map((p, i) => (i !== first && overflows(p.block) ? { ...p, block: truncate(p.block, dropped) } : p));
+  const blocks: PlacedBlock[] = spec.blocks.map((p, i) => (i !== first && overflows(p.block, hasTop) ? { ...p, block: truncate(p.block, dropped, hasTop) } : p));
   const target = blocks[first] as PlacedBlock & { block: Splittable };
-  const cap = capacity(target.block) as number;
+  const cap = capacity(target.block, hasTop) as number;
   const total = length(target.block);
   const of = Math.ceil(total / cap);
   const droppedNote = dropped.length > 0 ? [`Not shown on the slide:\n${dropped.map((t) => `- ${t}`).join('\n')}`] : [];

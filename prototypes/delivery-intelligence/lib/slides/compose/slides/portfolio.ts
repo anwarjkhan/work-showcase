@@ -37,16 +37,17 @@ export const portfolioHeadline: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'portfolio-headline',
-      title: n === 0 ? 'Reported status matches evidence across the portfolio' : `${n} of ${total} deliverables are reported differently from their evidence`,
+      title: n === 0 ? 'Reported status matches evidence across the portfolio' : `${n} of ${total} deliverables disagree with their evidence`,
       layout: 'two-column',
       blocks: [
         at('left', text(sentence, 'statement')),
         at('left', {
           type: 'kpis',
           items: [
-            { label: 'Disagreements', value: `${n} of ${total}`, tone: n > 0 ? 'red' : 'green' },
-            { label: `${terms.ragKinds.reported} ${terms.rag.green}`, value: String(s.reportedRag.green), tone: 'green' },
-            { label: `${terms.ragKinds.evidence} ${terms.rag.red}`, value: String(s.evidenceRag.red), tone: 'red' },
+            // Counts, not statuses: no tone, so no status glyph under the number.
+            { label: 'Disagreements', value: `${n} of ${total}` },
+            { label: `${terms.ragKinds.reported} ${terms.rag.green}`, value: String(s.reportedRag.green) },
+            { label: `${terms.rag.red} on evidence`, value: String(s.evidenceRag.red) },
           ],
         }),
         at('right', measures(f.views)),
@@ -105,7 +106,7 @@ export const portfolioDisagreements: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'portfolio-disagreements',
-      title: f.disagreeing.length === 0 ? 'No deliverable is reported differently from its evidence' : `Where reported status and evidence disagree: ${plural(f.disagreeing.length, 'deliverable')}`,
+      title: f.disagreeing.length === 0 ? 'No deliverable is reported differently from its evidence' : `${plural(f.disagreeing.length, 'deliverable')} where status and evidence disagree`,
       layout: 'table',
       blocks: [
         at(
@@ -139,7 +140,7 @@ export const portfolioProgrammes: SlideBuilder = (input) => {
   return [
     makeSlide(input, {
       kind: 'portfolio-programmes',
-      title: `${disagreeing} of ${plural(f.programmes.length, 'programme')} reported differently from their evidence`,
+      title: `${disagreeing} of ${plural(f.programmes.length, 'programme')} disagree with their evidence`,
       layout: 'table',
       blocks: [
         at(
