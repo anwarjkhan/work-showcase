@@ -17,6 +17,7 @@ const ROUTES: Array<{ name: string; path: string; title: string | RegExp }> = [
   { name: 'agents', path: '/agents/', title: 'Agent centre' },
   { name: 'blueprint', path: '/blueprint/', title: 'Template blueprint' },
   { name: 'evidence', path: '/evidence/', title: 'Pilot evidence' },
+  { name: 'slides', path: '/slides/', title: 'Slide builder' },
   { name: 'about', path: '/about/', title: 'About this build' },
 ];
 

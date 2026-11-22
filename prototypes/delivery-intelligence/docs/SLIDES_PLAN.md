@@ -1,6 +1,6 @@
 # Slide extraction: build plan
 
-**Status:** plan for review, not yet built.
+**Status:** built. Section 14 lists where the build differs from this plan.
 **Builder:** an Opus 5.5 coding agent working in the internal copy of this repository.
 **Read first:** `../DESIGN.md`, `../CONTRACTS.md`, `../README.md` and `../lib/agents/README.md`. This plan adds one capability to the existing application. It changes no existing behaviour.
 
@@ -349,3 +349,19 @@ The existing suites (unit, type check, lint, build, browser tests) must still pa
 3. Should agent-drafted narrative (weekly status, executive brief) go into packs by default, or only when chosen?
 4. Is PptxGenJS approved on the internal mirror?
 5. Should packs show internal system and template names? They will, automatically, if `lib/config/terminology.local.ts` is in place.
+
+---
+
+## 14. Where the build differs from this plan
+
+- **Timelines** hold 6 rows under a row of headline figures and 10 on a slide of their own, not 12; longer timelines continue on further slides.
+- **Titles** aim at 55 characters on first pages (70 is the hard cap), because 70 does not fit one line at 26 pt.
+- **Column widths** are set in inches by `compose/columns.ts` so headers never break mid-word. To fit, the deliverable RAID slide lists open and mitigating items only (closed ones go to the notes), and the project and programme risk slide puts its top findings in the notes.
+- **Roll-up readiness** ("8 of 26 ready") is a neutral count, not a status colour; a single deliverable's readiness keeps its state.
+- **Verdicts appended to project and programme packs** are off by default (an export option).
+- **The records-cited appendix** is never capped by the top-N option.
+- **New terminology groups** for slide words: `outcomeStatus`, `acceptance`, `raidStatus`, `pdlcStageStatus`, `reviewStates`, `milestones`.
+- **The Node command** takes a project or programme as `pm-node:<record id>`, for example `npm run slides -- --scope pm-node:pm-ccr`; `programme:`, `project:` and `initiative:` prefixes are also accepted.
+- **The deliverable tabs** share one "Add to slides" button that follows the active tab; the Work and Evidence tabs have no slide kind.
+- **`jszip`** is declared as a pinned development dependency because the browser tests open exported files with it.
+- **Checked in LibreOffice, not PowerPoint.** Open the deliverable, programme and portfolio packs in PowerPoint once inside the firm.
