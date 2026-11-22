@@ -398,7 +398,7 @@ function drawTimeline(ctx: DrawContext, slide: Slide, b: BlockOf<'timeline'>, re
     const labelH = Math.max(0.2, rowH - (labelY - y) - 0.02);
     const right = rect.x + rect.w;
     const noteOnBar = Boolean(rg.row.note) && right - noteX - 0.12 >= 1.6;
-    const labels: { anchor: number; text: string; runs: Run[]; align?: 'right' }[] = [];
+    const labels: { anchor: number; text: string; priority?: boolean; runs: Run[] }[] = [];
     for (const ms of rg.milestones) {
       const mx = xAt(ms.at);
       const mt = ms.tone && isStatusTone(ms.tone) ? TONES[ms.tone] : undefined;
@@ -419,7 +419,7 @@ function drawTimeline(ctx: DrawContext, slide: Slide, b: BlockOf<'timeline'>, re
     if (rg.row.note && noteOnBar) {
       addText(slide, rg.row.note, { x: noteX + 0.1, y: barY - 0.03, w: right - noteX - 0.12, h: barH + 0.06 }, { fontSize: TYPE.table, bold: true, color: COLOURS.amberFg, valign: 'middle' });
     } else if (rg.row.note) {
-      labels.push({ anchor: noteX - 0.1, text: rg.row.note, runs: [{ text: rg.row.note, options: { bold: true, color: COLOURS.amberFg } }] });
+      labels.push({ anchor: noteX - 0.1, priority: true, text: rg.row.note, runs: [{ text: rg.row.note, options: { bold: true, color: COLOURS.amberFg } }] });
     }
     const lines = Math.max(1, Math.floor(labelH / TIMELINE_LABEL_LINE_H));
     const spots = placeRowLabels(labels, plotX, right, Math.min(2, lines));

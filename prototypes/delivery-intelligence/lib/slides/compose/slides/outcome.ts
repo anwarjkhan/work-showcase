@@ -14,7 +14,6 @@ function factsOf(input: BuildInput): OutcomeFacts {
 }
 
 const oRef = (f: OutcomeFacts): EntityRef => ({ kind: 'outcome', id: f.outcome.id });
-const acceptanceCell = (accepted: boolean): Cell => toned(accepted ? 'Accepted' : 'Not accepted', accepted ? 'green' : 'red');
 
 export const outcomeSummary: SlideBuilder = (input) => {
   const f = factsOf(input);

@@ -350,7 +350,7 @@ function Timeline({ b, rect }: { b: BlockOf<'timeline'>; rect: Rect }) {
               // Same label placement as the PowerPoint renderer (placeRowLabels).
               const endIn = rg.projectedEnd !== undefined ? plotX + rg.projectedEnd * plotW : plotX + rg.end * plotW;
               const noteOnBar = Boolean(rg.row.note) && rect.w - endIn - 0.12 >= 1.6;
-              const labels: { anchor: number; text: string; node: ReactNode }[] = rg.milestones.map((ms) => {
+              const labels: { anchor: number; text: string; priority?: boolean; node: ReactNode }[] = rg.milestones.map((ms) => {
                 const mt = ms.tone && isStatusTone(ms.tone) ? TONES[ms.tone] : undefined;
                 const label = mt ? withGlyph(ms.label, ms.tone) : ms.label;
                 return {
@@ -364,7 +364,7 @@ function Timeline({ b, rect }: { b: BlockOf<'timeline'>; rect: Rect }) {
                   ),
                 };
               });
-              if (rg.row.note && !noteOnBar) labels.push({ anchor: endIn - 0.1, text: rg.row.note, node: <tspan fontWeight={700} fill={css(COLOURS.amberFg)}>{rg.row.note}</tspan> });
+              if (rg.row.note && !noteOnBar) labels.push({ anchor: endIn - 0.1, priority: true, text: rg.row.note, node: <tspan fontWeight={700} fill={css(COLOURS.amberFg)}>{rg.row.note}</tspan> });
               const labelTop = barY + barH + 0.03;
               const lines = Math.max(1, Math.floor((rowH - (labelTop - y) - 0.02) / TIMELINE_LABEL_LINE_H));
               const spots = placeRowLabels(labels, plotX, rect.w, Math.min(2, lines));

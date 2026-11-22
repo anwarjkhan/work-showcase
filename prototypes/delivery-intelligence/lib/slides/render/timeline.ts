@@ -89,6 +89,8 @@ export interface RowLabel {
   /** Where the label would like to start (inches, same origin as minX/maxX). */
   anchor: number;
   text: string;
+  /** Placed before the others (e.g. a knock-on note), so it is never the one left out. */
+  priority?: boolean;
 }
 
 /** Height of one label line at 11 pt, inches. */
@@ -102,25 +104,30 @@ export interface LabelSpot {
 }
 
 /**
- * Places a row's labels left to right without overlapping, on up to `lines`
- * lines: each label starts at its anchor or just after the previous label on
- * that line (pulled left to stay inside `maxX` where there is room). A label
- * that fits on no line is left out (null) rather than drawn over another;
- * the caller warns. Widths are estimated for 11 pt Arial.
+ * Places a row's labels on up to `lines` lines without overlapping. Priority
+ * labels go first, then the rest from left to right; each takes the first free
+ * spot at or after its anchor (or pulled left to stay inside `maxX`). A label
+ * that fits on no line is left out (null) rather than drawn over another; the
+ * caller warns. Widths are estimated for 11 pt Arial.
  */
 export function placeRowLabels(labels: readonly RowLabel[], minX: number, maxX: number, lines = 1): (LabelSpot | null)[] {
-  const order = labels.map((l, i) => ({ ...l, i })).sort((a, b) => a.anchor - b.anchor);
+  const order = labels
+    .map((l, i) => ({ ...l, i }))
+    .sort((a, b) => Number(Boolean(b.priority)) - Number(Boolean(a.priority)) || a.anchor - b.anchor);
   const out: (LabelSpot | null)[] = new Array(labels.length).fill(null);
-  const prevEnd = Array.from({ length: Math.max(1, lines) }, () => minX - 0.12);
+  const taken: { x: number; end: number }[][] = Array.from({ length: Math.max(1, lines) }, () => []);
+  const GAP = 0.12;
+  const free = (line: number, x: number, w: number) => taken[line]!.every((t) => x + w + GAP <= t.x || x >= t.end + GAP);
   for (const l of order) {
     const w = (l.text.length * 0.54 * 11) / 72 + 0.08;
-    for (let line = 0; line < prevEnd.length; line++) {
-      let x = Math.max(l.anchor, prevEnd[line]! + 0.12);
-      if (x + w > maxX) x = Math.max(prevEnd[line]! + 0.12, maxX - w);
-      if (x + w <= maxX + 0.01) {
-        out[l.i] = { x, w, line };
-        prevEnd[line] = x + w;
-        break;
+    for (let line = 0; line < taken.length && out[l.i] === null; line++) {
+      const starts = [l.anchor, ...taken[line]!.map((t) => t.end + GAP).filter((x) => x >= l.anchor), maxX - w];
+      for (const x of starts.map((v) => Math.max(minX, Math.min(v, maxX - w))).sort((a, b) => Math.abs(a - l.anchor) - Math.abs(b - l.anchor))) {
+        if (x + w <= maxX + 0.01 && free(line, x, w)) {
+          out[l.i] = { x, w, line };
+          taken[line]!.push({ x, end: x + w });
+          break;
+        }
       }
     }
   }
