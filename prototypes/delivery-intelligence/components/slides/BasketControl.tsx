@@ -6,9 +6,10 @@ import { Button, Drawer, EmptyState, IconButton } from '@/components/ui';
 import { cx, FOCUS_RING } from '@/components/ui/cx';
 import { buildDeck, buildSlides, CATALOGUE, footerText, scopeLabel } from '@/lib/slides';
 import type { SlideSpec } from '@/lib/slides';
-import { SlidePreview } from '@/lib/slides/render/html';
+import { EnlargeBadge, SlidePreview } from '@/lib/slides/render/html';
 import { clearBasket, moveInBasket, removeFromBasket, setBasketName, useBasket, type BasketItem } from './basket';
 import { ExportStatus } from './ExportStatus';
+import { SlideViewer } from './SlideViewer';
 import { useExport } from './useExport';
 import { useSlideContext } from './useSlideContext';
 
@@ -58,6 +59,8 @@ interface Built {
 function BasketList({ built }: { built: Built[] }) {
   const ctx = useSlideContext();
   const footer = footerText(ctx);
+  const [viewing, setViewing] = useState<number | null>(null);
+  const all = built.flatMap((b) => b.specs);
   // Slide numbers as in the exported file: earlier items may span several slides.
   const starts = built.map((_, i) => 1 + built.slice(0, i).reduce((sum, b) => sum + b.specs.length, 0));
   return (
@@ -68,7 +71,18 @@ function BasketList({ built }: { built: Built[] }) {
         const title = first?.title ?? CATALOGUE[b.item.kind].title;
         return (
           <li key={b.item.id} data-testid="basket-item" data-kind={b.item.kind} className="di-card grid grid-cols-[minmax(0,220px)_minmax(0,1fr)] gap-3 p-3">
-            {first ? <SlidePreview spec={first} footer={{ text: footer }} number={number} className="overflow-hidden rounded-sm border border-line" /> : <div className="grid aspect-video place-items-center rounded-sm border border-line text-xs text-fg-muted">No preview</div>}
+            {first ? (
+              <button
+                type="button"
+                data-testid="basket-thumb"
+                aria-label={`View slide ${number}: ${title}`}
+                onClick={() => setViewing(number - 1)}
+                className={cx('group relative block w-full cursor-zoom-in rounded-sm text-left transition-shadow duration-150 hover:shadow-raised', FOCUS_RING)}
+              >
+                <SlidePreview spec={first} footer={{ text: footer }} number={number} className="overflow-hidden rounded-sm border border-line" />
+                <EnlargeBadge />
+              </button>
+            ) : <div className="grid aspect-video place-items-center rounded-sm border border-line text-xs text-fg-muted">No preview</div>}
             <div className="flex min-w-0 flex-col gap-1">
               <p className="text-[13px] leading-snug font-semibold text-title" data-testid="basket-item-title">{title}</p>
               <p className="truncate text-xs text-fg-muted">{CATALOGUE[b.item.kind].title}</p>
@@ -83,6 +97,7 @@ function BasketList({ built }: { built: Built[] }) {
           </li>
         );
       })}
+      <SlideViewer deck={{ slides: all, footer: { text: footer } }} index={viewing} onIndex={setViewing} />
     </ol>
   );
 }

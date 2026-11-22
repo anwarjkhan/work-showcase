@@ -8,6 +8,7 @@
  * use container-width units, so nothing is measured in script and nothing can
  * push the page wider than its column.
  */
+import { Maximize2 } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import type { DeckSpec, FooterSpec, SlideSpec } from '@/lib/slides/types';
 import { HtmlBlock, pt } from './html-blocks';
@@ -92,10 +93,27 @@ export interface DeckPreviewGridProps {
   deck: DeckSpec;
   /** Minimum thumbnail width in px. */
   minThumbWidth?: number;
+  /** Makes each thumbnail a button that opens that slide (0-based index), e.g. in a full-size viewer. */
+  onOpen?: (index: number) => void;
+}
+
+const THUMB = 'overflow-hidden rounded-md border border-line shadow-card';
+
+/** "Enlarge" badge shown over a clickable thumbnail on hover or keyboard focus (parent needs `group relative`). */
+export function EnlargeBadge() {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute top-1.5 right-1.5 inline-flex items-center gap-1 rounded-pill bg-surface/95 px-2 py-0.5 text-[11px] font-medium text-accent opacity-0 shadow-card transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+    >
+      <Maximize2 className="size-3" />
+      Enlarge
+    </span>
+  );
 }
 
 /** Thumbnails of every slide in a deck, in order, numbered as in the exported file. */
-export function DeckPreviewGrid({ deck, minThumbWidth = 240 }: DeckPreviewGridProps) {
+export function DeckPreviewGrid({ deck, minThumbWidth = 240, onOpen }: DeckPreviewGridProps) {
   return (
     <ol
       aria-label={`${deck.title}: ${deck.slides.length} slides`}
@@ -104,7 +122,20 @@ export function DeckPreviewGrid({ deck, minThumbWidth = 240 }: DeckPreviewGridPr
     >
       {deck.slides.map((spec, i) => (
         <li key={spec.id} className="min-w-0">
-          <SlidePreview spec={spec} footer={deck.footer} number={i + 1} className="overflow-hidden rounded-md border border-line shadow-card" />
+          {onOpen ? (
+            <button
+              type="button"
+              data-testid="slide-thumb"
+              aria-label={`View ${slideLabel(spec, i + 1)}`}
+              onClick={() => onOpen(i)}
+              className="group relative block w-full cursor-zoom-in rounded-md text-left transition-shadow duration-150 hover:shadow-raised focus-visible:outline-none focus-visible:shadow-focus"
+            >
+              <SlidePreview spec={spec} footer={deck.footer} number={i + 1} className={THUMB} />
+              <EnlargeBadge />
+            </button>
+          ) : (
+            <SlidePreview spec={spec} footer={deck.footer} number={i + 1} className={THUMB} />
+          )}
           <p className="mt-1 truncate text-xs text-fg-muted">{`${i + 1}. ${spec.title}`}</p>
         </li>
       ))}

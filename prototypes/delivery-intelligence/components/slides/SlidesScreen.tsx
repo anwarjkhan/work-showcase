@@ -22,6 +22,7 @@ import { EntityPicker } from './EntityPicker';
 import { ExportStatus } from './ExportStatus';
 import { OrderList } from './OrderList';
 import { PackOptionsForm, toPackOptions } from './PackOptionsForm';
+import { SlideViewer } from './SlideViewer';
 import { useExport } from './useExport';
 import { useSlideContext } from './useSlideContext';
 
@@ -54,6 +55,7 @@ export function SlidesScreen() {
   const [applied, setApplied] = useState<string | null>(null);
   const [options, setOptions] = useState<PackOptions>({});
   const [name, setName] = useState('');
+  const [viewing, setViewing] = useState<number | null>(null);
 
   // Apply the URL hash on load and whenever it changes (derived during render, as the agent screen does).
   if (applied !== hash) {
@@ -261,11 +263,12 @@ export function SlidesScreen() {
             {deck && deck.slides.length > 0 ? (
               <>
                 <p className="text-xs text-fg-muted" data-testid="builder-footer-text">
-                  Every slide is printed with: {footerText(ctx)}
+                  Every slide is printed with: {footerText(ctx)}. Select a slide to view it full size.
                 </p>
                 <div data-testid="deck-preview">
-                  <DeckPreviewGrid deck={deck} />
+                  <DeckPreviewGrid deck={deck} onOpen={setViewing} />
                 </div>
+                <SlideViewer deck={deck} index={viewing} onIndex={setViewing} />
               </>
             ) : !built.error ? (
               <EmptyState title="Nothing to preview yet" description={choice.mode === 'pick' ? 'Tick one or more slides on the left.' : choice.mode === 'basket' ? 'Add slides to the basket from any screen.' : 'Choose a scope and a pack.'} />

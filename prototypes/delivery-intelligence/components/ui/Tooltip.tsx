@@ -99,7 +99,7 @@ export function Tooltip({ content, children, side = 'top', delay = 250, classNam
                   x: '-50%',
                   ...(pos.side === 'top' ? { bottom: pos.y } : { top: pos.y }),
                 }}
-                className="pointer-events-none z-[70] max-w-[300px] rounded-md border border-line-strong bg-surface px-2.5 py-1.5 text-xs leading-snug text-fg shadow-raised"
+                className="pointer-events-none z-[80] max-w-[300px] rounded-md border border-line-strong bg-surface px-2.5 py-1.5 text-xs leading-snug text-fg shadow-raised"
               >
                 {content}
               </motion.div>

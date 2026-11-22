@@ -1,12 +1,14 @@
 'use client';
 import { FileDown } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button, IconButton } from '@/components/ui';
 import { buildPackDeck, defaultPackFor, PACKS, scopeLabel } from '@/lib/slides';
-import type { PackId, PackOptions, SlideScope } from '@/lib/slides';
+import type { DeckSpec, PackId, PackOptions, SlideScope } from '@/lib/slides';
+import { DeckPreviewGrid } from '@/lib/slides/render/html';
 import { Dialog } from './Dialog';
 import { ExportStatus } from './ExportStatus';
 import { PackOptionsForm, toPackOptions } from './PackOptionsForm';
+import { SlideViewer } from './SlideViewer';
 import { useExport } from './useExport';
 import { useSlideContext } from './useSlideContext';
 
@@ -57,6 +59,15 @@ function PackDialog({ scope, packId, label, onClose }: { scope: SlideScope; pack
   const [options, setOptions] = useState<PackOptions>({});
   const exp = useExport();
   const pack = packId ?? defaultPackFor(scope, ctx);
+  const [viewing, setViewing] = useState<number | null>(null);
+  // Built live, so the preview follows the options (and the store) as they change.
+  const preview = useMemo<{ deck?: DeckSpec; error?: string }>(() => {
+    try {
+      return { deck: buildPackDeck(pack, scope, toPackOptions(options, pack), ctx) };
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'The preview could not be built.' };
+    }
+  }, [pack, scope, options, ctx]);
   let subject = '';
   try {
     subject = scopeLabel(scope, ctx);
@@ -67,6 +78,7 @@ function PackDialog({ scope, packId, label, onClose }: { scope: SlideScope; pack
     <Dialog
       open
       onClose={onClose}
+      size="lg"
       title={label ?? PACKS[pack].title}
       footer={
         <>
@@ -77,17 +89,32 @@ function PackDialog({ scope, packId, label, onClose }: { scope: SlideScope; pack
             loading={exp.state.phase === 'busy'}
             data-testid="export-pack-go"
             data-autofocus
-            onClick={() => exp.run(() => buildPackDeck(pack, scope, toPackOptions(options, pack), ctx))}
+            onClick={() => exp.run(() => preview.deck ?? buildPackDeck(pack, scope, toPackOptions(options, pack), ctx))}
           >
             Export .pptx
           </Button>
         </>
       }
     >
-      <div className="flex flex-col gap-4">
-        {subject ? <p className="text-[13px] text-fg-muted">{subject}</p> : null}
-        <PackOptionsForm packId={pack} value={options} onChange={setOptions} />
-        <ExportStatus state={exp.state} />
+      <div className="grid gap-5 md:grid-cols-[240px_minmax(0,1fr)]">
+        <div className="flex min-w-0 flex-col gap-4">
+          {subject ? <p className="text-[13px] text-fg-muted">{subject}</p> : null}
+          <PackOptionsForm packId={pack} value={options} onChange={setOptions} />
+          <ExportStatus state={exp.state} />
+        </div>
+        <div className="flex min-w-0 flex-col gap-2" data-testid="pack-preview">
+          <p className="di-eyebrow">
+            {preview.deck ? `Preview · ${preview.deck.slides.length} ${preview.deck.slides.length === 1 ? 'slide' : 'slides'}` : 'Preview'}
+          </p>
+          {preview.deck ? (
+            <>
+              <DeckPreviewGrid deck={preview.deck} minThumbWidth={170} onOpen={setViewing} />
+              <SlideViewer deck={preview.deck} index={viewing} onIndex={setViewing} />
+            </>
+          ) : (
+            <p role="alert" className="text-[13px] text-status-red-fg">{preview.error}</p>
+          )}
+        </div>
       </div>
     </Dialog>
   );
