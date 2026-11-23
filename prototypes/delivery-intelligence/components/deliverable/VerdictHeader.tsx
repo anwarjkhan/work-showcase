@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ProvenanceBadges } from '@/components/shell';
 import { AddToSlides } from '@/components/slides/AddToSlides';
 import { ExportPack } from '@/components/slides/ExportPack';
-import { AvatarLabel, Badge, IconButton, MeasureTriple, RagPill, ReadinessPill, cx } from '@/components/ui';
+import { DemoNote, AvatarLabel, Badge, IconButton, MeasureTriple, RagPill, ReadinessPill, cx } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { formatDate } from '@/lib/config/clock';
 import { stageDefinition } from '@/lib/config/pdlc';
@@ -230,9 +230,9 @@ export function VerdictHeader({ model }: { model: DeliverableModel }) {
             <p data-testid="verdict-sentence" className="font-display text-[16px] leading-snug font-medium text-fg">
               {verdict.sentence}
             </p>
-            <p className="mt-1 text-[11px] text-fg-subtle">
+            <DemoNote as="p" className="mt-1 text-[11px] text-fg-subtle">
               <ProvenanceBadges kinds={['computed']} size="sm" /> {verdict.disagrees ? 'The portfolio-system status is not changed by this view.' : null}
-            </p>
+            </DemoNote>
           </div>
         </div>
       </div>

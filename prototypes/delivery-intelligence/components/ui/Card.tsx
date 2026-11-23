@@ -13,6 +13,8 @@ export interface CardProps {
   actions?: ReactNode;
   /** Bottom strip separated by a rule: totals, links, provenance. */
   footer?: ReactNode;
+  /** The footer holds only provenance badges or demo notes: hide the whole strip when labels are off. */
+  footerLabel?: boolean;
   children?: ReactNode;
   /** Heading level for the title. Pages start at h2 sections, so cards default to h3. */
   level?: HeadingLevel;
@@ -37,7 +39,7 @@ const PAD_Y = { md: 'py-5', sm: 'py-4', none: '' } as const;
  *     ...
  *   </Card>
  */
-export function Card({ eyebrow, title, description, actions, footer, children, level = 3, padding = 'md', selected, className, bodyClassName, id, 'data-testid': testId }: CardProps) {
+export function Card({ eyebrow, title, description, actions, footer, footerLabel, children, level = 3, padding = 'md', selected, className, bodyClassName, id, 'data-testid': testId }: CardProps) {
   const hasHeader = Boolean(eyebrow || title || actions || description);
   const Heading = `h${level}` as ElementType;
   const px = PAD[padding === 'none' ? 'md' : padding];
@@ -61,7 +63,7 @@ export function Card({ eyebrow, title, description, actions, footer, children, l
         <div className={cx('min-w-0 flex-1', PAD[padding], hasHeader ? (padding === 'none' ? '' : 'pb-5') : PAD_Y[padding], bodyClassName)}>{children}</div>
       ) : null}
       {footer ? (
-        <footer className={cx('flex items-center gap-3 rounded-b-lg border-t border-line bg-surface-2 py-2.5 text-xs text-fg-muted', px)}>{footer}</footer>
+        <footer className={cx('flex items-center gap-3 rounded-b-lg border-t border-line bg-surface-2 py-2.5 text-xs text-fg-muted', px, footerLabel && 'di-demo-label')}>{footer}</footer>
       ) : null}
     </section>
   );

@@ -6,7 +6,7 @@ import type { StageView } from '@/lib/agents/workflow';
 import { daysBetween } from '@/lib/config/clock';
 import { terms } from '@/lib/config/terminology';
 import { ProvenanceBadge } from '@/components/shell';
-import { Badge, Button, cx } from '@/components/ui';
+import { DemoNote, Badge, Button, cx } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { usePortfolioIndex } from '@/lib/store';
 import type { EvidenceKind, Outcome } from '@/lib/types';
@@ -130,7 +130,7 @@ function EvidenceRow({ item }: { item: StageView['evidence'][number] }) {
             <Button size="sm" variant="secondary" onClick={() => record('fail')} {...failT}>
               Fail
             </Button>
-            <span className="text-[10.5px] text-prov-simulated">Nothing is executed.</span>
+            <DemoNote className="text-[10.5px] text-prov-simulated">Nothing is executed.</DemoNote>
           </>
         ) : (
           <>

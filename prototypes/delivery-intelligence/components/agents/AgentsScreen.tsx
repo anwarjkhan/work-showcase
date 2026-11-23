@@ -33,7 +33,7 @@ import { Bot, Scale, ScrollText, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { ProvenanceBadge } from '@/components/shell';
-import { Section, SectionHeading, StatTile, TabPanel, Tabs } from '@/components/ui';
+import { DemoNote, Section, SectionHeading, StatTile, TabPanel, Tabs } from '@/components/ui';
 import { playbackAt, playbackDuration, type AgentRunScope } from '@/lib/agents';
 import { PRESENTER_PERSON_ID } from '@/lib/config/story';
 import { useActingAs, useAgentRuns, useAuditTrail, useDemoActions, useDemoState, useDemoStore, useEngineResult, usePortfolioData, useProposals, useStatusDrafts } from '@/lib/store';
@@ -322,11 +322,11 @@ export function AgentsScreen() {
             title="Run, review and approve"
             description="Run an agent, watch each step and the records it used, then decide its proposed changes. Approving writes to the in-app data only, standing in for a work-tracker update."
             actions={
-              <span className="inline-flex items-center gap-2 text-xs text-fg-muted">
+              <DemoNote className="inline-flex items-center gap-2 text-xs text-fg-muted">
                 <Bot aria-hidden className="size-4 text-prov-scripted" />
                 Scripted agent, no live model
                 <ProvenanceBadge kind="scripted-agent" size="sm" />
-              </span>
+              </DemoNote>
             }
           />
           <div className="grid grid-cols-1 gap-4 2xl:h-[calc(100vh-var(--di-topbar-height)-40px)] 2xl:min-h-[720px] 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

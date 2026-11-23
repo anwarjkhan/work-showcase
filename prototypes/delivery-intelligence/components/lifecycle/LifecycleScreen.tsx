@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Fragment, useMemo, useState } from 'react';
 import { ProvenanceBadges } from '@/components/shell';
 import { AddToSlides } from '@/components/slides/AddToSlides';
-import { Badge, Card, Chip, cx, Section } from '@/components/ui';
+import { DemoNote, Badge, Card, Chip, cx, Section } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { PDLC_STAGES } from '@/lib/config/pdlc';
 import { hrefs } from '@/lib/config/routes';
@@ -126,23 +126,25 @@ export function LifecycleScreen() {
 
       <CrossCuttingBand />
 
-      <Card
-        padding="sm"
-        title={undefined}
-        footer={
-          <span className="flex flex-wrap items-center gap-2">
-            <Badge size="sm" tone="neutral" icon={<Info />}>Illustrative</Badge>
-            Stages, review roles and evidence per stage are set in <code className="font-mono">lib/config/pdlc.ts</code>; the required
-            evidence per risk tier in <code className="font-mono">lib/config/risk-tiers.ts</code>.
-          </span>
-        }
-      >
-        <p className="text-[13px] leading-relaxed text-fg-muted">
-          The review points shown here are illustrative and configurable. They are not presented as official gates, and no
-          named gate is invented. Placement, shares, pending reviews and evidence counts are computed from the sample data
-          held in this prototype and update as stages move.
-        </p>
-      </Card>
+      <DemoNote as="div">
+        <Card
+          padding="sm"
+          title={undefined}
+          footer={
+            <span className="flex flex-wrap items-center gap-2">
+              <Badge size="sm" tone="neutral" icon={<Info />}>Illustrative</Badge>
+              Stages, review roles and evidence per stage are set in <code className="font-mono">lib/config/pdlc.ts</code>; the required
+              evidence per risk tier in <code className="font-mono">lib/config/risk-tiers.ts</code>.
+            </span>
+          }
+        >
+          <p className="text-[13px] leading-relaxed text-fg-muted">
+            The review points shown here are illustrative and configurable. They are not presented as official gates, and no
+            named gate is invented. Placement, shares, pending reviews and evidence counts are computed from the sample data
+            held in this prototype and update as stages move.
+          </p>
+        </Card>
+      </DemoNote>
     </div>
   );
 }

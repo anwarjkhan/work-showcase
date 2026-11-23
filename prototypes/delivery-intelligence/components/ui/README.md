@@ -1,6 +1,6 @@
 # Interface primitives (D4)
 
-Import from `@/components/ui` and `@/components/charts`. Everything reads colours from theme tokens, so it works in both themes. Each component has a usage example in its JSDoc. Provenance badges stay in `@/components/shell` (`ProvenanceBadge`).
+Import from `@/components/ui` and `@/components/charts`. Everything reads colours from theme tokens, so it works in both themes. Each component has a usage example in its JSDoc. Provenance badges stay in `@/components/shell` (`ProvenanceBadge`, which carries `di-demo-label`). `Card` takes `footerLabel`, `DataTable` columns and `KeyValue` items take `demoLabel`, so a footer, column or row that holds only labels hides with them.
 
 ## Page layout conventions
 
@@ -34,6 +34,7 @@ Import from `@/components/ui` and `@/components/charts`. Everything reads colour
 | `ProgressBar` | `value` (0-100 or `null`), `target`, `targetLabel`, `tone`, `size`, `ariaLabel` (required) |
 | `Tabs` + `TabPanel` | `items [{id,label,count,icon,disabledReason}]`, `value`, `onChange`, `variant` (`underline`/`segmented`), `ariaLabel`; panels as children |
 | `Drawer` | `open`, `onClose`, `title`, `eyebrow`, `footer`, `width` (`md`/`lg`/`xl`) |
+| `DemoNote` | `as` (element, default `span`), `className`, any attribute; wraps an explanatory demo note, disclaimer or keyboard hint so Labels off hides it. Not for content |
 | `Tooltip` | `content`, `side`, `delay`; wraps one element |
 | `DataTable<T>` | `columns [{id,header,cell,accessor,numeric,align,minWidth,sortable}]`, `rows`, `getRowId`, `onRowClick`, `selectedId`, `defaultSort`, `maxHeight`, `dense`, `stickyFirstColumn`, `empty`, `ariaLabel` |
 | `EmptyState` | `title`, `description`, `icon`, `action`, `variant` (`boxed`/`inline`) |

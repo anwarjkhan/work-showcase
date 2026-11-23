@@ -104,7 +104,7 @@ function PanelBody({ req }: { req: OpenRequest }) {
       {req.quote ? (
         <blockquote className="rounded-md border-l-2 border-accent bg-surface-2 px-4 py-3 text-[13.5px] leading-relaxed text-fg">
           {req.quote}
-          <div className="mt-2">
+          <div className="di-demo-label mt-2">
             <ProvenanceBadge kind="scripted-agent" size="sm" />
           </div>
         </blockquote>
@@ -210,7 +210,7 @@ function describe(state: DemoState, ref: EntityRef, record: unknown): { title: s
           { label: 'Source', value: `${terms.systems[e.source]} · ${e.sourceRef}` },
           { label: 'Observed', value: date(e.observedAt) },
           { label: 'Recorded by', value: personName(state, e.recordedById) },
-          { label: 'Provenance', value: <ProvenanceBadge kind={e.provenance} size="sm" /> },
+          { label: 'Provenance', value: <ProvenanceBadge kind={e.provenance} size="sm" />, demoLabel: true },
         ],
       };
     }

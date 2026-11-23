@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Badge, Card, EmptyState } from '@/components/ui';
+import { DemoNote, Avatar, Badge, Card, EmptyState } from '@/components/ui';
 import { StackedBar, chartColor } from '@/components/charts';
 import { terms } from '@/lib/config/terminology';
 import { AGENT_CATALOGUE } from '@/lib/agents';
@@ -85,7 +85,7 @@ export function PodTab({ model }: { model: DeliverableModel }) {
         </Card>
       </div>
       <p className="text-xs text-fg-subtle">
-        Pod <RecordChip to={{ kind: 'pod', id: pod.id }} label={pod.name} /> sits in {model.ctx.idx.hubs.get(pod.hubId)?.city ?? 'its hub'}. {terms.app.demoNotice}.
+        Pod <RecordChip to={{ kind: 'pod', id: pod.id }} label={pod.name} /> sits in {model.ctx.idx.hubs.get(pod.hubId)?.city ?? 'its hub'}. <DemoNote>{terms.app.demoNotice}.</DemoNote>
       </p>
     </div>
   );

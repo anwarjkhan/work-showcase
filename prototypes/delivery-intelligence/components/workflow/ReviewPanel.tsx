@@ -4,7 +4,7 @@ import { Check, Undo2, UserCheck } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { PRESENTER_PERSON_ID } from '@/lib/config/story';
 import { terms } from '@/lib/config/terminology';
-import { AvatarLabel, Button, cx } from '@/components/ui';
+import { DemoNote, AvatarLabel, Button, cx } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { usePortfolioIndex } from '@/lib/store';
 import type { StageView } from '@/lib/agents/workflow';
@@ -26,9 +26,9 @@ export function ReviewPanel() {
           <ReviewRow key={r.roleId} stage={cur} review={r} />
         ))}
       </ul>
-      <p className="mt-auto text-[11.5px] leading-snug text-fg-subtle">
+      <DemoNote as="p" className="mt-auto text-[11.5px] leading-snug text-fg-subtle">
         Reviews are illustrative and set in configuration, not official gates. Moving forward needs every review of this stage approved by its named reviewer; an agent can never approve.
-      </p>
+      </DemoNote>
     </div>
   );
 }

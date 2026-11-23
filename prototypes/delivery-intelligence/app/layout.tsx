@@ -23,8 +23,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    // data-theme is set by the inline script before paint; React must not fight it.
-    <html lang="en-GB" data-theme="light" suppressHydrationWarning>
+    // data-theme and data-labels are set by the inline script before paint; React must not fight it.
+    <html lang="en-GB" data-theme="light" data-labels="on" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

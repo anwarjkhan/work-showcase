@@ -2,7 +2,7 @@
 import { ArrowDown, ArrowUp, FileDown, LayoutGrid, Presentation, Trash2 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Button, Drawer, EmptyState, IconButton } from '@/components/ui';
+import { DemoNote, Button, Drawer, EmptyState, IconButton } from '@/components/ui';
 import { cx, FOCUS_RING } from '@/components/ui/cx';
 import { buildDeck, buildSlides, CATALOGUE, footerText, scopeLabel } from '@/lib/slides';
 import type { SlideSpec } from '@/lib/slides';
@@ -188,9 +188,9 @@ function BasketDrawer({ open, onClose }: { open: boolean; onClose: () => void })
             />
           </div>
           <BasketList built={built} />
-          <p className="text-xs text-fg-muted" data-testid="basket-footer-text">
+          <DemoNote as="p" className="text-xs text-fg-muted" data-testid="basket-footer-text">
             Every slide is printed with: {footerText(ctx)}
-          </p>
+          </DemoNote>
         </div>
       )}
     </Drawer>

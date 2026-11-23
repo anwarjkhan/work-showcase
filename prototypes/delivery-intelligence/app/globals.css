@@ -253,3 +253,19 @@ html.di-theme-transition * {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Labels on/off (components/shell/labels.ts). With data-labels="off" the
+ * provenance badges (.di-demo-label) and explanatory demo notes (.di-demo-note)
+ * are hidden completely; the quiet "Prototype" marker in the top bar replaces
+ * the page provenance pills. Status pills, figures and section descriptions
+ * are content and are never given these classes.
+ */
+[data-labels="off"] .di-demo-label,
+[data-labels="off"] .di-demo-note {
+  display: none !important;
+}
+
+[data-labels="on"] .di-labels-off-only {
+  display: none !important;
+}

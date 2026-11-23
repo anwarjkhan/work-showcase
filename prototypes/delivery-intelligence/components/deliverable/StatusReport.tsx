@@ -11,7 +11,7 @@ import { useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ProvenanceBadge } from '@/components/shell';
 import { AddToSlides } from '@/components/slides/AddToSlides';
-import { Badge, Button, Card, Disclosure, SectionHeading, Timeline, cx, type TimelineStep } from '@/components/ui';
+import { DemoNote, Badge, Button, Card, Disclosure, SectionHeading, Timeline, cx, type TimelineStep } from '@/components/ui';
 import { FOCUS_RING } from '@/components/ui/cx';
 import { playbackAt, playbackDuration, resolveRef } from '@/lib/agents';
 import { formatDate } from '@/lib/config/clock';
@@ -329,9 +329,9 @@ export function StatusReport({ deliverableId }: { deliverableId: string }) {
                 <Timeline steps={steps} />
               </Disclosure>
             ) : null}
-            <p className="text-[11px] text-fg-subtle">
+            <DemoNote as="p" className="text-[11px] text-fg-subtle">
               {terms.provenance['scripted-agent']}: produced by deterministic rules over the records, not a language model. A named human reviews before anything is sent.
-            </p>
+            </DemoNote>
           </footer>
         </article>
       ) : null}

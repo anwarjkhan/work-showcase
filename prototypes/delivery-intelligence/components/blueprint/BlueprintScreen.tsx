@@ -3,7 +3,7 @@
 import { ArrowLeftRight, Bot, Eye, HandHelping, ShieldCheck, Zap, type LucideIcon } from 'lucide-react';
 import { BarChart, Legend, StackedBar, chartColor } from '@/components/charts';
 import { ProvenanceBadge, ProvenanceBadges } from '@/components/shell';
-import { Badge, Card, DataTable, Section, StatTile, cx, type Column } from '@/components/ui';
+import { DemoNote, Badge, Card, DataTable, Section, StatTile, cx, type Column } from '@/components/ui';
 import {
   AUTOMATION_RULES,
   CAPABILITIES,
@@ -248,7 +248,7 @@ function HierarchyDiagram() {
           </div>
         ))}
       </Card>
-      <Card selected title="Target additions" description="At Epic level, one deliverable can have many Epics" footer={<ProvenanceBadge kind="planned" size="sm" />}>
+      <Card selected title="Target additions" description="At Epic level, one deliverable can have many Epics" footerLabel footer={<ProvenanceBadge kind="planned" size="sm" />}>
         <div className="flex flex-col items-center gap-3">
           <div className="flex w-full items-center justify-center gap-2 rounded-md border border-accent-line bg-accent-soft px-3 py-2 text-[13px] font-semibold text-accent">
             {terms.workItemTypes['tech-deliverable']}
@@ -332,11 +332,11 @@ function RolloutCharts() {
   const cumulative = ESTATE.rolloutWaves.map((_, i) => ESTATE.rolloutWaves.slice(0, i + 1).reduce((sum, w) => sum + w.projects, 0));
   return (
     <div className="grid gap-4 lg:grid-cols-[2fr_3fr]">
-      <Card title="Projects by template today" bodyClassName="flex flex-col gap-4" footer={<span>{ROLLOUT_PLACEHOLDER_NOTE}</span>}>
+      <Card title="Projects by template today" bodyClassName="flex flex-col gap-4" footerLabel footer={<DemoNote>{ROLLOUT_PLACEHOLDER_NOTE}</DemoNote>}>
         <StatTile label="Projects in scope" value={ESTATE.projects} provenance="sample" caption="Placeholder" />
         <StackedBar segments={segments} size="lg" ariaLabel="Projects by template today" />
       </Card>
-      <Card title="Planned waves to the target template" description="Projects moving per wave (placeholder)" footer={<ProvenanceBadge kind="planned" size="sm" />}>
+      <Card title="Planned waves to the target template" description="Projects moving per wave (placeholder)" footerLabel footer={<ProvenanceBadge kind="planned" size="sm" />}>
         <BarChart data={waves} height={220} ariaLabel="Projects per rollout wave, placeholder" />
         <Legend
           className="mt-2"

@@ -3,7 +3,7 @@
 import { BookLock, Eye, FilePenLine, GitPullRequestArrow, ListChecks, ScrollText, ShieldCheck, UserCheck } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { ProvenanceBadge } from '@/components/shell';
-import { Disclosure, cx } from '@/components/ui';
+import { DemoNote, Disclosure, cx } from '@/components/ui';
 import { AGENT_CATALOGUE, AGENT_IDS, GOVERNANCE_RULES } from '@/lib/agents';
 import { PDLC_STAGES } from '@/lib/config/pdlc';
 import { RISK_TIERS, RISK_TIER_POLICIES } from '@/lib/config/risk-tiers';
@@ -182,7 +182,7 @@ export function GovernanceSummary() {
       <div className="flex min-w-0 flex-col gap-3 p-5">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="font-display text-[15px] font-semibold text-title">Autonomy ceiling by risk tier</h3>
-          <span className="text-xs text-fg-subtle">Set in the risk-tier policy; illustrative for the prototype</span>
+          <DemoNote className="text-xs text-fg-subtle">Set in the risk-tier policy; illustrative for the prototype</DemoNote>
         </div>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4" role="list" aria-label="Autonomy ceiling by risk tier">
           {RISK_TIERS.map((tier) => {

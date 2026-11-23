@@ -7,6 +7,7 @@ import { DemoControlSlot } from './DemoSlot';
 import { useCurrentPageMeta } from './page-meta';
 import { ProvenanceBadges } from './ProvenanceBadge';
 import { ResetDemoButton } from './ResetDemoButton';
+import { LabelsToggle } from './LabelsToggle';
 import { ThemeSwitch } from './ThemeSwitch';
 
 /** Page title, provenance, guided-demo control, theme switch and reset. */
@@ -35,11 +36,16 @@ export function TopBar() {
       </div>
 
       <ProvenanceBadges kinds={provenance} className="hidden shrink-0 justify-end min-[1280px]:inline-flex" />
+      {/* Labels off: the page provenance pills hide; this quiet marker says what the screen is. */}
+      <span data-testid="prototype-marker" className="di-labels-off-only shrink-0 text-[11px] font-medium tracking-[0.09em] text-fg-subtle uppercase">
+        Prototype
+      </span>
 
       <div className="flex shrink-0 items-center gap-2.5">
         <DemoControlSlot />
         <span aria-hidden className="mx-0.5 h-6 w-px bg-line" />
         <BasketControl />
+        <LabelsToggle />
         <ThemeSwitch />
         <ResetDemoButton />
       </div>

@@ -11,7 +11,7 @@
  */
 import { FileDown } from 'lucide-react';
 import { useMemo, useState, useSyncExternalStore } from 'react';
-import { Badge, Button, Card, Chip, EmptyState, Section } from '@/components/ui';
+import { DemoNote, Badge, Button, Card, Chip, EmptyState, Section } from '@/components/ui';
 import { cx, FOCUS_RING } from '@/components/ui/cx';
 import { availableKinds, buildDeck, buildPackDeck, buildSlides, CATALOGUE, defaultPackFor, footerText, PACKS, packsFor, parseScopeKey, scopeKey, scopeLabel } from '@/lib/slides';
 import type { DeckSpec, PackId, PackOptions, SlideKind, SlideScope } from '@/lib/slides';
@@ -262,9 +262,9 @@ export function SlidesScreen() {
             ) : null}
             {deck && deck.slides.length > 0 ? (
               <>
-                <p className="text-xs text-fg-muted" data-testid="builder-footer-text">
+                <DemoNote as="p" className="text-xs text-fg-muted" data-testid="builder-footer-text">
                   Every slide is printed with: {footerText(ctx)}. Select a slide to view it full size.
-                </p>
+                </DemoNote>
                 <div data-testid="deck-preview">
                   <DeckPreviewGrid deck={deck} onOpen={setViewing} />
                 </div>

@@ -7,3 +7,5 @@ export { ResetDemoButton } from './ResetDemoButton';
 export { RoutePlaceholder } from './RoutePlaceholder';
 export { ThemeSwitch } from './ThemeSwitch';
 export { applyTheme, useTheme, type ThemeName } from './theme';
+export { LabelsToggle } from './LabelsToggle';
+export { applyLabels, useLabelsMode, type LabelsMode } from './labels';

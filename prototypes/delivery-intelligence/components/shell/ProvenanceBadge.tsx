@@ -33,7 +33,7 @@ export function ProvenanceBadge({ kind, size = 'md', label, className = '' }: Pr
   const sizing = size === 'sm' ? 'h-5 gap-1 px-1.5 text-[10.5px]' : 'h-6 gap-1.5 px-2 text-[11.5px]';
   return (
     <span
-      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-pill border font-medium tracking-[0.01em] ${sizing} ${tone} ${className}`}
+      className={`di-demo-label inline-flex shrink-0 items-center whitespace-nowrap rounded-pill border font-medium tracking-[0.01em] ${sizing} ${tone} ${className}`}
       title={terms.provenanceHelp[kind]}
       data-provenance={kind}
     >
@@ -47,7 +47,7 @@ export function ProvenanceBadge({ kind, size = 'md', label, className = '' }: Pr
 export function ProvenanceBadges({ kinds, size, className = '' }: { kinds: Provenance[]; size?: 'sm' | 'md'; className?: string }) {
   const unique = [...new Set(kinds)];
   return (
-    <span className={`inline-flex flex-wrap items-center gap-1.5 ${className}`} aria-label="Provenance">
+    <span className={`di-demo-label inline-flex flex-wrap items-center gap-1.5 ${className}`} aria-label="Provenance">
       {unique.map((k) => (
         <ProvenanceBadge key={k} kind={k} size={size} />
       ))}

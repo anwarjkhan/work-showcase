@@ -3,7 +3,7 @@
 import { BookOpenCheck, CheckCheck, CircleSlash, FastForward, Play, Sparkles } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { ProvenanceBadge } from '@/components/shell';
-import { Badge, Button, EmptyState, ProgressBar, SeverityBadge, Tabs, TabPanel, Timeline, cx, type TimelineStep } from '@/components/ui';
+import { DemoNote, Badge, Button, EmptyState, ProgressBar, SeverityBadge, Tabs, TabPanel, Timeline, cx, type TimelineStep } from '@/components/ui';
 import { AGENT_CATALOGUE, AGENT_IDS, runFindings, runScopeOf, type AgentRunScope, type PlaybackView } from '@/lib/agents';
 import { PDLC_STAGES } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
@@ -69,7 +69,7 @@ export function RunConsole(props: RunConsoleProps) {
             </h3>
             <ProvenanceBadge kind="scripted-agent" size="sm" />
           </div>
-          <span className="text-xs text-fg-subtle">Deterministic rules over the records shown; no model is called</span>
+          <DemoNote className="text-xs text-fg-subtle">Deterministic rules over the records shown; no model is called</DemoNote>
         </div>
         <div className="flex flex-wrap items-end gap-2">
           <label className="flex min-w-0 flex-[1_1_210px] flex-col gap-1">
@@ -312,9 +312,9 @@ function RunResult({ data, run, proposals, draft, portfolioFindings }: { data: P
           )}
         </TabPanel>
       </Tabs>
-      <p className="text-[11px] text-fg-subtle">
+      <DemoNote as="p" className="text-[11px] text-fg-subtle">
         Provider: scripted, no external call · {data.meta.sourceKind === 'synthetic' ? terms.provenance.sample : terms.provenance.reported}
-      </p>
+      </DemoNote>
     </div>
   );
 }

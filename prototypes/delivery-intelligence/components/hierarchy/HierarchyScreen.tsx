@@ -23,7 +23,7 @@ export function HierarchyScreen() {
         title="How work moves through the hierarchy"
         description={`${c.requests} investment requests: ${c.formal} deliverables take the formal route, ${c.standalone} the standalone route. ${c.deliverables} deliverables map to ${c.epics} Epics (${perEpic} each), joined to ${c.stories + c.subTasks} work items by two fields.`}
       >
-        <Card padding="sm" footer={<ProvenanceBadges kinds={['computed', 'sample']} size="sm" />}>
+        <Card padding="sm" footerLabel footer={<ProvenanceBadges kinds={['computed', 'sample']} size="sm" />}>
           <ModelDiagram model={model} view={view} onView={setView} />
         </Card>
       </Section>

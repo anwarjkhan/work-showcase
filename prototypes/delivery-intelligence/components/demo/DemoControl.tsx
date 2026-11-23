@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Presentation, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button, IconButton } from '@/components/ui';
 import { DEMO_STEPS } from '@/lib/config/demo-script';
+import { useLabelsMode } from '@/components/shell/labels';
 import { useResetDemo } from '@/lib/store';
 import { demoStore } from './demo-state';
 import { useDemoController } from './useDemoController';
@@ -15,6 +16,7 @@ import { useDemoController } from './useDemoController';
 export function DemoControl() {
   const { state, start, prev, next, exit } = useDemoController();
   const reset = useResetDemo();
+  const [labels, setLabels] = useLabelsMode();
   const [asking, setAsking] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +77,16 @@ export function DemoControl() {
           <p className="mt-1 text-xs text-fg-muted">
             Resetting restores the seeded data and clears agent runs, approvals and the audit trail, so every run starts from the same state.
           </p>
+          <label className="mt-3 flex cursor-pointer items-center gap-2 text-xs text-fg">
+            <input
+              type="checkbox"
+              data-testid="demo-start-labels"
+              checked={labels === 'on'}
+              onChange={(e) => setLabels(e.target.checked ? 'on' : 'off')}
+              className="size-3.5 accent-[var(--di-accent)]"
+            />
+            Labels on
+          </label>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
               variant="primary"

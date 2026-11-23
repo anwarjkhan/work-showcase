@@ -184,7 +184,7 @@ export function RunHistory({ runs, proposals, data, activeRunId, onReopen, perso
             })}
         </tbody>
       </table>
-      <div className="flex items-center justify-end border-t border-line bg-surface-2 px-3 py-2">
+      <div className="di-demo-label flex items-center justify-end border-t border-line bg-surface-2 px-3 py-2">
         <ProvenanceBadge kind="scripted-agent" size="sm" />
       </div>
     </div>

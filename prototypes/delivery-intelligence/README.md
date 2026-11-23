@@ -116,10 +116,17 @@ npm run e2e          # builds, serves out/ on port 4173, runs the Playwright bro
 - The browser tests use the Chromium that Playwright already has. Do not run `playwright install` on a restricted machine; if the browser is somewhere else, set `PW_CHROMIUM_PATH` to its executable (for example `/opt/pw-browsers/chromium`). They run at 1920 wide, and the route checks also run at 1366.
 - The demo clock is fixed at 8 March 2027, so every screen shows the same thing on every run.
 
+### Labels on/off
+
+A small tag button in the top bar, next to the theme switch, hides the explanatory layer for a crisper screen when you present it yourself. Default is **Labels on** (fully labelled, safe when someone runs the demo alone). Its tooltip and accessible name say "Labels on" or "Labels off"; **Shift+L** toggles it (ignored while focus is in an input, select or text area), and the Start guided demo popover has a matching "Labels on" checkbox. The choice is `data-labels="on|off"` on `<html>`, set before first paint and kept in `localStorage` (`di-labels`); **Reset demo** resets data only and leaves it alone.
+
+With labels off these are hidden completely, not shrunk: provenance badges (Scripted agent, Simulated evidence, Simulated step, Planned, Computed from data, Sample data, reported), the page provenance pills in the top bar (replaced by one quiet "Prototype" marker), provenance columns and rows in tables and record panels, and explanatory notes, disclaimers and keyboard-hint lines. Notes are written with `DemoNote` (`components/ui`) and badges carry `di-demo-label`; one CSS rule in `app/globals.css` does the hiding. Section descriptions, status pills (RAG, readiness, severity, review state), figures, the guided demo bar, the sidebar line "Synthetic data for demonstration only" and the "Placeholder" tags and page notice on Pilot evidence are content and always show. Exported slides are unaffected. A unit test fails if a known demo-note phrase is written outside `DemoNote`; the browser suite runs once with labels on and once with them off.
+
 ### What the browser tests cover (`e2e/`)
 
 - Every route loads inside the shell with no console error, no failed request, no request leaving the machine and no horizontal overflow, at 1920 and 1366, including both dynamic routes for the two story deliverables and one other.
 - Both themes on the portfolio screen, and the choice surviving a reload.
+- Labels on/off: nothing labelled is visible on any route with labels off, the "Prototype" marker and sidebar line stay, the toggle (button, Shift+L, tooltip, demo popover checkbox) works, the choice survives a reload and Reset demo. The rest of the suite runs again with labels off (`chromium-1920-labels-off` project).
 - The guided journey: start, all eleven steps by keyboard (and back), the keyboard rules, collapse, reload, reset.
 - The main storyline (Green reported, Red by evidence, 82%, 1 of 4, Not ready) and a weekly status in which every sentence is cited, with a citation opening its record.
 - Agent centre: run, approve, refusal as the item's assignee, and reset restoring the findings count, an empty queue and an empty audit trail.
@@ -169,7 +176,7 @@ Files are written to `out/slides/` (replaced by `npm run build`) and named `<sco
 
 ```
 app/                    routes (page.tsx per route), theme.css (all colours and fonts), globals.css
-components/shell/       frame: navigation, top bar, theme switch, reset, provenance badge
+components/shell/       frame: navigation, top bar, theme switch, labels toggle, reset, provenance badge
 components/ui/          shared primitives (see components/ui/README.md)
 components/charts/      hand-built SVG charts
 components/<screen>/    portfolio, hierarchy, deliverable, plan, global, lifecycle, workflow,

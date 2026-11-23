@@ -56,7 +56,7 @@ export function EvidenceTab({ model }: { model: DeliverableModel }) {
     { id: 'observed', header: 'Observed', accessor: (x) => x.evidence.observedAt, cell: (x) => formatDate(x.evidence.observedAt, { withYear: false }), minWidth: 100 },
     { id: 'by', header: 'Recorded by', accessor: (x) => (x.evidence.recordedById ? idx.people.get(x.evidence.recordedById)?.name : null), cell: (x) => <PersonCell id={x.evidence.recordedById} fallback="Automated source" />, minWidth: 160 },
     { id: 'covers', header: 'Covers', accessor: (x) => x.covers, minWidth: 140 },
-    { id: 'prov', header: 'Provenance', accessor: (x) => x.evidence.provenance, cell: (x) => <ProvenanceBadge kind={x.evidence.provenance} size="sm" />, minWidth: 150 },
+    { id: 'prov', header: 'Provenance', accessor: (x) => x.evidence.provenance, cell: (x) => <ProvenanceBadge kind={x.evidence.provenance} size="sm" />, minWidth: 150, demoLabel: true },
     {
       id: 'stale',
       header: 'Currency',

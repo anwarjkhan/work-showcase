@@ -5,7 +5,7 @@ import { Boxes, Check, CircleDashed, FileText, Flag, FolderTree, Layers, ListChe
 import { Fragment, useCallback, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { AddToSlides } from '@/components/slides/AddToSlides';
 import { ExportPack } from '@/components/slides/ExportPack';
-import { Avatar, Badge, Button, EmptyState, RagPair, ReadinessPill, Tabs, Tree, TreeRow, cx } from '@/components/ui';
+import { DemoNote, Avatar, Badge, Button, EmptyState, RagPair, ReadinessPill, Tabs, Tree, TreeRow, cx } from '@/components/ui';
 import { PDLC_STAGES } from '@/lib/config/pdlc';
 import { HERO_DELIVERABLE_ID } from '@/lib/config/story';
 import { hrefs } from '@/lib/config/routes';
@@ -587,9 +587,9 @@ export function ExplorerTree({ view, onViewChange }: { view: ExplorerView; onVie
             )}
           </div>
         </div>
-        <div className="border-t border-line px-3 py-2 text-[11px] text-fg-muted">
+        <DemoNote as="div" className="border-t border-line px-3 py-2 text-[11px] text-fg-muted">
           Arrow keys move, Right and Left open and close, Home and End jump, Enter toggles, <kbd className="rounded-xs border border-line-strong px-1 font-mono">D</kbd> opens the deliverable detail. Rows load only when opened.
-        </div>
+        </DemoNote>
       </div>
     </div>
   );

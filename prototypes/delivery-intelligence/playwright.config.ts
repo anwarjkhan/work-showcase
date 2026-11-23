@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { LABELS_OFF_STATE } from './e2e/helpers';
 
 // Browser tests run against the static export (the artefact we ship), served
 // on loopback by scripts/serve-static.mjs. `npm run e2e` builds first.
@@ -24,6 +25,13 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium-1920', use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 }, launchOptions } },
+    // The same suite again with the labels toggle off (localStorage seeded before first paint).
+    // labels.spec.ts drives the toggle itself, so it runs only in the project above.
+    {
+      name: 'chromium-1920-labels-off',
+      testIgnore: /labels\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 }, launchOptions, storageState: LABELS_OFF_STATE },
+    },
   ],
   webServer: {
     command: `npm run build && node scripts/serve-static.mjs ${PORT}`,

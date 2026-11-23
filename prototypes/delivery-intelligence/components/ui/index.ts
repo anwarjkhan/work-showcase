@@ -3,6 +3,7 @@ export { Avatar, AvatarLabel, AvatarStack, type AvatarProps } from './Avatar';
 export { Badge, Chip, type BadgeProps, type BadgeTone, type ChipProps } from './Badge';
 export { Button, IconButton, type ButtonProps, type ButtonSize, type ButtonVariant, type IconButtonProps } from './Button';
 export { Card, Section, SectionHeading, type CardProps, type SectionHeadingProps, type SectionProps } from './Card';
+export { DemoNote } from './DemoNote';
 export { DataTable, type Column, type DataTableProps, type SortValue } from './DataTable';
 export { Disclosure, Tree, TreeRow, type DisclosureProps, type TreeRowProps } from './Disclosure';
 export { Drawer, type DrawerProps } from './Drawer';

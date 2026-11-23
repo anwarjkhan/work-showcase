@@ -4,7 +4,7 @@ import { Ban, CalendarCheck, CheckCircle2, ClipboardList, FileLock2, KeyRound, S
 import type { ReactNode } from 'react';
 import { BarChart, DualBar, chartColor } from '@/components/charts';
 import { ProvenanceBadge } from '@/components/shell';
-import { Badge, Card, DataTable, EmptyState, Section, SeverityBadge, StatTile, cx, type Column } from '@/components/ui';
+import { DemoNote, Badge, Card, DataTable, EmptyState, Section, SeverityBadge, StatTile, cx, type Column } from '@/components/ui';
 import { RULE_DESCRIPTIONS, RULE_SEVERITY } from '@/lib/config/thresholds';
 import { terms } from '@/lib/config/terminology';
 import { useEngineResult } from '@/lib/store';
@@ -22,10 +22,11 @@ function PlaceholderCard({ title, description, children }: { title: string; desc
       description={description}
       className="border-dashed"
       actions={<Badge size="sm" tone="amber" dashed>Placeholder</Badge>}
+      footerLabel
       footer={
         <>
           <ProvenanceBadge kind="planned" size="sm" />
-          <span>Placeholder figures, not measured.</span>
+          <DemoNote>Placeholder figures, not measured.</DemoNote>
         </>
       }
     >

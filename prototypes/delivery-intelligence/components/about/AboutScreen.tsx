@@ -32,7 +32,7 @@ const REGISTER: RegisterRow[] = [
 
 const columns: Column<RegisterRow>[] = [
   { id: 'area', header: 'Screen or capability', accessor: (r) => r.area, cell: (r) => <span className="font-semibold text-fg">{r.area}</span>, minWidth: 200 },
-  { id: 'kinds', header: 'What it is', cell: (r) => <ProvenanceBadges kinds={r.kinds} size="sm" />, sortable: false, minWidth: 280 },
+  { id: 'kinds', header: 'What it is', cell: (r) => <ProvenanceBadges kinds={r.kinds} size="sm" />, sortable: false, minWidth: 280, demoLabel: true },
   { id: 'what', header: 'Detail', cell: (r) => <span className="text-fg-muted">{r.what}</span>, sortable: false, minWidth: 420 },
 ];
 

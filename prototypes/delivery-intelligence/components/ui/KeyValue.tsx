@@ -8,6 +8,8 @@ export interface KeyValueItem {
   hint?: ReactNode;
   /** Monospace value (ids, keys). */
   mono?: boolean;
+  /** The row is a provenance label: hidden when labels are off. */
+  demoLabel?: boolean;
 }
 
 export interface KeyValueProps {
@@ -31,7 +33,7 @@ export function KeyValue({ items, layout = 'stacked', columns = 2, className }: 
     return (
       <dl className={cx('m-0 flex flex-col text-[13px]', className)}>
         {items.map((it, i) => (
-          <div key={i} className="flex items-baseline justify-between gap-6 border-b border-line py-2 first:pt-0 last:border-b-0 last:pb-0">
+          <div key={i} className={cx('flex items-baseline justify-between gap-6 border-b border-line py-2 first:pt-0 last:border-b-0 last:pb-0', it.demoLabel && 'di-demo-label')}>
             <dt className="shrink-0 text-fg-muted">{it.label}</dt>
             <dd className={cx('m-0 min-w-0 text-right text-fg tabular-nums', it.mono && 'font-mono text-xs')}>
               {it.value}
@@ -45,7 +47,7 @@ export function KeyValue({ items, layout = 'stacked', columns = 2, className }: 
   return (
     <dl className={cx('m-0 grid gap-x-6 gap-y-4', COLS[columns], className)}>
       {items.map((it, i) => (
-        <div key={i} className="min-w-0">
+        <div key={i} className={cx('min-w-0', it.demoLabel && 'di-demo-label')}>
           <dt className="di-eyebrow mb-1">{it.label}</dt>
           <dd className={cx('m-0 text-[13px] text-fg tabular-nums', it.mono && 'font-mono text-xs')}>
             {it.value}

@@ -26,6 +26,8 @@ export interface Column<T> {
   minWidth?: number;
   /** Extra classes for body cells. */
   className?: string;
+  /** The whole column is a provenance label: hidden (header and cells) when labels are off. */
+  demoLabel?: boolean;
 }
 
 export interface DataTableProps<T> {
@@ -133,6 +135,7 @@ export function DataTable<T>({ columns, rows, getRowId, onRowClick, selectedId, 
                       ALIGN[align],
                       dense && 'px-3 py-2',
                       stickyFirstColumn && ci === 0 && 'left-0 z-20 border-r',
+                      c.demoLabel && 'di-demo-label',
                     )}
                   >
                     {sortable ? (
@@ -182,6 +185,7 @@ export function DataTable<T>({ columns, rows, getRowId, onRowClick, selectedId, 
                           ALIGN[align],
                           stickyFirstColumn && ci === 0 && 'sticky left-0 z-[1] border-r bg-surface',
                           c.className,
+                          c.demoLabel && 'di-demo-label',
                         )}
                       >
                         {content}

@@ -64,3 +64,10 @@ export async function number(page: Page, testId: string): Promise<number> {
   const text = await page.getByTestId(testId).first().innerText();
   return Number(text.replace(/[^0-9]/g, ''));
 }
+
+/** localStorage key and the Playwright storage state that starts every page with labels off. */
+export const LABELS_KEY = 'di-labels';
+export const LABELS_OFF_STATE = {
+  cookies: [],
+  origins: [{ origin: 'http://127.0.0.1:4173', localStorage: [{ name: LABELS_KEY, value: 'off' }] }],
+};

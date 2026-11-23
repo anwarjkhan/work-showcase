@@ -325,7 +325,7 @@ function Legend() {
       {item(<span className="inline-block h-0 w-6 border-t-[1.75px] border-dashed border-status-red" />, 'Late dependency')}
       {item(<span className="inline-block h-3.5 w-0.5 rounded-pill bg-title" />, 'Forecast end (on or before plan)')}
       {item(<span className="inline-block h-3 w-0.5 bg-accent" />, planText.today)}
-      <span className="ml-auto inline-flex items-center gap-1.5">
+      <span className="di-demo-label ml-auto inline-flex items-center gap-1.5">
         <ProvenanceBadge kind="computed" size="sm" />
       </span>
     </div>

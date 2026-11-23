@@ -197,7 +197,7 @@ function RecordBody({ r, ctx }: { r: ReturnType<typeof resolveRef> & {}; ctx: En
           label: 'Covers',
           value: e.workItemKey ? <RecordChip to={{ kind: 'work-item', id: e.workItemKey }} /> : e.outcomeId ? <RecordChip to={{ kind: 'outcome', id: e.outcomeId }} /> : 'The whole deliverable',
         },
-        { label: 'Provenance', value: <ProvenanceBadge kind={e.provenance} size="sm" /> },
+        { label: 'Provenance', value: <ProvenanceBadge kind={e.provenance} size="sm" />, demoLabel: true },
         {
           label: 'Currency',
           value: st.stale ? (
