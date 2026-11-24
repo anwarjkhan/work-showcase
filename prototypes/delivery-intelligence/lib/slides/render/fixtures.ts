@@ -125,7 +125,7 @@ const stagesBar: Block = {
 const rail: Block = {
   type: 'stage-rail',
   stages: [
-    { stageId: 'ideation-requirements', name: 'Ideation & Requirements', state: 'done', detail: 'Approved by Alexis Merrow · 1 record' },
+    { stageId: 'ideation-requirements', name: 'Ideation & Requirements', state: 'done', detail: 'Approved by Anwar Khan · 1 record' },
     { stageId: 'design-specifications', name: 'Design & Specifications', state: 'done', detail: 'Approved by Priya Natarajan · 2 records' },
     { stageId: 'risk-control-compliance', name: 'Risk, Control & Compliance', state: 'current', detail: '1 review open', movedBackFrom: 'Build, Test & Validate' },
     { stageId: 'build-test-validate', name: 'Build, Test & Validate', state: 'not-started', detail: 'Needs a test result' },
@@ -244,7 +244,7 @@ export const FIXTURE_DECK: DeckSpec = {
     slide('', 'td-pdlc', 'rail', 'TD-1001 moved back to Risk, Control & Compliance', [
       at('top', rail),
       at('main', { type: 'table', columns: [{ header: 'Review', width: 2 }, { header: 'Reviewer', width: 1.6 }, { header: 'State', width: 1.2 }, { header: 'Date', width: 1 }], rows: [
-        ['Requirements review', 'Alexis Merrow', { text: 'Approved', tone: 'green' }, '14 Jan 2027'],
+        ['Requirements review', 'Anwar Khan', { text: 'Approved', tone: 'green' }, '14 Jan 2027'],
         ['Design review', 'Priya Natarajan', { text: 'Approved', tone: 'green' }, '3 Feb 2027'],
         ['Control owner review', 'Jonas Whitfield', { text: 'Open', tone: 'amber' }, '—'],
       ] }),

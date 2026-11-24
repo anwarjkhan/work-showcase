@@ -146,7 +146,7 @@ export interface StageView {
   stageId: PdlcStageId;
   name: string;           // "Build, Test & Validate"
   state: 'done' | 'current' | 'not-started';
-  detail: string;         // "Approved by Alexis Merrow · 1 record" | "Current · 1 review open"
+  detail: string;         // "Approved by Anwar Khan · 1 record" | "Current · 1 review open"
   movedBackFrom?: string; // stage name, when the last move into this stage was a move back
 }
 

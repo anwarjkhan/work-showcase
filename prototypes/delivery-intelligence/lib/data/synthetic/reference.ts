@@ -146,7 +146,7 @@ interface FixedPerson {
 }
 
 const FIXED_PEOPLE: FixedPerson[] = [
-  { id: PRESENTER_PERSON_ID, name: 'Alexis Merrow', title: 'Head of delivery (presenter)', roles: ['delivery-lead', 'business-owner', 'requirements-owner', 'design-reviewer', 'release-owner', 'control-owner', 'independent-validator', 'investment-owner'], hubId: 'hub-ldn' },
+  { id: PRESENTER_PERSON_ID, name: 'Anwar Khan', title: 'Head of delivery (presenter)', roles: ['delivery-lead', 'business-owner', 'requirements-owner', 'design-reviewer', 'release-owner', 'control-owner', 'independent-validator', 'investment-owner'], hubId: 'hub-ldn' },
   { id: 'p-owner-1', name: 'Priya Raman', title: 'Programme lead, counterparty credit risk', roles: ['programme-lead', 'investment-owner'], hubId: 'hub-ldn' },
   { id: 'p-owner-2', name: 'Henrik Lindqvist', title: 'Programme lead, FRTB', roles: ['programme-lead', 'investment-owner'], hubId: 'hub-fra' },
   { id: 'p-owner-3', name: 'Aoife Brennan', title: 'Programme lead, finance ledger', roles: ['programme-lead', 'investment-owner'], hubId: 'hub-dub' },

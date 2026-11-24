@@ -1568,14 +1568,14 @@
               [
                 "Delivery & Launch",
                 "Not started",
-                "Business owner not requested (Alexis Merrow); Release owner not reque…",
+                "Business owner not requested (Anwar Khan); Release owner not requeste…",
                 "Business acceptance: pass; Release checklist: missing"
               ]
             ]
           }
         }
       ],
-      "notes": "TD-1001 in Build & test; independent validator pending. Moving to Delivery & Launch needs the independent validator review (pending) approved first.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Business owner not requested (Alexis Merrow); Release owner not requested (Priya Raman)",
+      "notes": "TD-1001 in Build & test; independent validator pending. Moving to Delivery & Launch needs the independent validator review (pending) approved first.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Business owner not requested (Anwar Khan); Release owner not requested (Priya Raman)",
       "citations": [
         {
           "ref": {
