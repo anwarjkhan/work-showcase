@@ -108,7 +108,7 @@ export function AboutScreen() {
         </div>
       </Section>
 
-      <Section title="Plugging in" description="Four places to change after import. None needs a screen to be rewritten.">
+      <Section id="plugging-in" title="Plugging in" description="Four places to change after import. None needs a screen to be rewritten.">
         <div className="grid gap-4 xl:grid-cols-2">
           <Step icon={<Database aria-hidden />} title="Real data: DataSource">
             <p className="text-xs text-fg-muted">Screens read everything through one interface. Write a Jira source that loads read-only, then return it from <code className="font-mono">getDataSource()</code>.</p>

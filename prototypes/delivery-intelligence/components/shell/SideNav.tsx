@@ -8,6 +8,7 @@ import { NAV_GROUP_LABELS, ROUTES, routeForPath, type NavGroup } from '@/lib/con
 import { terms } from '@/lib/config/terminology';
 import { useClock, useDemoState } from '@/lib/store';
 import { NAV_ICONS } from './nav-icons';
+import { PortfolioSwitcher } from './PortfolioSwitcher';
 
 const GROUP_ORDER: NavGroup[] = ['portfolio', 'delivery', 'adoption', 'build'];
 
@@ -21,7 +22,7 @@ export function SideNav() {
   return (
     <nav
       aria-label={terms.shell.navLabel}
-      className="sticky top-0 flex h-screen w-[var(--di-nav-width)] shrink-0 flex-col border-r border-nav-line bg-nav bg-gradient-to-b from-nav to-nav-2 text-nav-fg"
+      className="sticky top-0 z-40 flex h-screen w-[var(--di-nav-width)] shrink-0 flex-col border-r border-nav-line bg-nav bg-gradient-to-b from-nav to-nav-2 text-nav-fg"
     >
       {/* Product wordmark: text only, no brand mark. */}
       <div className="flex h-[var(--di-topbar-height)] items-center gap-3 border-b border-nav-line px-5">
@@ -33,6 +34,8 @@ export function SideNav() {
           <span className="truncate text-[11px] text-nav-muted">{terms.app.navSubtitle}</span>
         </span>
       </div>
+
+      <PortfolioSwitcher />
 
       <div className="flex-1 overflow-y-auto px-3 py-4">
         {GROUP_ORDER.map((group) => (

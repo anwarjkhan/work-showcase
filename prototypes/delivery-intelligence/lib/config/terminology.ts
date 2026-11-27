@@ -290,6 +290,29 @@ export const baseTerminology = {
     dataSource: 'Data source',
     comingSoon: 'Coming in this build',
   },
+  /** Portfolio switcher (visual stub): wording for the control, menu and preview panel. */
+  portfolioSwitch: {
+    label: 'Portfolio',
+    menuLabel: 'Switch portfolio',
+    search: 'Search portfolios',
+    noMatch: 'No portfolio matches',
+    current: 'Current',
+    notLoaded: 'Not loaded in this prototype',
+    previewEyebrow: 'Portfolio preview',
+    willShow: 'What the app would show once connected',
+    estateHeading: 'Expected estate (round placeholder figures)',
+    projects: 'Projects on the standard templates',
+    activeEpics: 'Active Epics',
+    placeholder: 'Placeholder',
+    sourcesHeading: 'Data it would read',
+    readOnlyFirst: 'Read-only first',
+    note: 'This prototype holds one portfolio. Switching loads another portfolio\u2019s records through the same screens.',
+    rollupHeading: 'How the roll-up works',
+    rollupBody:
+      'Every screen reads the combined records, so figures are computed once across portfolios, never averaged from portfolio summaries. Each programme carries its portfolio tag.',
+    returnTo: 'Return to',
+    connectionPlan: 'View the connection plan',
+  },
 };
 
 export type Terminology = typeof baseTerminology;

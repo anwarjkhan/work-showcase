@@ -91,6 +91,8 @@ Keyboard in the guided demo: Right, Page Down or N for next; Left, Page Up or P 
 | `/evidence` | Pilot evidence | Baseline against assisted effort, exception counts and draft acceptance. Every figure is marked as a placeholder until measured. The pilot ask. |
 | `/about` | About this build | What is computed, scripted, sample or planned, and how to plug in real data and a model. |
 
+A portfolio switcher under the wordmark in the left navigation (a visual stub): the app holds one portfolio; choosing another opens a labelled preview of what it would show once connected and never changes the data.
+
 Every scripted, simulated, sample or placeholder element carries a provenance badge: `Sample data`, `Computed from data`, `Scripted agent`, `Portfolio system (reported)`, `Planned`, `Simulated evidence`.
 
 ## 4. Running locally

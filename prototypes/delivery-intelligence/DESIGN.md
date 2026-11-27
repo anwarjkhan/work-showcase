@@ -428,6 +428,7 @@ Section 16 expands this into a working checklist.
 | 23 Nov 2026 | Labels on/off toggle for a cleaner presenting view (section 12) |
 | 24 Nov 2026 | Sample presenter renamed by the owner |
 | 27 Nov 2026 | Core Four pod roles adopted across model, rules, workflow, screens and template blueprint (section 13) |
+| 27 Nov 2026 | Portfolio switcher added as a visual stub: one real portfolio, others shown as not-loaded previews (section 17) |
 
 ---
 
@@ -548,9 +549,9 @@ The gaps sit on deliverables that were already Amber, or are medium severity, so
 |---|---|
 | `npm run typecheck` | clean |
 | `npm run lint` | clean |
-| `npm test` | 464 tests in 32 files |
+| `npm test` | 467 tests in 33 files |
 | `npm run build` | static export |
-| `npm run e2e` | 151 tests, run once with labels on and once with labels off (about 3 minutes) |
+| `npm run e2e` | 163 tests, run once with labels on and once with labels off (about 3 minutes) |
 
 **Requirements:** Node 22 (22.22 or later) or 24 (24.15 or later). `npm run slides` needs Node 22.15 or later. Works on Windows, macOS and Linux.
 
@@ -592,6 +593,7 @@ Ordered by value for the next MD conversation. "Model" is a suggestion for an AI
 | B11 | **Open in PowerPoint** | Deliverable, programme and portfolio packs opened in PowerPoint and checked slide by slide; fixes logged | `lib/slides/render/*` | Sonnet |
 | B12 | **Persona hash on the same page** | Changing `#act-as=` while already on a workflow page switches the persona (today only arrival by navigation does) | `components/workflow/WorkflowScreen.tsx` | Sonnet |
 | B13 | **Same-page hash links** | Screens that listen only to `hashchange` also respond to router pushes on the same path | screens with hash support | Sonnet |
+| B14 | **Multiple portfolios** | Load a second portfolio through `DataSource`, scope every screen by portfolio, and add the All portfolios roll-up. The switcher then changes data instead of opening a preview | `lib/data/*`, `lib/store/*`, `lib/config/portfolios.ts`, `components/shell/PortfolioSwitcher.tsx` | Opus |
 
 ### Open questions for the owner
 1. **Moving back from Build:** a failing test at Build, Test & Validate moves the deliverable back one stage, to Risk, Control & Compliance Reviews. Should a failure instead surface at Delivery & Launch and move back to Build?
@@ -607,10 +609,24 @@ Ordered by value for the next MD conversation. "Model" is a suggestion for an AI
 1. **Import** the repository into the internal GitHub, then run `npm install`, `npm run dev`, and the full check list in section 14.
 2. **Internal names:** create `lib/config/terminology.local.ts` from `terminology.local.fallback.ts`. Use it for the portfolio system's real name, the template names, the requirements workspace and its agents, and the Core Four titles if they differ.
 3. **Brand:** set the colours, fonts and logo in `app/theme.css`. Slide colours mirror these in `lib/slides/render/theme.ts`, and a test fails if they drift.
-4. **Numbers:** set the real estate numbers in `lib/config/estate.ts` (for example 450 FRT and 550 Markets Tech projects).
+4. **Numbers:** set the real estate numbers in `lib/config/estate.ts` (the number of projects on each function's templates).
 5. **Brief an AI coding agent** with:
    - "Read `DESIGN.md` sections 13 to 16, `CONTRACTS.md` and `lib/agents/README.md` first";
    - one backlog item and its acceptance;
    - the rules in section 14;
    - "Run every command in section 14 before reporting done".
 6. **Record** each change in section 10 and anything that differs from this design in the section for that feature.
+
+---
+
+## 17. Portfolio switcher (visual stub, added 27 Nov 2026)
+
+The prototype holds one real (synthetic) portfolio. The switcher shows how moving between portfolios would work, without a second dataset.
+
+- **Config:** `lib/config/portfolios.ts` lists the portfolios (id, name, description, owner function, `status` of `loaded` or `not-loaded`). Exactly one is loaded: "Risk & Finance Technology", the synthetic book. The not-loaded entries (three business-line portfolios and an "All portfolios" roll-up) carry only round placeholder estate figures (projects on the standard templates, active Epics), in the style of `ESTATE`. They never carry RAG, readiness, finding counts or anything that could pass as computed delivery status. Names are generic. UI wording is in `terms.portfolioSwitch`. A unit test enforces both rules.
+- **Control:** `components/shell/PortfolioSwitcher.tsx`, under the wordmark in the left navigation. It shows the current name; the menu opens by click or ArrowDown and supports arrow keys, Home, End, Enter and Escape (focus returns to the control). A search field appears when there are more than five entries. The top bar eyebrow also names the portfolio ("Risk & Finance Technology · Portfolio").
+- **Choosing a not-loaded portfolio never changes data.** It opens a preview dialog: the title line "Not loaded in this prototype" (content, always shown), placeholder estate figures marked "Placeholder", the sources it would read (portfolio system and Jira projects, read-only first), and the actions "Return to Risk & Finance Technology" and "View the connection plan" (the Plugging in section of `/about`). The All portfolios entry explains the roll-up in the same panel. The selection always stays on the loaded portfolio.
+- **Labels toggle:** the "Not loaded in this prototype" menu markers and the explanatory note use `DemoNote`; the "Placeholder" badges use `ProvenanceBadge kind="planned"`. With labels off the menu is cleaner, but the preview still says plainly that the portfolio is not loaded.
+- **State:** only open/closed, in memory. Nothing is persisted and Reset demo does not affect it.
+- **Tests:** `lib/config/portfolios.test.ts` and `e2e/portfolio-switcher.spec.ts`.
+- **Next step:** backlog B14.
