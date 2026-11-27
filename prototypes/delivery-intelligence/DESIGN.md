@@ -1,6 +1,7 @@
 # Delivery Intelligence — Design
 
-**Status:** built. All 16 deliverables are complete; section 9 lists where the build differs from this design.
+**Status:** built and extended. Sections 1 to 8 are the original design, kept as the baseline. Section 9 lists where the first build differs from it. Sections 10 to 14 describe what was added after the first build (slides, the labels toggle and the Core Four roles). Section 15 is the backlog for continuing the work, and section 16 explains how to pick it up inside the firm.
+**Last updated:** 27 November 2026.
 **Working title:** "Delivery Intelligence" (set in the terminology file, changeable).
 **Location:** `prototypes/delivery-intelligence/` in this repository. All paths below are relative to that folder unless they start with `/`.
 
@@ -111,8 +112,10 @@ Guided demo steps:
 | `/blueprint` | Template blueprint | Current rapid and advanced templates beside the target template. Issue types mapped to the hierarchy. New fields. Rollout across the project estate |
 | `/evidence` | Pilot evidence | Baseline against assisted effort, exception counts, draft acceptance. All figures marked as placeholders until measured. The pilot ask |
 | `/about` | About this build | What is computed, scripted, sample or planned. How to plug in real data and a model |
+| `/slides` | Slide builder | *Added after the first build (section 11).* Pick a scope and a pack or individual slides, preview them and export editable PowerPoint |
+| `/roles` | By role | *Added after the first build (section 13).* For each Core Four role: reviews waiting on that role, reviews coming up, and seat gaps |
 
-Cross-cutting: left navigation, top bar with provenance badge, theme switch, guided-demo control and "Reset demo".
+Cross-cutting: left navigation, top bar with provenance badge, theme switch, guided-demo control and "Reset demo". Added later: the slide basket (section 11) and the labels on/off toggle (section 12).
 
 Provenance labels used everywhere: `Sample data`, `Computed from data`, `Scripted agent`, `Portfolio system (reported)`, `Planned`.
 
@@ -185,6 +188,8 @@ PDLC workflow (per deliverable):
 - Five stages in order, with moves allowed forward and back between neighbours.
 - Each stage defines its work products, the agent that assists, one human review, and the evidence it should leave behind:
 
+> **Superseded on 27 November 2026.** The "Human review" column below is the original single-reviewer design. Reviews now follow the Core Four gates in section 13.
+
 | Stage | Agent assist | Human review | Evidence left |
 |---|---|---|---|
 | Ideation & Requirements | Requirements structuring | Requirements owner | Requirements sign-off |
@@ -215,6 +220,8 @@ Checks (each produces `Finding` records; thresholds live in config):
 | R12 | Evidence older than the latest change to the work it covers |
 | R13 | A required test result is failing |
 | R14 | Epic with no Deliverable ID, or a Deliverable ID that does not exist |
+| R15 | *Added (section 13).* Core Four incomplete: a role not named, or one person holding two core roles. High when the In-Business Risk Lead is missing on a T3 or T4 deliverable, otherwise medium |
+| R16 | *Added (section 13).* Work started before the Core Four was complete. Medium |
 
 Evidence-based RAG: Red if any critical finding or a missed committed date; Amber if any high finding or stale data; Green otherwise; Unknown if there is too little data. It is always shown beside the reported RAG and never replaces it.
 
@@ -236,6 +243,7 @@ All are deterministic and labelled `Scripted agent`. Each implements `AgentDefin
 
 Governance rules enforced in code and tested:
 - An agent can never approve, accept an outcome, or set readiness. Approval needs a named human who is not the item's assignee.
+- *Added (section 13):* a stage review can be decided only by the person holding that Core Four role on the deliverable, in order, with the Product Manager last.
 - Autonomy ceiling by risk tier: T1 may auto-apply specifically allowed changes; T2 and T3 propose only; T4 is advisory only, with no proposed changes.
 - Every run, proposal, approval and rejection appends to the audit trail.
 - Reported RAG in the portfolio system can never be changed by an agent or an approval.
@@ -377,7 +385,7 @@ Each deliverable is built by one subagent. "Model" is the cheapest that should d
 ## 7. What this build does not do
 
 - Connect to Jira, the portfolio system or any model.
-- Authenticate users or enforce roles; the presenter acts as a named sample approver.
+- Authenticate users. The presenter acts as named sample people; Core Four roles are enforced against the persona chosen in "Acting as", not a login.
 - Persist anything; a refresh returns to the seeded state.
 - Generate code, execute tests or deploy anything. Test results arrive as simulated evidence.
 - Show money or headcount.
@@ -390,6 +398,8 @@ Each deliverable is built by one subagent. "Model" is the cheapest that should d
 4. Implement `JiraSource` against the Jira API, read-only first.
 5. Implement a `ModelProvider` against the approved agent platform.
 6. Replace the Pilot evidence placeholders with the measured baseline.
+
+Section 16 expands this into a working checklist.
 
 ## 9. Where the build differs from this design
 
@@ -404,3 +414,203 @@ Each deliverable is built by one subagent. "Model" is the cheapest that should d
 - **A sixth provenance label, "Simulated evidence"**, was added to those in section 4.
 - **The on-screen name for the hierarchy** is "Simplified delivery hierarchy", set in the terminology file.
 - **Browser tests:** 43, covering every route at two widths, both themes, the guided journey, the main storyline, the agent centre with a governance refusal, the workflow walk-through and reset.
+
+---
+
+## 10. Change log
+
+| Date | Change |
+|---|---|
+| 16 Nov 2026 | First build: foundation, synthetic portfolio, engine (three measures, R1 to R14), screens, agents and governance |
+| 17 Nov 2026 | Forecast gating, data tuning, PDLC workflow screen, agent centre, guided demo, browser tests. Section 9 records the differences |
+| 18 Nov 2026 | Dev and build scripts fixed for Windows paths |
+| 19 to 22 Nov 2026 | Slide extraction planned and built: single slides, five packs, PowerPoint export, slide builder, previews (section 11) |
+| 23 Nov 2026 | Labels on/off toggle for a cleaner presenting view (section 12) |
+| 24 Nov 2026 | Sample presenter renamed by the owner |
+| 27 Nov 2026 | Core Four pod roles adopted across model, rules, workflow, screens and template blueprint (section 13) |
+
+---
+
+## 11. Slide extraction (added 19 to 22 Nov 2026)
+
+The full plan, and where the build differs from it, is in `docs/SLIDES_PLAN.md`. In short:
+
+- **What it does:** turns what the app shows into editable PowerPoint: single slides collected in a basket from any screen, or complete packs for an outcome, a Technology Deliverable, a project, a programme or the portfolio.
+- **How:** three layers. `lib/slides/extract` reads facts from the data and engine. `lib/slides/compose` turns facts into renderer-neutral slide specifications. `lib/slides/render` draws them as native PowerPoint with PptxGenJS 4.0.1, and as HTML previews in the app.
+- **Where in the app:**
+  - "Add to slides" buttons on each screen;
+  - the Slides basket in the top bar;
+  - "Export pack" buttons;
+  - the `/slides` builder;
+  - `npm run slides -- --scope <scope>` from the command line.
+- **Rules carried into slides:** reported status beside evidence-based; three measures kept separate; readiness never a percentage; scripted drafts labelled; a provenance footer on every slide; record keys in the speaker notes.
+- **Since then:** a full-size slide viewer, hover previews and a preview in the pack dialog were added.
+- **Unaffected by** the labels toggle. Slides now include the Core Four on the `td-pod` and `td-pdlc` slides.
+
+---
+
+## 12. Labels on/off (added 23 Nov 2026)
+
+**Purpose:** a crisper screen when the owner presents, and the fully labelled screen when someone runs the demo alone.
+
+- **Default: labels on.** The setting is per browser (`localStorage` key `di-labels`) and Reset demo does not change it.
+- **Control:** a small tag toggle in the top bar, with the tooltip "Labels on" or "Labels off". Shift+L also switches it, except while typing in a field. The guided demo's start popover has the same setting as a "Labels on" tick box.
+- **What hides when off:**
+  - every provenance badge (`ProvenanceBadge` and `ProvenanceBadges` carry the class `di-demo-label`);
+  - every explanatory note, wrapped in `components/ui/DemoNote.tsx` (class `di-demo-note`);
+  - table columns and card footers that hold only labels (`Card` `footerLabel`, `DataTable` and `KeyValue` `demoLabel`).
+- **Mechanism:** one CSS rule in `app/globals.css` keyed off `<html data-labels="off">`, set before first paint by `components/shell/theme-script.ts`.
+- **What never hides:**
+  - controls, figures and status pills;
+  - section descriptions;
+  - the "Prototype" marker that replaces the top bar's labels;
+  - the sidebar line "Synthetic data for demonstration only";
+  - the Pilot evidence placeholder tags and intro line;
+  - the guided demo bar;
+  - exported slides.
+- **Guarding it:**
+  - `components/demo-notes.test.ts` fails if a known demo-note phrase appears outside `DemoNote`. Add new note phrases to its list.
+  - The browser suite runs twice, with labels on and off (`playwright.config.ts` projects).
+  - `e2e/labels.spec.ts` checks every route with labels off.
+
+---
+
+## 13. The Core Four (added 27 Nov 2026)
+
+**Source:** the organisation's description of the PDLC team, in which every pod has four roles and the Product Manager is the process owner with go/no-go at every gate. The mapping of roles to stages below is an interpretation of that material, held in configuration, not the official model.
+
+### Owner decisions
+1. Only the Core Four are modelled. Business Analyst, QA and architecture approvers are not.
+2. The Product Manager approves the gate at all five stages, always last, after that stage's specialist confirmations.
+3. Changes 1 to 4 of the proposal are built (roles and checks, gates, the By role screen, template fields). Change 5, governance mode and requirements validation as evidence, is in the backlog (B1).
+
+### Roles
+| Role | Short label | Owns |
+|---|---|---|
+| Product Manager | PM | The why and the value; the go/no-go decision at every gate; business acceptance of outcomes |
+| Tech Lead | Tech Lead | Architecture, feasibility and technical validation |
+| In-Business Risk Lead | Risk Lead | Naming the obligations; confirming risk and controls for the second line |
+| UX Design Lead | UX Lead | User context, journeys, accessibility and prototypes |
+
+### Gates (`lib/config/pdlc.ts`)
+| Stage | Confirms first, in order | Decides |
+|---|---|---|
+| Ideation & Requirements | Risk Lead (obligations named), UX Lead (user context) | Product Manager |
+| Design & Specifications | Tech Lead (architecture validated), UX Lead (prototype reviewed) | Product Manager |
+| Risk, Control & Compliance Reviews | Risk Lead (risk and controls confirmed for the second line) | Product Manager |
+| Build, Test & Validate | Tech Lead (technical validation; needs a passing test result) | Product Manager |
+| Delivery & Launch | Tech Lead (release checklist) | Product Manager (after business acceptance) |
+
+### Model and logic
+- **Model:** `TechDeliverable.coreTeam: Partial<Record<CoreRole, { personId; joinedAt }>>` replaces the old per-stage `reviewers`. `CoreRole` is `'product-manager' | 'tech-lead' | 'risk-lead' | 'ux-lead'`, and `ReviewRoleId` is an alias of it.
+- **Governance:** `lib/agents/governance.ts` `checkReviewDecision` refuses, with a sentence naming the person:
+  - agents;
+  - an empty seat;
+  - a non-holder;
+  - a person holding two seats;
+  - a decision made out of order.
+
+  Every refusal is audited as `governance.blocked`.
+- **Workflow read model:** `describeWorkflow(data, results, id, actingAs?)` returns each review with its holder, what they confirm and whether the acting person may decide it. It also returns `nextReview`, so the next-step control can switch persona and act in one click.
+- **Rules:** R15 and R16 are in `lib/engine/rules-team.ts`, with helpers in `lib/engine/core-team.ts`. Duplicate holders are reported under R15, not a separate R17.
+- **Rule counts on the default seed:** R1 3, R2 3, R3 22, R4 11, R5 2, R6 5, R7 3, R8 4, R9 12, R10 6, R11 7, R12 4, R13 2, R14 4, R15 4, R16 5.
+
+### Synthetic data (`lib/data/synthetic/core-team.ts`)
+Every deliverable has four distinct people, except these deliberate gaps:
+
+| Deliverable | Gap | Rules |
+|---|---|---|
+| TD-1014 (T3) | No In-Business Risk Lead | R15 high, R16 |
+| TD-1019 (T2) | No UX Design Lead | R15, R16 |
+| TD-1007 (T4) | No UX Design Lead | R15, R16 |
+| TD-1005 (T2) | One person holds the Tech Lead and UX Design Lead seats | R15 |
+| TD-1009 (T3) | Risk Lead joined after work started | R16 |
+| TD-2005 (T2) | UX Lead joined after work started | R16 |
+
+The gaps sit on deliverables that were already Amber, or are medium severity, so the headline figures did not move. These are: the evidence-based RAG mix (14 Green, 6 Amber, 4 Red, 2 Unknown), readiness (8 ready, 3 not ready, 15 unknown), the six status disagreements, and TD-1001's facts. The sample presenter is Product Manager on TD-2001 (the walk-through) and TD-1001.
+
+### Screens
+- **Workflow page:** "The Core Four review" shows one row per confirmation and a distinct "Gate · Product Manager" row. The "Acting as" list shows the Core Four first. The next-step control acts as the right person in one click. The TD-2001 walk-through is 34 clicks.
+- **Pod tab:** a Core Four panel with each seat In place, Not named, Holds two roles or Joined late.
+- **Lifecycle board:** stage headers list the confirming roles. Cards say who they are waiting on and flag gaps.
+- **By role (`/roles`):** count cards per role, then three lists: waiting on you, coming up, and seat gaps. Each "Open workflow as …" link opens the workflow with that person selected. Supports the hashes `#role=`, `#person=` and, on the workflow page, `#act-as=`.
+- **Blueprint:** the target template adds the four role pickers, governance mode, the requirements validation result (Pass, Conditional pass or Fail) and the risk sign-off reference. It also adds a capability row, and an automation rule that blocks moving past Ideation & Requirements until all four seats are filled.
+
+---
+
+## 14. Current state and how to check it
+
+**Routes (13):** portfolio, hierarchy, deliverable detail, plan, global, slides, lifecycle, PDLC workflow, by role, agent centre, blueprint, pilot evidence, about.
+
+**Checks at the last update (27 Nov 2026)**, all passing:
+
+| Command | Result |
+|---|---|
+| `npm run typecheck` | clean |
+| `npm run lint` | clean |
+| `npm test` | 464 tests in 32 files |
+| `npm run build` | static export |
+| `npm run e2e` | 151 tests, run once with labels on and once with labels off (about 3 minutes) |
+
+**Requirements:** Node 22 (22.22 or later) or 24 (24.15 or later). `npm run slides` needs Node 22.15 or later. Works on Windows, macOS and Linux.
+
+**Documents to read before changing anything:**
+- this file;
+- `CONTRACTS.md` (ownership, store hooks, actions, page pattern, the Core Four section);
+- `lib/agents/README.md` (agents, workflow actions, refusal sentences, worked walk-through);
+- `docs/SLIDES_PLAN.md` (slides);
+- `components/ui/README.md` (shared components);
+- `README.md` (running, screens, demo script).
+
+**Rules every change must keep:**
+- Synthetic data only, and no real company or internal tool names in this public repository. Internal names go in the git-ignored `lib/config/terminology.local.ts`.
+- No internal ids or the word "hero" in user-visible text.
+- Reported status always sits beside evidence-based status.
+- The three measures are never merged, and readiness is never a percentage.
+- Agents never approve, accept or set readiness.
+- Every demo note uses `DemoNote` and every provenance label uses `ProvenanceBadge`, so the labels toggle keeps working.
+- Both label modes pass the browser suite.
+
+---
+
+## 15. Backlog
+
+Ordered by value for the next MD conversation. "Model" is a suggestion for an AI coding agent; any capable engineer can do it.
+
+| # | Item | Acceptance | Main files | Model |
+|---|---|---|---|---|
+| B1 | **Governance mode and requirements validation as evidence** (proposal change 5) | Deliverable carries a governance mode chosen by the PM, advised by the Risk Lead. Evidence gains a `conditional` result. Ideation & Requirements needs a requirements validation record (Pass, Conditional pass or Fail) before the PM gate. A finding fires when a T3 or T4 deliverable uses a relaxed mode. Screens, slides and tests updated | `lib/types.ts`, `lib/config/pdlc.ts`, `lib/engine/*`, `lib/agents/governance.ts`, workflow and Pod screens | Opus |
+| B2 | **Requirements workspace adapter** | A `DataSource` addition that reads team membership, gate decisions and validation results from the requirements workspace export, mapped to `coreTeam`, reviews and evidence. Mock adapter first, with fixtures | `lib/data/*` | Opus |
+| B3 | **Read-only Jira source** (design section 8) | `JiraSource` implements `DataSource` for an allowlisted set of projects. Mapping documented. Synthetic remains the default | `lib/data/*` | Opus |
+| B4 | **Portfolio system source** | As B3, for deliverables, outcomes and reported status | `lib/data/*` | Opus |
+| B5 | **Approved model provider** | A `ModelProvider` behind the scripted agents for drafting only. Every draft still labelled and cited; governance unchanged | `lib/agents/provider.ts` | Opus |
+| B6 | **Confirm the Core Four mapping with the central PDLC team** | Gate table in section 13 confirmed or corrected in `lib/config/pdlc.ts`. Tests updated | `lib/config/pdlc.ts` | Sonnet |
+| B7 | **Guided demo: a Core Four step** | A step on the By role screen (for example the Risk Lead view) between the lifecycle board and the workflow. Script wording, README table and journey test updated | `lib/config/demo-script.ts`, `e2e/journey.spec.ts` | Sonnet |
+| B8 | **Slides for the By role view** | A `role-queue` slide kind and an optional slide in the portfolio pack | `lib/slides/*` | Sonnet |
+| B9 | **Pilot evidence placeholders** | Replace placeholder savings figures with empty chart frames until a baseline is measured, then wire in the measured baseline | `components/evidence/*` | Sonnet |
+| B10 | **Corporate slide template** | A template-based renderer (for example python-pptx) that fills the official master; see `docs/SLIDES_PLAN.md` section 7 | new service | Opus |
+| B11 | **Open in PowerPoint** | Deliverable, programme and portfolio packs opened in PowerPoint and checked slide by slide; fixes logged | `lib/slides/render/*` | Sonnet |
+| B12 | **Persona hash on the same page** | Changing `#act-as=` while already on a workflow page switches the persona (today only arrival by navigation does) | `components/workflow/WorkflowScreen.tsx` | Sonnet |
+| B13 | **Same-page hash links** | Screens that listen only to `hashchange` also respond to router pushes on the same path | screens with hash support | Sonnet |
+
+### Open questions for the owner
+1. **Moving back from Build:** a failing test at Build, Test & Validate moves the deliverable back one stage, to Risk, Control & Compliance Reviews. Should a failure instead surface at Delivery & Launch and move back to Build?
+2. **Parent status:** a programme's evidence-based status is its worst deliverable's. Is a weighted view wanted?
+3. **Records-cited appendix:** it is 4 slides in the TD-1001 pack. Should it be capped, or moved into the speaker notes?
+4. **Repository visibility:** the root `README.md` still describes the repository as private. It is public.
+5. **R17:** should a person holding two seats become its own rule? It would need a second example in the data.
+
+---
+
+## 16. Continuing inside the firm
+
+1. **Import** the repository into the internal GitHub, then run `npm install`, `npm run dev`, and the full check list in section 14.
+2. **Internal names:** create `lib/config/terminology.local.ts` from `terminology.local.fallback.ts`. Use it for the portfolio system's real name, the template names, the requirements workspace and its agents, and the Core Four titles if they differ.
+3. **Brand:** set the colours, fonts and logo in `app/theme.css`. Slide colours mirror these in `lib/slides/render/theme.ts`, and a test fails if they drift.
+4. **Numbers:** set the real estate numbers in `lib/config/estate.ts` (for example 450 FRT and 550 Markets Tech projects).
+5. **Brief an AI coding agent** with:
+   - "Read `DESIGN.md` sections 13 to 16, `CONTRACTS.md` and `lib/agents/README.md` first";
+   - one backlog item and its acceptance;
+   - the rules in section 14;
+   - "Run every command in section 14 before reporting done".
+6. **Record** each change in section 10 and anything that differs from this design in the section for that feature.
