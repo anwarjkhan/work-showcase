@@ -3,7 +3,7 @@
  * technology deliverables, built from the catalogue.
  */
 import { HERO_DELIVERABLE_ID, PRESENTER_PERSON_ID, WORKFLOW_DELIVERABLE_ID } from '@/lib/config/story';
-import type { InvestmentRequest, PmNode, RagStatus, ReviewRoleId, TechDeliverable } from '@/lib/types';
+import type { CoreRole, InvestmentRequest, PmNode, RagStatus, TechDeliverable } from '@/lib/types';
 import {
   DELIVERABLES,
   INVESTMENT_REQUESTS,
@@ -14,6 +14,7 @@ import {
 } from './catalogue';
 import { addDays, maxDate, minDate } from './dates';
 import type { Rng } from './random';
+import { applyCoreTeamGaps, provisionalSeat } from './core-team';
 import type { Cast, ProgrammeKey, Reference } from './reference';
 
 /** Hands out Jira keys per project. Epics are allocated first, then children continue the sequence. */
@@ -37,7 +38,11 @@ const PINNED_EPIC_KEYS: Record<string, string[]> = {
   [WORKFLOW_DELIVERABLE_ID]: ['LIM-10'],
 };
 
-const REVIEW_ROLES: ReviewRoleId[] = ['requirements-owner', 'design-reviewer', 'control-owner', 'independent-validator', 'business-owner', 'release-owner'];
+/** Pinned Core Four for the story deliverables (four different people each). */
+const PINNED_CORE: Record<string, Record<CoreRole, string>> = {
+  [HERO_DELIVERABLE_ID]: { 'product-manager': PRESENTER_PERSON_ID, 'tech-lead': 'p-risk-ldn-1', 'risk-lead': 'p-ctl-1', 'ux-lead': 'p-dsg-1' },
+  [WORKFLOW_DELIVERABLE_ID]: { 'product-manager': PRESENTER_PERSON_ID, 'tech-lead': 'p-xva-nyc-1', 'risk-lead': 'p-ctl-1', 'ux-lead': 'p-dsg-1' },
+};
 
 export interface Hierarchy {
   investmentRequests: InvestmentRequest[];
@@ -78,17 +83,29 @@ export function buildHierarchy(root: Rng, ref: Reference): Hierarchy {
     const dr = rng.fork(spec.id);
     const epicKeys = PINNED_EPIC_KEYS[spec.id] ?? spec.epics.map(() => keys.next(spec.programme));
 
-    const reviewers: Partial<Record<ReviewRoleId, string>> = {};
-    for (const role of REVIEW_ROLES) {
-      let holder: string;
-      if (spec.id === WORKFLOW_DELIVERABLE_ID) holder = PRESENTER_PERSON_ID;
-      else if (spec.id === HERO_DELIVERABLE_ID) {
-        holder = { 'requirements-owner': 'p-owner-1', 'design-reviewer': 'p-owner-1', 'control-owner': 'p-ctl-1', 'independent-validator': 'p-val-1', 'business-owner': PRESENTER_PERSON_ID, 'release-owner': 'p-owner-1' }[role];
-      } else if (role === 'business-owner' && spec.programme === 'limits') holder = PRESENTER_PERSON_ID;
-      else if (role === 'business-owner' && spec.programme === 'stress') holder = cast.owners.stress;
-      else holder = dr.pick(cast.pools[role]);
-      reviewers[role] = holder;
+    // Core Four. The six pool draws happen in their original order for every generated
+    // deliverable, so the seeded stream (and the report dates drawn after it) is unchanged.
+    // The Product Manager, Risk Lead and UX Design Lead come from their pools (limits work
+    // is product-managed by the presenter, stress tooling by its head of tooling); the Tech
+    // Lead is the pod's lead. Join dates are settled once work items exist (core-team.ts).
+    let core: Record<CoreRole, string>;
+    const pinned = PINNED_CORE[spec.id];
+    if (pinned) core = pinned;
+    else {
+      dr.pick(cast.pools.analysis);
+      const ux = dr.pick(cast.pools.ux);
+      const risk = dr.pick(cast.pools.risk);
+      dr.pick(cast.pools.validation);
+      const product = spec.programme === 'limits' ? PRESENTER_PERSON_ID : spec.programme === 'stress' ? cast.owners.stress : dr.pick(cast.pools.product);
+      dr.pick(cast.pools.release);
+      core = { 'product-manager': product, 'tech-lead': podLead(spec.podId), 'risk-lead': risk, 'ux-lead': ux };
     }
+    const coreTeam = applyCoreTeamGaps(spec.id, {
+      'product-manager': provisionalSeat(core['product-manager'], spec.start),
+      'tech-lead': provisionalSeat(core['tech-lead'], spec.start),
+      'risk-lead': provisionalSeat(core['risk-lead'], spec.start),
+      'ux-lead': provisionalSeat(core['ux-lead'], spec.start),
+    });
 
     return {
       id: spec.id,
@@ -107,7 +124,7 @@ export function buildHierarchy(root: Rng, ref: Reference): Hierarchy {
       hubIds: spec.hubs,
       podId: spec.podId,
       ownerId: spec.ownerId ?? podLead(spec.podId),
-      reviewers,
+      coreTeam,
       plannedStart: spec.start,
       plannedEnd: spec.end,
       reportedForecastEnd: spec.forecast ?? null,

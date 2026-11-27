@@ -4,7 +4,7 @@
  *
  * `computeAll(data, clock)` is the contract the store calls on load and after
  * every data change. It indexes the snapshot once (buildContext), computes the
- * three independent measures, runs rules R1 to R14, derives evidence-based RAG
+ * three independent measures, runs rules R1 to R16, derives evidence-based RAG
  * beside the reported RAG, rolls up the hierarchy and builds the plan model.
  *
  * Helpers for screens and agents are re-exported below: plan windows and bar
@@ -61,6 +61,10 @@ export { dependencyLateDays, isDependencyLate, isDependencyOpen, isDependencyTro
 export { RULES, RULE_IDS, runRules, compareFindings } from './findings';
 export { statusDisagreements, worstRag, rollupRag, missedMilestones } from './rag';
 export { titleSimilarity } from './rules-raid';
+export { missingRoleSeverity } from './rules-team';
+
+// --- Core Four ----------------------------------------------------------------
+export { coreTeamSeats, missingCoreRoles, sharedCoreSeats, rolesHeldBy, coreRoleHolder, workStartedAt, latestJoin, type CoreSeatView } from './core-team';
 
 // --- Roll-ups ---------------------------------------------------------------
 export { computeHierarchyRollups, rollupMeasures, type HierarchyRollup, type HierarchyRollups, type MeasureRollup } from './rollups';

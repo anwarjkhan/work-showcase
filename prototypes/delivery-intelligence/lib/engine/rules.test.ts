@@ -445,6 +445,92 @@ describe('R14 Epic with no Deliverable ID, or one that does not exist', () => {
   });
 });
 
+describe('R15 Core Four incomplete', () => {
+  it('hits high: a T3 deliverable with no In-Business Risk Lead (raised by config)', () => {
+    const data = change(baseline(), (d) => {
+      d.deliverables[0]!.riskTier = 'T3';
+      delete d.deliverables[0]!.coreTeam['risk-lead'];
+    });
+    const fs = findings(data, 'R15');
+    expect(fs).toHaveLength(1);
+    expect(fs[0]).toMatchObject({ severity: 'high', subject: { kind: 'deliverable', id: 'td-1' }, deliverableId: 'td-1' });
+    expect(fs[0]!.message).toBe(`TD-1 has no ${terms.coreRoles['risk-lead']} named in its Core Four; ${terms.riskTiers.T3} work needs that role filled before it moves on.`);
+    expect(fs[0]!.evidence).toContainEqual({ kind: 'person', id: 'p-accept' });
+  });
+
+  it('hits medium: a missing risk lead on T1, or a missing UX Design Lead on T3; lists every missing role', () => {
+    const t1 = change(baseline(), (d) => {
+      delete d.deliverables[0]!.coreTeam['risk-lead'];
+    });
+    expect(findings(t1, 'R15').map((f) => f.severity)).toEqual(['medium']);
+    const t3 = change(baseline(), (d) => {
+      d.deliverables[0]!.riskTier = 'T3';
+      delete d.deliverables[0]!.coreTeam['ux-lead'];
+      delete d.deliverables[0]!.coreTeam['tech-lead'];
+    });
+    const [f] = findings(t3, 'R15');
+    expect(f!.severity).toBe('medium');
+    expect(f!.message).toBe('TD-1 has no Tech Lead and UX Design Lead named in its Core Four.');
+  });
+
+  it('hits medium: one person holding two core roles, as its own finding', () => {
+    const data = change(baseline(), (d) => {
+      d.deliverables[0]!.coreTeam['ux-lead'] = { personId: 'p-owner', joinedAt: '2026-12-01' };
+    });
+    const fs = findings(data, 'R15');
+    expect(fs).toHaveLength(1);
+    expect(fs[0]).toMatchObject({ severity: 'medium', id: 'f-R15-deliverable-td-1-shared-p-owner' });
+    expect(fs[0]!.message).toBe('Olive Owner holds both the Tech Lead and UX Design Lead roles on TD-1; each core role needs a different person.');
+    expect(fs[0]!.evidence).toContainEqual({ kind: 'person', id: 'p-owner' });
+  });
+
+  it('misses: four different people in the four seats', () => {
+    expect(findings(baseline(), 'R15')).toEqual([]);
+  });
+});
+
+describe('R16 work started before the Core Four was complete', () => {
+  it('hits: the risk lead joined after the first story-level item was resolved', () => {
+    const data = change(baseline(), (d) => {
+      d.deliverables[0]!.coreTeam['risk-lead'] = { personId: 'p-risk', joinedAt: '2027-02-25' };
+    });
+    const fs = findings(data, 'R16');
+    expect(fs).toHaveLength(1);
+    expect(fs[0]).toMatchObject({ severity: RULE_SEVERITY.R16, subject: { kind: 'deliverable', id: 'td-1' } });
+    expect(fs[0]!.message).toBe(
+      'Work on TD-1 had started by 20 Feb 2027 (S-1 had moved out of to do) before its Core Four was complete: the In-Business Risk Lead (Rita Risk) joined on 25 Feb 2027.',
+    );
+    expect(fs[0]!.evidence).toEqual(expect.arrayContaining([{ kind: 'work-item', id: 'S-1' }, { kind: 'person', id: 'p-risk' }]));
+  });
+
+  it('hits: work in progress while a role is still unfilled (an in-progress item counts from its last update)', () => {
+    const data = change(baseline(), (d) => {
+      delete d.deliverables[0]!.coreTeam['ux-lead'];
+      d.workItems.push(story('S-0', 'E-1', 'oc-1', { status: 'In Progress', statusCategory: 'in-progress', resolved: null, updated: '2027-02-10T09:00:00.000Z' }));
+    });
+    const [f] = findings(data, 'R16');
+    expect(f!.message).toBe('Work on TD-1 had started by 10 Feb 2027 (S-0 had moved out of to do) before its Core Four was complete: the UX Design Lead role is still unfilled.');
+  });
+
+  it('misses: everyone joined on or before the day work started', () => {
+    const data = change(baseline(), (d) => {
+      d.deliverables[0]!.coreTeam['risk-lead'] = { personId: 'p-risk', joinedAt: '2027-02-20' };
+    });
+    expect(findings(data, 'R16')).toEqual([]);
+    expect(findings(baseline(), 'R16')).toEqual([]);
+  });
+
+  it('misses: a late join or an empty seat while all work is still to do', () => {
+    const data = change(baseline(), (d) => {
+      d.deliverables[0]!.coreTeam['risk-lead'] = { personId: 'p-risk', joinedAt: '2027-03-05' };
+      delete d.deliverables[0]!.coreTeam['ux-lead'];
+      d.workItems = d.workItems.map((w) => (w.type === 'story' ? { ...w, status: 'To Do', statusCategory: 'to-do', resolved: null } : w));
+    });
+    expect(findings(data, 'R16')).toEqual([]);
+    expect(findings(data, 'R15')).toHaveLength(1);
+  });
+});
+
 describe('finding order', () => {
   it('sorts worst first, then by rule number', () => {
     const data = withProvider((d) => {

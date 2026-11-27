@@ -1,5 +1,6 @@
 import type {
   AgentId,
+  CoreRole,
   EvidenceKind,
   IsoDateTime,
   PdlcReviewState,
@@ -15,6 +16,30 @@ export interface WorkProductDefinition {
   label: string;
 }
 
+/** What a role confirms at one review. */
+export interface ReviewConfirmation {
+  /** Verb phrase that follows "to", e.g. "confirm risk and controls" ("Waiting on … to confirm risk and controls."). */
+  confirms: string;
+  /** Short outcome phrase for chips and tables, e.g. "Risk and controls confirmed for the second line". */
+  confirmed: string;
+}
+
+/** The Core Four, in display order. Labels are in `terms.coreRoles`. */
+export const CORE_ROLES: readonly CoreRole[] = ['product-manager', 'tech-lead', 'risk-lead', 'ux-lead'] as const;
+
+/** The role that owns the process and takes the go / no-go decision at every stage gate. */
+export const GATE_ROLE: CoreRole = 'product-manager';
+
+/** One line on what each core role brings (for tooltips and the pod view). */
+export const CORE_ROLE_SUMMARY: Record<CoreRole, string> = {
+  'product-manager': 'Business. Owns the process and takes the go / no-go decision at every stage gate.',
+  'tech-lead': 'Technology. Owns the architecture, feasibility and the technical truth of the work.',
+  'risk-lead': 'First line of defence. Names the obligations and confirms risk and controls for the second line, with a named audit trail.',
+  'ux-lead': 'Design and research. Owns the user journey, accessibility and prototypes.',
+};
+
+const GATE: ReviewConfirmation = { confirms: 'approve the stage gate', confirmed: 'Go / no-go decision on the stage gate' };
+
 export interface PdlcStageDefinition {
   id: PdlcStageId;
   /** 1..5 */
@@ -26,16 +51,28 @@ export interface PdlcStageDefinition {
   workProducts: WorkProductDefinition[];
   /** Agents that assist in this stage (catalogue ids; implementations in lib/agents). */
   agentAssist: AgentId[];
-  /** Human reviews, in the order they must happen. Forward movement needs all approved. */
+  /**
+   * Human reviews, in the order they must happen, each decided by the holder of that
+   * core role. The Product Manager's gate decision is always last. Forward movement
+   * needs all approved.
+   */
   reviews: ReviewRoleId[];
+  /** What each reviewing role confirms in this stage, for the UI and refusal sentences. */
+  confirms: Partial<Record<ReviewRoleId, ReviewConfirmation>>;
+  /**
+   * Evidence a review looks at, so it should be held and passing before the review is
+   * decided (a guide for the screen's next step; the store does not enforce it).
+   */
+  evidenceBefore: Partial<Record<ReviewRoleId, EvidenceKind>>;
   /** Evidence the stage should leave behind. */
   evidenceLeft: EvidenceKind[];
 }
 
 /**
- * The five PDLC stages (design section 5). Reviews are illustrative and set
- * here; they are not presented as the firm's official gates. Movement is
- * allowed forward and back between neighbours only.
+ * The five PDLC stages (design section 5). Each stage's reviews are decided by
+ * the deliverable's Core Four: the specialist confirmations first, then the
+ * Product Manager's gate decision. Movement is allowed forward and back between
+ * neighbours only.
  */
 export const PDLC_STAGES: readonly PdlcStageDefinition[] = [
   {
@@ -50,7 +87,13 @@ export const PDLC_STAGES: readonly PdlcStageDefinition[] = [
       { id: 'stories', label: 'Stories with acceptance criteria' },
     ],
     agentAssist: ['requirements-structuring'],
-    reviews: ['requirements-owner'],
+    reviews: ['risk-lead', 'ux-lead', 'product-manager'],
+    confirms: {
+      'risk-lead': { confirms: 'name the obligations that apply', confirmed: 'Obligations named' },
+      'ux-lead': { confirms: 'confirm the user context', confirmed: 'User context confirmed' },
+      'product-manager': GATE,
+    },
+    evidenceBefore: {},
     evidenceLeft: ['requirements-sign-off'],
   },
   {
@@ -65,7 +108,13 @@ export const PDLC_STAGES: readonly PdlcStageDefinition[] = [
       { id: 'test-approach', label: 'Test approach' },
     ],
     agentAssist: ['outcome-mapping'],
-    reviews: ['design-reviewer'],
+    reviews: ['tech-lead', 'ux-lead', 'product-manager'],
+    confirms: {
+      'tech-lead': { confirms: 'validate the architecture', confirmed: 'Architecture validated' },
+      'ux-lead': { confirms: 'review the prototype', confirmed: 'Prototype reviewed' },
+      'product-manager': GATE,
+    },
+    evidenceBefore: {},
     evidenceLeft: ['design-review'],
   },
   {
@@ -79,7 +128,12 @@ export const PDLC_STAGES: readonly PdlcStageDefinition[] = [
       { id: 'risk-assessment', label: 'Risk assessment' },
     ],
     agentAssist: ['control-evidence-check'],
-    reviews: ['control-owner'],
+    reviews: ['risk-lead', 'product-manager'],
+    confirms: {
+      'risk-lead': { confirms: 'confirm risk and controls', confirmed: 'Risk and controls confirmed for the second line' },
+      'product-manager': GATE,
+    },
+    evidenceBefore: {},
     evidenceLeft: ['control-assessment'],
   },
   {
@@ -94,7 +148,12 @@ export const PDLC_STAGES: readonly PdlcStageDefinition[] = [
       { id: 'validation-report', label: 'Validation report' },
     ],
     agentAssist: ['release-readiness'],
-    reviews: ['independent-validator'],
+    reviews: ['tech-lead', 'product-manager'],
+    confirms: {
+      'tech-lead': { confirms: 'confirm the technical validation', confirmed: 'Technical validation confirmed' },
+      'product-manager': GATE,
+    },
+    evidenceBefore: { 'tech-lead': 'test-result' },
     evidenceLeft: ['test-result'],
   },
   {
@@ -109,12 +168,22 @@ export const PDLC_STAGES: readonly PdlcStageDefinition[] = [
       { id: 'launch-note', label: 'Launch note' },
     ],
     agentAssist: ['release-readiness'],
-    reviews: ['business-owner', 'release-owner'],
+    reviews: ['tech-lead', 'product-manager'],
+    confirms: {
+      'tech-lead': { confirms: 'confirm the release checklist', confirmed: 'Release checklist confirmed' },
+      'product-manager': GATE,
+    },
+    evidenceBefore: { 'tech-lead': 'release-checklist', 'product-manager': 'business-acceptance' },
     evidenceLeft: ['business-acceptance', 'release-checklist'],
   },
 ] as const;
 
 export const PDLC_STAGE_IDS: PdlcStageId[] = PDLC_STAGES.map((s) => s.id);
+
+/** What `roleId` confirms in `stageId` (falls back to a generic phrase for a role the stage does not list). */
+export function reviewConfirmation(stageId: PdlcStageId, roleId: ReviewRoleId): ReviewConfirmation {
+  return stageDefinition(stageId).confirms[roleId] ?? (roleId === GATE_ROLE ? GATE : { confirms: 'confirm the stage', confirmed: 'Stage confirmed' });
+}
 
 export function stageDefinition(id: PdlcStageId): PdlcStageDefinition {
   const stage = PDLC_STAGES.find((s) => s.id === id);
@@ -140,12 +209,13 @@ export const CROSS_CUTTING_AGENTS: AgentId[] = [
 
 /**
  * Builds a fresh PdlcRun for a deliverable positioned at `currentStage`.
- * Stages before it are marked approved (their reviews approved by the named
- * reviewers when known), the current stage is in progress, later ones not
- * started. Used by data sources to seed runs; D2 may hand-tune the result.
+ * Stages before it are marked approved (each review approved by the holder of
+ * that core role when there is one, in the stage's order, the Product Manager
+ * last), the current stage is in progress, later ones not started. Used by data
+ * sources to seed runs; the synthetic source hand-tunes the result.
  */
 export function createPdlcRun(
-  deliverable: Pick<TechDeliverable, 'id' | 'reviewers'>,
+  deliverable: Pick<TechDeliverable, 'id' | 'coreTeam'>,
   currentStage: PdlcStageId,
   startedAt: IsoDateTime,
 ): PdlcRun {
@@ -154,7 +224,7 @@ export function createPdlcRun(
   PDLC_STAGES.forEach((def, index) => {
     const done = index < currentIndex;
     const reviews: PdlcReviewState[] = def.reviews.map((roleId) => {
-      const reviewerId = deliverable.reviewers[roleId] ?? null;
+      const reviewerId = deliverable.coreTeam[roleId]?.personId ?? null;
       return {
         roleId,
         state: done ? 'approved' : 'not-requested',

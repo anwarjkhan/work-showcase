@@ -30,7 +30,7 @@ All shared types are in `lib/types.ts`. Key conventions:
 - Measures that may not be computable are `Computable<T>`: check `m.computable` before reading `m.value`; otherwise show `terms.measures.notComputable` and `m.detail`.
 - `Dependency`: `from` provides, `to` receives (needs it by `needBy`).
 - `Outcome.reportedStatus` stands in for the design's `reportedOnTrack`: on track means `'on-track'` or `'complete'`.
-- `TechDeliverable.reviewers` names the human for each PDLC review role. `PortfolioData.pdlcRuns` holds each deliverable's workflow state. D5 keeps `TechDeliverable.pdlcStage` in step with `PdlcRun.currentStage`.
+- `TechDeliverable.coreTeam` holds the deliverable's Core Four: `Partial<Record<CoreRole, { personId, joinedAt }>>` for `'product-manager' | 'tech-lead' | 'risk-lead' | 'ux-lead'` (a missing key is a gap, flagged by rule R15; a late `joinedAt` by R16). Every PDLC review (`ReviewRoleId` = `CoreRole`) is decided only by the holder of that role, in the stage's order, the Product Manager's gate decision last at every stage (`checkReviewDecision` in `lib/agents/governance.ts`); one person may not hold two core roles on a deliverable. Each outcome's `acceptanceOwnerId` is its deliverable's Product Manager. `PortfolioData.pdlcRuns` holds each deliverable's workflow state. D5 keeps `TechDeliverable.pdlcStage` in step with `PdlcRun.currentStage`.
 - `EditableFields` lists every field an approved proposal may change. Reported RAG is deliberately absent.
 
 ## 4. Reading state
@@ -75,7 +75,7 @@ const result = actions.approveProposal(proposalId, actingAs);
 if (!result.ok) showReason(result.reason);   // governance refusals are results, not exceptions
 ```
 
-Actions: `startAgentRun`, `approveProposal`, `rejectProposal`, `runStageAgent`, `approveReview`, `returnReview`, `recordEvidence` (`simulated: true` for "Simulate evidence arriving"), `acceptCriterion`, `rejectCriterion`, `moveStage`, `setActingAs`. Signatures and rules are in `lib/store/actions.ts`. Reset is `useResetDemo()`; the shell already has the button.
+Actions: `startAgentRun`, `approveProposal`, `rejectProposal`, `runStageAgent`, `approveReview` and `returnReview` (by the core role holder; `describeWorkflow(data, results, id, actingAs).nextReview` gives the one-click step and whether to switch persona first), `recordEvidence` (`simulated: true` for "Simulate evidence arriving"), `acceptCriterion`, `rejectCriterion`, `moveStage`, `setActingAs`. Signatures and rules are in `lib/store/actions.ts`. Reset is `useResetDemo()`; the shell already has the button.
 
 For D5: write through `DemoStoreApi` only. `setState`/`updateData` re-run the engine when `data` changes. Use `store.nextId(prefix)` and `store.now()` for ids and timestamps (deterministic, reset by `reset()`), and `store.appendAudit({...})` for every action.
 
@@ -118,10 +118,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
 ## 7. Terminology and provenance
 
-- Every label for a system, template, tool, level or status comes from `terms` in `@/lib/config/terminology`: for example `terms.systems['portfolio-system']`, `terms.templates.rapid`, `terms.readiness['not-ready']`, `terms.evidenceKinds['test-result']`, `terms.reviewRoles['control-owner']`. Never type a system or template name in a component.
+- Every label for a system, template, tool, level or status comes from `terms` in `@/lib/config/terminology`: for example `terms.systems['portfolio-system']`, `terms.templates.rapid`, `terms.readiness['not-ready']`, `terms.evidenceKinds['test-result']`, `terms.coreRoles['risk-lead']` (short forms in `terms.coreRolesShort`). Never type a system or template name in a component.
 - Inside the firm, create the git-ignored `lib/config/terminology.local.ts` (template: `terminology.local.fallback.ts`). The build uses it automatically when it exists.
 - Provenance: `<ProvenanceBadge kind="computed" />` or `<ProvenanceBadges kinds={['scripted-agent', 'simulated']} size="sm" />` from `@/components/shell`. Kinds: `sample`, `computed`, `scripted-agent`, `reported`, `planned`, `simulated`. Every figure that is scripted, simulated or a placeholder must carry its badge.
-- Other config: `PDLC_STAGES` and `neighbourStage` (`pdlc.ts`), `RISK_TIER_POLICIES` (required evidence and autonomy per tier, in `risk-tiers.ts`), `RULE_THRESHOLDS` and `RULE_SEVERITY` (`thresholds.ts`), `ESTATE` (`estate.ts`), `ROUTES` (`routes.ts`), `HERO_DELIVERABLE_ID` and `WORKFLOW_DELIVERABLE_ID` (`story.ts`).
+- Other config: `PDLC_STAGES` (each stage's `reviews` in order, with `confirms` and `evidenceBefore` per role), `CORE_ROLES`, `GATE_ROLE`, `reviewConfirmation` and `neighbourStage` (`pdlc.ts`), `RISK_TIER_POLICIES` (required evidence and autonomy per tier, in `risk-tiers.ts`), `RULE_THRESHOLDS`, `RULE_SEVERITY` and `CORE_TEAM_SEVERITY` (`thresholds.ts`; rules R1 to R16), `ESTATE` (`estate.ts`), `ROUTES` (`routes.ts`), `HERO_DELIVERABLE_ID` and `WORKFLOW_DELIVERABLE_ID` (`story.ts`).
 
 ## 8. Theme tokens
 

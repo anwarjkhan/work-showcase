@@ -44,8 +44,8 @@ export const CATALOGUE_LIST: readonly CatalogueEntry[] = [
   entry('td-findings', 'Why the evidence says this', 'Findings, most severe first, with the records behind them.', ['deliverable']),
   entry('td-plan', 'Plan', 'Planned against forecast, milestones and dependency knock-on.', ['deliverable']),
   entry('td-raid', 'Risks, issues and dependencies', 'RAID with age and owner; inbound and outbound dependencies with days late.', ['deliverable']),
-  entry('td-pdlc', 'Lifecycle position', 'Stage rail with reviews, reviewers and evidence per stage, and any moves back.', ['deliverable']),
-  entry('td-pod', 'Pod', 'People and agent identities, and the human and agent share of work.', ['deliverable']),
+  entry('td-pdlc', 'Lifecycle position', 'Stage rail with Core Four reviews, who decides them and evidence per stage, and any moves back.', ['deliverable']),
+  entry('td-pod', 'Pod', 'The Core Four with names and join dates and any gaps, people and agent identities, and the human and agent share of work.', ['deliverable']),
   entry('td-jira-map', 'How it maps to Jira', 'The portfolio record above the boundary; its Epics and linking fields below.', ['deliverable']),
   entry('td-status', 'Weekly status', 'The status-reporting agent’s latest draft with numbered citations.', ['deliverable']),
   // Outcome

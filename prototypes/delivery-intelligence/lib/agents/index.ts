@@ -7,11 +7,11 @@
  */
 export { AGENT_CATALOGUE, AGENT_IDS, agentsForStage, crossCuttingAgents, type AgentCatalogueEntry, type AgentIconName } from './catalogue';
 export { AGENTS, AGENT_LIST, getAgent, stageAgentId, acceptsScope, checkScope, runAgent, runScopeOf, runFindings, type RunResult } from './registry';
-export { GOVERNANCE_RULES, ceilingFor, isAutoApplicable, initialStatus, checkApproval, checkRejection, requirePerson, type Check, type GovernanceCode } from './governance';
+export { GOVERNANCE_RULES, ceilingFor, isAutoApplicable, initialStatus, checkApproval, checkRejection, checkReviewDecision, requirePerson, reviewVerb, roleWithHolder, waitingOnSentence, type Check, type GovernanceCode } from './governance';
 export { applyPatch, isEditable, EDITABLE_FIELDS, type PatchResult } from './patches';
 export { playbackAt, playbackDuration, stepTimeline, type PlaybackView, type PlayState, type StepTiming } from './playback';
 export { scriptedProvider, activeProvider } from './provider';
 export { resolveRef, unresolvedRefs, type ResolvedRef } from './refs';
-export { checkSimulateWorkClosed, describeWorkflow, latestEvidence, producingStage, SIMULATE_WORK_FROM, type SimulatedStep, type StageView, type WorkflowView } from './workflow';
+export { checkSimulateWorkClosed, describeWorkflow, latestEvidence, nextReviewStep, producingStage, SIMULATE_WORK_FROM, type CoreSeat, type NextReviewStep, type ReviewView, type SimulatedStep, type StageView, type WorkflowView } from './workflow';
 export { scopeLabel, STEP_DURATION_MS } from './kit';
 export type { AgentRunScope, AgentScopeKind, ProgrammeScope, ScriptedAgent, ScriptedAgentInput, ScriptedAgentRun } from './types';

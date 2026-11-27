@@ -2,22 +2,24 @@
  * Control evidence check (read only). For each deliverable in scope it lists
  * the evidence its risk tier requires and whether each kind is held, passing,
  * failing, stale, pending or missing, and checks the fields the tier depends on:
- *   all tiers  Epics carry a valid Deliverable ID; every review role has a named person
+ *   all tiers  Epics carry a valid Deliverable ID; every Core Four role has a named
+ *              person, and no one holds two core roles
  *   T2 and up  agent-assigned items have a named human reviewer
  *   T3 and up  high and critical RAID items have an owner and a mitigation date;
  *              every outcome has at least one mandatory acceptance criterion
- *   T4         the control owner is not the deliverable owner (segregation of duties)
+ *   T4         the In-Business Risk Lead is not the deliverable owner (segregation of duties)
  * It changes nothing and proposes nothing.
  */
 import { AGENT_CATALOGUE } from '@/lib/agents/catalogue';
+import { CORE_ROLES } from '@/lib/config/pdlc';
 import { requiredEvidenceFor } from '@/lib/config/risk-tiers';
 import { terms } from '@/lib/config/terminology';
-import type { AgentRunOutput, DraftSentence, EntityRef, ReviewRoleId, RiskTier, TechDeliverable } from '@/lib/types';
+import { missingCoreRoles, sharedCoreSeats } from '@/lib/engine/core-team';
+import type { AgentRunOutput, DraftSentence, EntityRef, RiskTier, TechDeliverable } from '@/lib/types';
 import { AgentKit, listPhrases, lowerFirst, plural, ref } from '../kit';
 import type { ScriptedAgent, ScriptedAgentInput } from '../types';
 
 const meta = AGENT_CATALOGUE['control-evidence-check'];
-const ROLES: ReviewRoleId[] = ['requirements-owner', 'design-reviewer', 'control-owner', 'independent-validator', 'business-owner', 'release-owner'];
 const TIER_RANK: Record<RiskTier, number> = { T1: 1, T2: 2, T3: 3, T4: 4 };
 
 export interface ControlGap {
@@ -123,8 +125,11 @@ export function fieldGapsFor(kit: AgentKit, d: TechDeliverable): ControlGap[] {
       kit.finding('R14', 'high', ref.item(key), d.id, `${terms.hierarchy.epic} ${key} of ${d.ref} has no valid ${terms.hierarchy.deliverableIdField}.`, [dRef]);
     }
   }
-  const unnamed = ROLES.filter((r) => !d.reviewers[r] || !kit.ctx.idx.people.has(d.reviewers[r] as string));
-  if (unnamed.length > 0) gaps.push({ text: `No named person for the ${listPhrases(unnamed.map((r) => lowerFirst(terms.reviewRoles[r])))} ${unnamed.length === 1 ? 'review' : 'reviews'}.`, refs: [dRef] });
+  const unnamed = CORE_ROLES.filter((r) => missingCoreRoles(d).includes(r) || !kit.ctx.idx.people.has(d.coreTeam[r]?.personId ?? ''));
+  if (unnamed.length > 0) gaps.push({ text: `No named ${listPhrases(unnamed.map((r) => terms.coreRoles[r]))} in the ${terms.coreTeam.name}.`, refs: [dRef] });
+  for (const shared of sharedCoreSeats(d)) {
+    gaps.push({ text: `${kit.person(shared.personId)} holds the ${listPhrases(shared.roles.map((r) => terms.coreRoles[r]))} roles; each core role needs a different person.`, refs: [dRef, ref.person(shared.personId)] });
+  }
 
   if (tier >= 2) {
     const agentItems = kit.stories(d.id).filter((w) => w.assigneeType === 'agent');
@@ -145,8 +150,8 @@ export function fieldGapsFor(kit: AgentKit, d: TechDeliverable): ControlGap[] {
     const noCriteria = outcomes.filter((o) => !(kit.ctx.idx.criteriaByOutcome.get(o.id) ?? []).some((c) => c.mandatory));
     if (noCriteria.length > 0) gaps.push({ text: `${plural(noCriteria.length, 'outcome')} ${noCriteria.length === 1 ? 'has' : 'have'} no mandatory acceptance criterion: ${listPhrases(noCriteria.map((o) => o.ref))}.`, refs: noCriteria.map((o) => ref.outcome(o.id)) });
   }
-  if (tier >= 4 && d.reviewers['control-owner'] && d.reviewers['control-owner'] === d.ownerId) {
-    gaps.push({ text: `The ${lowerFirst(terms.reviewRoles['control-owner'])} (${kit.person(d.ownerId)}) is also the deliverable owner; ${terms.riskTiers.T4} needs them to be different people.`, refs: [dRef, ref.person(d.ownerId)] });
+  if (tier >= 4 && d.coreTeam['risk-lead']?.personId === d.ownerId) {
+    gaps.push({ text: `The ${terms.coreRoles['risk-lead']} (${kit.person(d.ownerId)}) is also the deliverable owner; ${terms.riskTiers.T4} needs them to be different people.`, refs: [dRef, ref.person(d.ownerId)] });
   }
   return gaps;
 }

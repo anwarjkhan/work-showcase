@@ -102,7 +102,7 @@ function checklist(kit: AgentKit, d: TechDeliverable): number {
   if (run) {
     context.push(
       reviews.length > 0
-        ? kit.sentence(`${stageName(d)} still needs the ${listPhrases(reviews.map((r) => lowerFirst(terms.reviewRoles[r.roleId])))} review.`, [ref.pdlcRun(run.id)])
+        ? kit.sentence(`${stageName(d)} still needs the ${listPhrases(reviews.map((r) => terms.coreRoles[r.roleId]))} ${reviews.length === 1 ? 'review' : 'reviews'}.`, [ref.pdlcRun(run.id)])
         : kit.sentence(`Every ${stageName(d)} review is approved.`, [ref.pdlcRun(run.id)]),
     );
   }

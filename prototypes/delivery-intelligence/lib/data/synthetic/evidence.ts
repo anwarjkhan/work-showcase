@@ -8,7 +8,7 @@
  * evidence was observed, so only the records planted as stale are stale.
  */
 import { PDLC_STAGE_IDS } from '@/lib/config/pdlc';
-import type { Evidence, EvidenceKind, PdlcStageId, ReviewRoleId, SourceSystemId, WorkItem } from '@/lib/types';
+import type { CoreRole, Evidence, EvidenceKind, PdlcStageId, SourceSystemId, WorkItem } from '@/lib/types';
 import { PENDING_RELEASE, type DeliverableSpec } from './catalogue';
 import { addDays, clampDate, dateOf, daysBetween, stamp, stampOn, TODAY } from './dates';
 import type { Hierarchy } from './hierarchy';
@@ -34,12 +34,13 @@ const KIND_SOURCE: Record<EvidenceKind, SourceSystemId> = {
   'release-checklist': 'release-tool',
 };
 
-const KIND_REVIEWER: Partial<Record<EvidenceKind, ReviewRoleId>> = {
-  'requirements-sign-off': 'requirements-owner',
-  'design-review': 'design-reviewer',
-  'control-assessment': 'control-owner',
-  'business-acceptance': 'business-owner',
-  'release-checklist': 'release-owner',
+/** Core role that records each kind (test results arrive from the test harness, unrecorded). */
+const KIND_REVIEWER: Partial<Record<EvidenceKind, CoreRole>> = {
+  'requirements-sign-off': 'product-manager',
+  'design-review': 'tech-lead',
+  'control-assessment': 'risk-lead',
+  'business-acceptance': 'product-manager',
+  'release-checklist': 'tech-lead',
 };
 
 const KIND_PREFIX: Record<EvidenceKind, string> = {
@@ -84,7 +85,7 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
         evidence.push({
           id: `ev-${spec.n}-rs-01`, kind: 'requirements-sign-off', title: `Requirements sign-off — ${trimTitle(spec.title)}`, deliverableId: spec.id, outcomeId: null, workItemKey: own,
           stageId: 'ideation-requirements', result: 'pending', source: 'document-store', sourceRef: `DOC-${(docCounter += 7)}`, observedAt: stamp(addDays(TODAY, -1), 18, 0),
-          recordedById: deliverable.reviewers['requirements-owner'] ?? null, provenance: 'sample',
+          recordedById: deliverable.coreTeam['product-manager']?.personId ?? null, provenance: 'sample',
         });
       }
       continue;
@@ -132,7 +133,8 @@ export function buildEvidence(root: Rng, hierarchy: Hierarchy, plan: OutcomePlan
         source: KIND_SOURCE[kind],
         sourceRef: kind === 'test-result' ? `RUN-${(runCounter += dr.int(1, 4))}` : `${KIND_PREFIX[kind]}-${(docCounter += dr.int(3, 19))}`,
         observedAt: when.stamp ?? stamp(when.date, 18, dr.int(0, 59)),
-        recordedById: role ? (deliverable.reviewers[role] ?? null) : null,
+        // A gap in the Core Four falls back to the Product Manager as recorder.
+        recordedById: role ? (deliverable.coreTeam[role]?.personId ?? deliverable.coreTeam['product-manager']?.personId ?? null) : null,
         provenance: 'sample',
       };
       evidence.push(record);

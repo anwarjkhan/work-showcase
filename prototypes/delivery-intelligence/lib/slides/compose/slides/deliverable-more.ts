@@ -7,8 +7,8 @@ import { daysBetween } from '@/lib/config/clock';
 import { stageDefinition } from '@/lib/config/pdlc';
 import { routeById } from '@/lib/config/routes';
 import { terms } from '@/lib/config/terminology';
-import type { EntityRef, PdlcStageStatus, ReviewState, Severity } from '@/lib/types';
-import { date, personName, plural } from '../../extract';
+import type { CoreRole, EntityRef, PdlcStageStatus, ReviewState, Severity } from '@/lib/types';
+import { date, personName, plural, type CoreSeatLine } from '../../extract';
 import type { Cell, StageView, Tone } from '../../types';
 import { at, callout, col, makeSlide, table, text, TITLE_TARGET, toned, type SlideBuilder } from '../kit';
 import { factsOf } from './deliverable';
@@ -85,7 +85,19 @@ export const tdPdlc: SlideBuilder = (input) => {
   const currentIndex = wf.stages.findIndex((s) => s.current);
   const backInto = new Map<string, string>();
   for (const m of wf.run.moves) if (m.direction === 'back') backInto.set(m.to, stageDefinition(m.from).name);
-  const reviewText = (r: (typeof wf.stages)[number]['reviews'][number]) => `${terms.reviewRoles[r.roleId]} ${reviewState(r.state)} (${personName(env, r.reviewerId)})`;
+  type Review = (typeof wf.stages)[number]['reviews'][number];
+  const reviewText = (r: Review) => `${r.roleShort} ${reviewState(r.state)} (${r.personName ?? terms.coreTeam.missing.toLowerCase()})`;
+  /** One stage's reviews: compact once all are approved ("Risk Lead and UX Lead confirmed; gate approved by …"). */
+  const reviewsText = (reviews: Review[]): string => {
+    if (reviews.length === 0) return '—';
+    const gate = reviews.find((r) => r.gate);
+    const specialists = reviews.filter((r) => !r.gate);
+    if (reviews.every((r) => r.state === 'approved') && gate) {
+      const confirmed = specialists.length > 0 ? `${specialists.map((r) => r.roleShort).join(' and ')} confirmed; ` : '';
+      return `${confirmed}gate approved by ${gate.personName ?? terms.coreTeam.missing.toLowerCase()}`;
+    }
+    return reviews.map(reviewText).join('; ');
+  };
   const stages: StageView[] = wf.stages.map((s, i) => {
     const state = s.current ? 'current' : i < currentIndex ? 'done' : 'not-started';
     const approvedBy = s.reviews.flatMap((r) => r.decisions.filter((d) => d.decision === 'approved').map((d) => personName(env, d.reviewerId)));
@@ -103,7 +115,7 @@ export const tdPdlc: SlideBuilder = (input) => {
   const current = wf.stages[currentIndex];
   const next = current?.reviews.find((r) => r.next);
   // The first wording that fits on one line wins: full stage name, short name, then without the review state.
-  const role = next ? terms.reviewRoles[next.roleId].toLowerCase() : '';
+  const role = next ? next.roleLabel : '';
   const candidates = current
     ? [current.definition.name, current.definition.shortName].flatMap((stage) => (next ? [`${ref} in ${stage}; ${role} ${reviewState(next.state)}`, `${ref} in ${stage}; ${role} review next`] : [`${ref} in ${stage}; all reviews approved`]))
     : [`${ref} lifecycle position`];
@@ -112,7 +124,7 @@ export const tdPdlc: SlideBuilder = (input) => {
   const rows: Cell[][] = wf.stages.map((s) => [
     s.definition.name,
     STAGE_STATUS[s.state.status],
-    s.reviews.map(reviewText).join('; ') || '—',
+    reviewsText(s.reviews),
     s.evidence.map((e) => `${terms.evidenceKinds[e.kind]}: ${e.result === 'missing' ? 'missing' : terms.evidenceResults[e.result].toLowerCase()}`).join('; ') || '—',
   ]);
   const backMoves = wf.run.moves.filter((m) => m.direction === 'back');
@@ -151,12 +163,44 @@ export const tdPod: SlideBuilder = (input) => {
   const totalItems = f.workShare.human + f.workShare.agent;
   const agentShare = totalItems === 0 ? 'No work' : `${Math.round((f.workShare.agent / totalItems) * 100)}%`;
   const hub = (id: string | null) => (id ? env.idx.hubs.get(id)?.name ?? '—' : '—');
+  const roleLabel = (r: CoreRole) => terms.coreRoles[r];
+  const flagCell = (s: CoreSeatLine): Cell => {
+    switch (s.flag) {
+      case 'missing':
+        return toned(terms.coreTeam.missing, 'red', true);
+      case 'shared':
+        return toned(`Also ${s.alsoHolds.map((r) => terms.coreRolesShort[r]).join(', ')}`, 'amber');
+      case 'late':
+        return toned(terms.coreTeam.joinedLate, 'amber');
+      case 'in-place':
+        return toned(terms.coreTeam.inPlace, 'green');
+    }
+  };
+  const coreRows: Cell[][] = f.coreTeam.map((s) => [roleLabel(s.roleId), s.personId ? personName(env, s.personId) : '—', s.joinedAt ? date(s.joinedAt) : '—', flagCell(s)]);
+  const missing = f.coreTeam.filter((s) => s.flag === 'missing').map((s) => roleLabel(s.roleId));
+  const shared = f.coreTeam.filter((s) => s.flag === 'shared');
+  const late = f.coreTeam.filter((s) => s.flag === 'late').map((s) => roleLabel(s.roleId));
+  const gaps: string[] = [];
+  if (missing.length > 0) gaps.push(`no ${listOf(missing)}`);
+  if (shared.length > 0) gaps.push(`${personName(env, shared[0]!.personId)} holds two core roles`);
+  if (late.length > 0) gaps.push(`the ${listOf(late)} joined after work started`);
+  const coreName = terms.coreTeam.name;
+  const candidates =
+    gaps.length > 0
+      ? [`${ref} ${coreName} gaps: ${gaps.join('; ')}`, `${ref} ${coreName} has ${plural(gaps.length, 'gap')}`]
+      : [`${ref} ${coreName} in place; ${f.pod.name}: ${plural(f.members.length, 'person', 'people')}, ${plural(f.agents.length, 'agent')}`, `${ref} ${coreName} in place before work started`];
+  const title = candidates.find((t) => t.length <= TITLE_TARGET) ?? (candidates.at(-1) as string);
+  const coreSay =
+    gaps.length > 0
+      ? `The ${coreName} of ${ref} is not complete: ${gaps.join('; ')}.`
+      : `${ref} has its full ${coreName}, four different people, all in place before work started.`;
   return [
     makeSlide(input, {
       kind: 'td-pod',
-      title: `${f.pod.name}: ${plural(f.members.length, 'person', 'people')}, ${plural(f.agents.length, 'agent')}`,
+      title,
       layout: 'two-column',
       blocks: [
+        at('left', table([col(coreName, 3), col('Name', 3), col('Joined', 2), col('Status', 3, { maxChars: 32 })], coreRows)),
         at('left', {
           type: 'kpis',
           items: [
@@ -165,7 +209,7 @@ export const tdPod: SlideBuilder = (input) => {
             { label: 'Agent share of items', value: agentShare, caption: `${f.workShare.agent} of ${totalItems} items assigned to agents` },
           ],
         }),
-        at('left', table([col('Name', 3), col('Title', 3, { maxChars: 28 }), col('Hub', 2)], f.members.map((p) => [p.name, p.title, hub(p.hubId)]), 'No people are recorded in this pod.')),
+        at('right', table([col('Name', 3), col('Title', 3, { maxChars: 28 }), col('Hub', 2)], f.members.map((p) => [p.name, p.title, hub(p.hubId)]), 'No people are recorded in this pod.')),
         at(
           'right',
           table(
@@ -175,12 +219,16 @@ export const tdPod: SlideBuilder = (input) => {
           ),
         ),
       ],
-      say: `${f.pod.name} in ${hub(f.pod.hubId)} delivers ${ref}. Agents carry ${f.workShare.agent} of ${totalItems} items; each agent identity has a named accountable owner.`,
-      refs: [dRef],
+      say: `${coreSay} ${f.pod.name} in ${hub(f.pod.hubId)} delivers ${ref}. Agents carry ${f.workShare.agent} of ${totalItems} items; each agent identity has a named accountable owner.`,
+      refs: [dRef, ...f.coreTeam.flatMap((s) => (s.personId ? [{ kind: 'person' as const, id: s.personId }] : []))],
       provenance: ['computed', 'reported'],
     }),
   ];
 };
+
+function listOf(parts: string[]): string {
+  return parts.length <= 1 ? (parts[0] ?? '') : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
 
 export const tdJiraMap: SlideBuilder = (input) => {
   const f = factsOf(input);

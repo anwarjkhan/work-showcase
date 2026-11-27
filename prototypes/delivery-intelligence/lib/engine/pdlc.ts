@@ -2,12 +2,13 @@
  * PDLC workflow transition checks, as pure functions returning a result with a
  * reason the UI can show. Rules (design section 5):
  *   forward  only to the next stage, and only when every review the current stage
- *            requires is approved
+ *            requires is approved (the Core Four confirmations, then the Product
+ *            Manager's gate decision)
  *   back     only to the previous stage, always allowed, but a reason is required
  *   other    moves to a non-neighbouring stage (or the same stage) are refused
  * Store actions (D5) perform the move; these functions only decide.
  */
-import { neighbourStage, PDLC_STAGE_IDS, stageDefinition } from '@/lib/config/pdlc';
+import { neighbourStage, PDLC_STAGE_IDS, reviewConfirmation, stageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
 import type { EvidenceKind, PdlcRun, PdlcStageId, ReadinessAssessment, ReviewRoleId, ReviewState } from '@/lib/types';
 import { evidenceKindLabel, listPhrases, lowerFirst } from './messages';
@@ -55,14 +56,14 @@ export function canMoveForward(run: PdlcRun): TransitionCheck {
   }
   const outstanding = outstandingReviews(run, from);
   if (outstanding.length > 0) {
-    const parts = outstanding.map((r) => `${lowerFirst(terms.reviewRoles[r.roleId])} review (${lowerFirst(reviewStateLabel(r.state))})`);
+    const parts = outstanding.map((r) => `the ${terms.coreRoles[r.roleId]} to ${reviewConfirmation(from, r.roleId).confirms} (${lowerFirst(reviewStateLabel(r.state))})`);
     return {
       allowed: false,
       direction: 'forward',
       from,
       to,
       code: 'review-not-approved',
-      reason: `Moving to ${stageName(to)} needs the ${listPhrases(parts)} approved first.`,
+      reason: `Moving to ${stageName(to)} needs ${listPhrases(parts)}.`,
       outstandingReviews: outstanding,
     };
   }

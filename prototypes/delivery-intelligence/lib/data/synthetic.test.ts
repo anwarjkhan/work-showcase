@@ -101,7 +101,7 @@ describe('referential integrity', () => {
       expect(pods.has(d.podId)).toBe(true);
       expect(people.has(d.ownerId)).toBe(true);
       for (const h of d.hubIds) expect(hubs.has(h)).toBe(true);
-      for (const p of Object.values(d.reviewers)) expect(people.has(p as string)).toBe(true);
+      for (const seat of Object.values(d.coreTeam)) expect(people.has(seat!.personId)).toBe(true);
       for (const k of d.epicKeys) expect(epicKeys.has(k)).toBe(true);
     }
     for (const p of data.pods) {
@@ -320,7 +320,7 @@ describe('integration with the engine', () => {
   it('gives every rule a few natural hits and none a flood', () => {
     const counts = new Map<RuleId, number>();
     for (const f of result.findings) counts.set(f.ruleId, (counts.get(f.ruleId) ?? 0) + 1);
-    for (let i = 1; i <= 14; i += 1) {
+    for (let i = 1; i <= 16; i += 1) {
       const rule = `R${i}` as RuleId;
       expect(counts.get(rule) ?? 0, rule).toBeGreaterThanOrEqual(2);
       expect(counts.get(rule) ?? 0, rule).toBeLessThanOrEqual(25);
@@ -345,6 +345,57 @@ describe('integration with the engine', () => {
     const r11 = new Set(result.findings.filter((f) => f.ruleId === 'R11').map((f) => f.deliverableId));
     for (const id of [HERO_DELIVERABLE_ID, 'td-1005', 'td-1008', 'td-1009', 'td-1014', 'td-2006']) expect(r11.has(id), id).toBe(true);
     expect(r11.size).toBeLessThanOrEqual(8);
+  });
+});
+
+describe('the Core Four', () => {
+  const result = computeAll(data, DEMO_CLOCK);
+  const roles = ['product-manager', 'tech-lead', 'risk-lead', 'ux-lead'] as const;
+  const byId = (id: string) => data.deliverables.find((d) => d.id === id)!;
+  const distinct = (id: string) => new Set(roles.map((r) => byId(id).coreTeam[r]?.personId)).size;
+
+  it('gives every deliverable four different people except the deliberate gaps', () => {
+    const missing = data.deliverables.filter((d) => roles.some((r) => !d.coreTeam[r])).map((d) => d.id).sort();
+    expect(missing).toEqual(['td-1007', 'td-1014', 'td-1019']);
+    expect(byId('td-1014').coreTeam['risk-lead']).toBeUndefined();
+    expect(['T3', 'T4']).toContain(byId('td-1014').riskTier);
+    const shared = data.deliverables.filter((d) => roles.every((r) => d.coreTeam[r]) && distinct(d.id) < 4).map((d) => d.id);
+    expect(shared).toEqual(['td-1005']);
+    for (const d of data.deliverables.filter((x) => !['td-1007', 'td-1014', 'td-1019', 'td-1005'].includes(x.id))) expect(distinct(d.id), d.id).toBe(4);
+  });
+
+  it('pins a complete Core Four on the hero and the walk-through, with the presenter as walk-through Product Manager', () => {
+    expect(distinct(HERO_DELIVERABLE_ID)).toBe(4);
+    expect(distinct(WORKFLOW_DELIVERABLE_ID)).toBe(4);
+    expect(byId(WORKFLOW_DELIVERABLE_ID).coreTeam['product-manager']?.personId).toBe(PRESENTER_PERSON_ID);
+    for (const id of [HERO_DELIVERABLE_ID, WORKFLOW_DELIVERABLE_ID]) {
+      expect(result.findings.filter((f) => f.deliverableId === id && (f.ruleId === 'R15' || f.ruleId === 'R16'))).toEqual([]);
+    }
+  });
+
+  it('makes each outcome\'s acceptance owner its deliverable\'s Product Manager', () => {
+    for (const o of data.outcomes) expect(o.acceptanceOwnerId, o.id).toBe(byId(o.deliverableId).coreTeam['product-manager']?.personId);
+  });
+
+  it('flags exactly the deliberate gaps, high only for the T3 deliverable missing its risk lead', () => {
+    const r15 = result.findings.filter((f) => f.ruleId === 'R15');
+    expect(r15.map((f) => `${f.deliverableId}:${f.severity}`).sort()).toEqual(['td-1005:medium', 'td-1007:medium', 'td-1014:high', 'td-1019:medium']);
+    const r16 = result.findings.filter((f) => f.ruleId === 'R16');
+    expect(r16.map((f) => f.deliverableId).sort()).toEqual(['td-1007', 'td-1009', 'td-1014', 'td-1019', 'td-2005']);
+    for (const f of r16) expect(f.severity).toBe('medium');
+  });
+
+  it('records seeded review decisions by the role holders in order, the Product Manager last', () => {
+    for (const run of data.pdlcRuns) {
+      const d = byId(run.deliverableId);
+      for (const stage of Object.values(run.stages)) {
+        const decided = stage.reviews.flatMap((r) => r.decisions);
+        for (const dec of decided) expect(dec.reviewerId).toBe(d.coreTeam[dec.roleId]?.personId);
+        const times = decided.map((x) => x.decidedAt);
+        expect(times).toEqual([...times].sort());
+        if (decided.length > 0) expect(stage.reviews.at(-1)!.roleId).toBe('product-manager');
+      }
+    }
   });
 });
 

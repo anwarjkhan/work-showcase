@@ -234,14 +234,24 @@ export type PdlcStageId =
   | 'build-test-validate'
   | 'delivery-launch';
 
-/** Human review roles used by PDLC stages. A stage can need more than one, in order. */
-export type ReviewRoleId =
-  | 'requirements-owner'
-  | 'design-reviewer'
-  | 'control-owner'
-  | 'independent-validator'
-  | 'business-owner'
-  | 'release-owner';
+/**
+ * The Core Four: the four named roles every pod working on a deliverable must
+ * have before work starts. The Product Manager owns the process and takes the
+ * go / no-go decision at every stage gate; the other three confirm, validate or
+ * advise in their specialism and never take the gate decision. Labels in
+ * `terms.coreRoles`; order and descriptions in lib/config/pdlc.ts (`CORE_ROLES`).
+ */
+export type CoreRole = 'product-manager' | 'tech-lead' | 'risk-lead' | 'ux-lead';
+
+/** Roles that decide PDLC reviews: always one of the Core Four. A stage can need more than one, in order, the Product Manager last. */
+export type ReviewRoleId = CoreRole;
+
+/** One seat of a deliverable's Core Four. */
+export interface CoreTeamSeat {
+  personId: string;
+  /** Date the person joined the deliverable's core team (rule R16 compares it with the start of work). */
+  joinedAt: IsoDate;
+}
 
 export interface TechDeliverable {
   id: string;
@@ -267,8 +277,12 @@ export interface TechDeliverable {
   hubIds: string[];
   podId: string;
   ownerId: string;
-  /** Named human per review role (who approves each PDLC review / accepts criteria). */
-  reviewers: Partial<Record<ReviewRoleId, string>>;
+  /**
+   * The deliverable's Core Four: one named person per core role, with the date they joined.
+   * Partial so gaps can be represented (rule R15); one person in two seats is also flagged (R15)
+   * and may not decide reviews. Only the seat holder can decide that role's PDLC reviews.
+   */
+  coreTeam: Partial<Record<CoreRole, CoreTeamSeat>>;
   plannedStart: IsoDate;
   plannedEnd: IsoDate;
   /** Forecast end as recorded in the portfolio system; the engine computes its own forecast too. */
@@ -488,7 +502,7 @@ export interface PdlcReviewDecision {
 export interface PdlcReviewState {
   roleId: ReviewRoleId;
   state: ReviewState;
-  /** Person expected to review (from TechDeliverable.reviewers). */
+  /** Person expected to decide it: the holder of that core role (from TechDeliverable.coreTeam). */
   reviewerId: string | null;
   decisions: PdlcReviewDecision[];
 }
@@ -507,7 +521,7 @@ export interface PdlcStageState {
   stageId: PdlcStageId;
   status: PdlcStageStatus;
   workProducts: PdlcWorkProductState[];
-  /** One entry per review role the stage requires, in order. */
+  /** One entry per core role the stage requires, in order (the Product Manager gate last). */
   reviews: PdlcReviewState[];
   agentRunIds: string[];
   evidenceIds: string[];
@@ -699,7 +713,7 @@ export interface EvidenceRag {
   reasons: Reason[];
 }
 
-export type RuleId = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7' | 'R8' | 'R9' | 'R10' | 'R11' | 'R12' | 'R13' | 'R14';
+export type RuleId = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7' | 'R8' | 'R9' | 'R10' | 'R11' | 'R12' | 'R13' | 'R14' | 'R15' | 'R16';
 
 export interface Finding {
   id: string;
@@ -1111,7 +1125,7 @@ export interface DemoState {
   drafts: StatusDraft[];
   /** Append-only during a session. */
   audit: AuditEvent[];
-  /** The sample human the presenter acts as (approver, reviewer). */
+  /** The sample human the presenter acts as (approver, or the Core Four role holder deciding a review). */
   actingAsPersonId: string;
   /** Increments on every change; handy as a React key. */
   revision: number;

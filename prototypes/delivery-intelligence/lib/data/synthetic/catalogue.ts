@@ -2,7 +2,7 @@
  * The hand-written catalogue the generator expands: investment requests,
  * programme structure and the 26 deliverables with their Epics and outcomes.
  * Everything here is fictional. Numbers in `flags` plant the data conditions the
- * engine rules (R1 to R14) are meant to find.
+ * engine rules (R1 to R14) are meant to find; the Core Four gaps (R15, R16) are set in core-team.ts.
  */
 import { HERO_DELIVERABLE_ID, HERO_PROGRAMME_ID, WORKFLOW_DELIVERABLE_ID } from '@/lib/config/story';
 import type { ActivityRisk, PdlcStageId, RagStatus, RiskTier, TemplateId } from '@/lib/types';
@@ -612,7 +612,7 @@ export const SUBTASK_TEMPLATES = [
 ];
 
 export const CRITERIA_TEMPLATES = [
-  'Business owner confirms the outcome in the user acceptance environment',
+  'Product Manager confirms the outcome in the user acceptance environment',
   'Reconciled figures agree to the source within the agreed tolerance',
   'Runbook and support handover accepted by operations',
   'Controls evidence filed in the control register',

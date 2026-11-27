@@ -1474,7 +1474,7 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "TD-1001 in Build & test; independent validator pending",
+      "title": "TD-1001 in Build, Test & Validate; Tech Lead pending",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "rail",
       "blocks": [
@@ -1487,25 +1487,25 @@
                 "stageId": "ideation-requirements",
                 "name": "Ideation & Requirements",
                 "state": "done",
-                "detail": "Approved by Priya Raman · 1 record"
+                "detail": "Approved by Jordan Ellis, Rhys Sorensen, Anwar Khan · 1 record"
               },
               {
                 "stageId": "design-specifications",
                 "name": "Design & Specifications",
                 "state": "done",
-                "detail": "Approved by Priya Raman · 1 record"
+                "detail": "Approved by Imogen Pemberton, Rhys Sorensen, Anwar Khan · 1 record"
               },
               {
                 "stageId": "risk-control-compliance",
                 "name": "Risk, Control & Compliance Reviews",
                 "state": "done",
-                "detail": "Approved by Jordan Ellis · 0 records"
+                "detail": "Approved by Jordan Ellis, Anwar Khan · 0 records"
               },
               {
                 "stageId": "build-test-validate",
                 "name": "Build, Test & Validate",
                 "state": "current",
-                "detail": "Current · Independent validator pending (Mei Lin Tan)"
+                "detail": "Current · Tech Lead pending (Imogen Pemberton); PM pending (Anwar Khan)"
               },
               {
                 "stageId": "delivery-launch",
@@ -1544,38 +1544,38 @@
               [
                 "Ideation & Requirements",
                 "Approved",
-                "Requirements owner approved (Priya Raman)",
+                "Risk Lead and UX Lead confirmed; gate approved by Anwar Khan",
                 "Requirements sign-off: pass"
               ],
               [
                 "Design & Specifications",
                 "Approved",
-                "Design reviewer approved (Priya Raman)",
+                "Tech Lead and UX Lead confirmed; gate approved by Anwar Khan",
                 "Design review: pass"
               ],
               [
                 "Risk, Control & Compliance Reviews",
                 "Approved",
-                "Control owner approved (Jordan Ellis)",
+                "Risk Lead confirmed; gate approved by Anwar Khan",
                 "Control assessment: missing"
               ],
               [
                 "Build, Test & Validate",
                 "In review",
-                "Independent validator pending (Mei Lin Tan)",
+                "Tech Lead pending (Imogen Pemberton); PM pending (Anwar Khan)",
                 "Test result: fail"
               ],
               [
                 "Delivery & Launch",
                 "Not started",
-                "Business owner not requested (Anwar Khan); Release owner not requeste…",
+                "Tech Lead not requested (Imogen Pemberton); PM not requested (Anwar K…",
                 "Business acceptance: pass; Release checklist: missing"
               ]
             ]
           }
         }
       ],
-      "notes": "TD-1001 in Build & test; independent validator pending. Moving to Delivery & Launch needs the independent validator review (pending) approved first.\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Business owner not requested (Anwar Khan); Release owner not requested (Priya Raman)",
+      "notes": "TD-1001 in Build, Test & Validate; Tech Lead pending. Moving to Delivery & Launch needs the Tech Lead to confirm the technical validation (pending) and the Product Manager to approve the stage gate (pending).\n\nRecords: TD-1001, DOC-1120, DOC-1138, RUN-5521, DOC-118\n\nShortened on the slide:\n- Tech Lead not requested (Imogen Pemberton); PM not requested (Anwar Khan)",
       "citations": [
         {
           "ref": {
@@ -1632,10 +1632,73 @@
         "kind": "deliverable",
         "deliverableId": "td-1001"
       },
-      "title": "Counterparty risk analytics: 4 people, 2 agents",
+      "title": "TD-1001 Core Four in place before work started",
       "subtitle": "IR-2027-001 › Counterparty Credit Risk Modernisation › TD-1001",
       "layout": "two-column",
       "blocks": [
+        {
+          "region": "left",
+          "block": {
+            "type": "table",
+            "columns": [
+              {
+                "header": "Core Four",
+                "width": 2.13
+              },
+              {
+                "header": "Name",
+                "width": 1.68
+              },
+              {
+                "header": "Joined",
+                "width": 1.23
+              },
+              {
+                "header": "Status",
+                "width": 0.98,
+                "maxChars": 16
+              }
+            ],
+            "rows": [
+              [
+                "Product Manager",
+                "Anwar Khan",
+                "27 Nov 2026",
+                {
+                  "text": "In place",
+                  "tone": "green"
+                }
+              ],
+              [
+                "Tech Lead",
+                "Imogen Pemberton",
+                "4 Dec 2026",
+                {
+                  "text": "In place",
+                  "tone": "green"
+                }
+              ],
+              [
+                "In-Business Risk Lead",
+                "Jordan Ellis",
+                "8 Dec 2026",
+                {
+                  "text": "In place",
+                  "tone": "green"
+                }
+              ],
+              [
+                "UX Design Lead",
+                "Rhys Sorensen",
+                "11 Dec 2026",
+                {
+                  "text": "In place",
+                  "tone": "green"
+                }
+              ]
+            ]
+          }
+        },
         {
           "region": "left",
           "block": {
@@ -1659,7 +1722,7 @@
           }
         },
         {
-          "region": "left",
+          "region": "right",
           "block": {
             "type": "table",
             "columns": [
@@ -1680,7 +1743,7 @@
             "rows": [
               [
                 "Imogen Pemberton",
-                "Delivery lead",
+                "Tech lead",
                 "London"
               ],
               [
@@ -1736,7 +1799,7 @@
           }
         }
       ],
-      "notes": "Counterparty risk analytics in London delivers TD-1001. Agents carry 1 of 23 items; each agent identity has a named accountable owner.\n\nRecords: TD-1001",
+      "notes": "TD-1001 has its full Core Four, four different people, all in place before work started. Counterparty risk analytics in London delivers TD-1001. Agents carry 1 of 23 items; each agent identity has a named accountable owner.\n\nRecords: TD-1001",
       "citations": [
         {
           "ref": {

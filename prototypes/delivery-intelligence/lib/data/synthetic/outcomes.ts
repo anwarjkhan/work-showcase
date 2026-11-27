@@ -33,7 +33,8 @@ export function buildOutcomes(root: Rng, hierarchy: Hierarchy): OutcomePlan {
     if (!spec || spec.pinned) continue;
     const dr = rng.fork(spec.id);
     const m = spec.outcomes.length;
-    const owner = deliverable.reviewers['business-owner'] ?? deliverable.ownerId;
+    // Business acceptance is the Product Manager's.
+    const owner = deliverable.coreTeam['product-manager']?.personId ?? deliverable.ownerId;
 
     spec.outcomes.forEach((os, index) => {
       const i = index + 1;
@@ -66,7 +67,7 @@ export function buildOutcomes(root: Rng, hierarchy: Hierarchy): OutcomePlan {
       const templates = dr.shuffle(CRITERIA_TEMPLATES.slice(1, 11));
       for (let k = 1; k <= count; k += 1) {
         const optional = count === 4 && k === 4;
-        const text = k === 1 ? `Business owner confirms: ${os.title.charAt(0).toLowerCase()}${os.title.slice(1)}` : optional ? 'Documentation published where users can find it' : (templates[k - 2] as string);
+        const text = k === 1 ? `Product Manager confirms: ${os.title.charAt(0).toLowerCase()}${os.title.slice(1)}` : optional ? 'Documentation published where users can find it' : (templates[k - 2] as string);
         const rejected = Boolean(spec.flags?.failingTest) && i === spec.accepted + 1 && k === 1;
         criteria.push({
           id: `ac-${id}-${k}`,

@@ -3,8 +3,10 @@ import { PRESENTER_PERSON_ID, WORKFLOW_DELIVERABLE_ID } from '@/lib/config/story
 import { createDemoActions } from '@/lib/store/actions';
 import { createDemoStore } from '@/lib/store/store';
 import type { ChangePatch, DemoState, ProposedChange } from '@/lib/types';
+import { checkReviewDecision, GOVERNANCE_RULES } from './governance';
 import { applyPatch } from './patches';
 import { runFindings } from './registry';
+import { describeWorkflow } from './workflow';
 
 function setup() {
   const store = createDemoStore();
@@ -70,7 +72,7 @@ describe('an agent can never approve, accept or set readiness', () => {
       actions.approveProposal(pending.id, agent),
       actions.rejectProposal(pending.id, agent),
       actions.acceptCriterion('ac-oc-2001-1-1', agent),
-      actions.approveReview(WORKFLOW_DELIVERABLE_ID, 'ideation-requirements', 'requirements-owner', agent),
+      actions.approveReview(WORKFLOW_DELIVERABLE_ID, 'ideation-requirements', 'risk-lead', agent),
       actions.recordEvidence({ deliverableId: WORKFLOW_DELIVERABLE_ID, kind: 'test-result', result: 'pass', title: 'x', recordedById: agent, simulated: true }),
       actions.moveStage(WORKFLOW_DELIVERABLE_ID, 'forward', agent),
       actions.startAgentRun('status-reporting', { kind: 'portfolio' }, agent),
@@ -238,5 +240,53 @@ describe('reset', () => {
     // Replaying gives the same ids and timestamps.
     const r = actions.startAgentRun('raid-quality', { kind: 'portfolio' });
     expect(r.ok && r.value.runId).toBe('run-1');
+  });
+});
+
+describe('Core Four review decisions (G6)', () => {
+  const coreOf = (s: DemoState, id: string) => s.data.deliverables.find((d) => d.id === id)!.coreTeam;
+  const nameOf = (s: DemoState, id: string) => s.data.people.find((p) => p.id === id)!.name;
+
+  it('is stated as a rule', () => {
+    expect(GOVERNANCE_RULES.find((r) => r.id === 'G6')?.text).toMatch(/Only the person holding a role decides that role's reviews, in order; the Product Manager takes the gate decision last at every stage/);
+  });
+
+  it('refuses everyone but the holder, in order, the Product Manager last', () => {
+    const { s } = setup();
+    const core = coreOf(s(), WORKFLOW_DELIVERABLE_ID);
+    const risk = core['risk-lead']!.personId;
+    expect(checkReviewDecision(s().data, WORKFLOW_DELIVERABLE_ID, 'ideation-requirements', 'risk-lead', risk)).toEqual({ ok: true });
+    expect(checkReviewDecision(s().data, WORKFLOW_DELIVERABLE_ID, 'ideation-requirements', 'risk-lead', PRESENTER_PERSON_ID)).toMatchObject({ ok: false, code: 'not-role-holder' });
+    expect(checkReviewDecision(s().data, WORKFLOW_DELIVERABLE_ID, 'ideation-requirements', 'product-manager', PRESENTER_PERSON_ID)).toMatchObject({
+      ok: false,
+      code: 'review-out-of-order',
+      reason: expect.stringMatching(new RegExp(`^Waiting on the In-Business Risk Lead \\(${nameOf(s(), risk)}\\) to name the obligations that apply and the UX Design Lead`)),
+    });
+    expect(checkReviewDecision(s().data, WORKFLOW_DELIVERABLE_ID, 'ideation-requirements', 'risk-lead', s().data.agentIdentities[0]!.id)).toMatchObject({ ok: false, code: 'agent-actor' });
+  });
+
+  it('refuses a person holding two core roles on the deliverable, audits it, and the engine flags it', () => {
+    const { actions, s } = setup();
+    const core = coreOf(s(), 'td-1005');
+    const both = core['tech-lead']!.personId;
+    expect(core['ux-lead']!.personId).toBe(both);
+    const run = s().data.pdlcRuns.find((r) => r.deliverableId === 'td-1005')!;
+    const res = actions.approveReview('td-1005', run.currentStage, 'tech-lead', both);
+    expect(res).toEqual({ ok: false, reason: `${nameOf(s(), both)} holds both the Tech Lead and UX Design Lead roles on TD-1005; one person may not hold two core roles, so they cannot decide its reviews until one seat is given to someone else.` });
+    expect(s().audit.at(-1)).toMatchObject({ action: 'governance.blocked', details: { code: 'two-core-roles' } });
+    expect(s().results.findings.some((f) => f.ruleId === 'R15' && f.deliverableId === 'td-1005' && f.message.includes('holds both'))).toBe(true);
+    const step = describeWorkflow(s().data, s().results, 'td-1005', PRESENTER_PERSON_ID)!.nextReview!;
+    expect(step).toMatchObject({ roleId: 'tech-lead', personId: both, blocked: expect.stringMatching(/two core roles/) });
+  });
+
+  it('refuses any decision on a review whose role is unfilled', () => {
+    const { actions, s } = setup();
+    expect(coreOf(s(), 'td-1014')['risk-lead']).toBeUndefined();
+    const res = actions.approveReview('td-1014', 'risk-control-compliance', 'risk-lead', PRESENTER_PERSON_ID);
+    expect(res).toEqual({ ok: false, reason: 'TD-1014 has no In-Business Risk Lead named, so this review cannot be decided until one joins the Core Four.' });
+    const view = describeWorkflow(s().data, s().results, 'td-1014', PRESENTER_PERSON_ID)!;
+    expect(view.coreTeamGaps.missing).toEqual(['risk-lead']);
+    expect(view.nextReview).toMatchObject({ roleId: 'risk-lead', personId: null, personName: null, needsActAs: false, label: 'Confirm as In-Business Risk Lead' });
+    expect(view.nextReview!.blocked).toMatch(/no In-Business Risk Lead named/);
   });
 });

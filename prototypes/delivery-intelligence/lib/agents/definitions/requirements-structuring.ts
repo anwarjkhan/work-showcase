@@ -141,7 +141,7 @@ function structure(kit: AgentKit, d: TechDeliverable): AgentRunOutput {
   drafts.push({
     type: 'task',
     summary: `Prepare the release checklist and launch note for ${d.ref}`,
-    narrative: `Prepare what the ${lowerFirst(terms.reviewRoles['release-owner'])} needs to release ${d.ref} ${quote(d.title)} by ${date(d.plannedEnd)}.`,
+    narrative: `Prepare what the ${terms.coreRoles['tech-lead']} needs to confirm the release of ${d.ref} ${quote(d.title)} by ${date(d.plannedEnd)}.`,
     points: 2,
     outcome: outcomes[0] ?? null,
     criteria: [
@@ -221,7 +221,7 @@ function structure(kit: AgentKit, d: TechDeliverable): AgentRunOutput {
       [ref.item(target.key), ...items.map((w) => ref.item(w.key))],
     ),
     kit.sentence(`The stories below are drawn from ${d.ref} ${quote(d.title)}, ${plural(outcomes.length, 'outcome')} and ${plural(criteria.length, 'acceptance criterion', 'acceptance criteria')}.`, [dRef, ...outcomes.map((o) => ref.outcome(o.id))]),
-    kit.sentence(`This is a scripted draft from fixed templates; a ${lowerFirst(terms.reviewRoles['requirements-owner'])} must review and approve it before anything is added.`, [dRef]),
+    kit.sentence(`This is a scripted draft from fixed templates; a named person must review and approve it before anything is added, and the ${terms.coreRoles['product-manager']} decides the stage gate.`, [dRef]),
   ];
   kit.section('Basis', basis);
   fresh.forEach((s, i) => {

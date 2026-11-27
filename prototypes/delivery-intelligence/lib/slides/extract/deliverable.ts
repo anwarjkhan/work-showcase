@@ -6,9 +6,10 @@
  */
 import { describeWorkflow, type WorkflowView } from '@/lib/agents';
 import { stageDefinition } from '@/lib/config/pdlc';
-import { dependencyLateDays, isDependencyOpen, isDependencyTroubled, type Forecast, type KnockOn } from '@/lib/engine';
+import { coreTeamSeats, dependencyLateDays, isDependencyOpen, isDependencyTroubled, workStartedAt, type Forecast, type KnockOn } from '@/lib/engine';
 import type {
   AgentIdentity,
+  CoreRole,
   DeliverableMeasures,
   Dependency,
   Evidence,
@@ -73,12 +74,26 @@ export interface DeliverableFacts {
   workflow: WorkflowView | null;
   stageName: string;
   pod: Pod | undefined;
+  /** The Core Four in role order, gaps included, each flagged. */
+  coreTeam: CoreSeatLine[];
+  /** When work demonstrably started (engine rule R16), or null. */
+  workStartedAt: string | null;
   members: Person[];
   agents: AgentIdentity[];
   /** Items below Epic level by assignee type (a count, not a measure). */
   workShare: { human: number; agent: number };
   epics: { key: string; item: WorkItem | undefined; storyCount: number; mappedCount: number }[];
   statusDraft: StatusDraft | null;
+}
+
+/** One Core Four seat for the pod slide. `late` = joined after work had started. */
+export interface CoreSeatLine {
+  roleId: CoreRole;
+  personId: string | null;
+  joinedAt: string | null;
+  flag: 'in-place' | 'missing' | 'shared' | 'late';
+  /** The other core roles the same person holds (for `shared`). */
+  alsoHolds: CoreRole[];
 }
 
 /** The verdict statement for a status pair. */
@@ -142,6 +157,13 @@ function build(env: SlideEnv, deliverableId: string): DeliverableFacts {
   }
 
   const pod = idx.pods.get(d.podId);
+  const started = workStartedAt(eng.storiesByDeliverable.get(d.id) ?? []);
+  const seats = coreTeamSeats(d);
+  const coreTeam: CoreSeatLine[] = seats.map((s) => {
+    const alsoHolds = s.personId ? seats.filter((o) => o.roleId !== s.roleId && o.personId === s.personId).map((o) => o.roleId) : [];
+    const flag: CoreSeatLine['flag'] = !s.personId ? 'missing' : alsoHolds.length > 0 ? 'shared' : started && s.joinedAt && s.joinedAt > started.at.slice(0, 10) ? 'late' : 'in-place';
+    return { roleId: s.roleId, personId: s.personId, joinedAt: s.joinedAt, flag, alsoHolds };
+  });
   const below = eng.belowEpicByDeliverable.get(d.id) ?? [];
   const epics = (eng.epicsByDeliverable.get(d.id) ?? d.epicKeys).map((key) => {
     const stories = (eng.childrenOf.get(key) ?? []).filter((w) => w.epicKey === key && w.type !== 'sub-task');
@@ -167,6 +189,8 @@ function build(env: SlideEnv, deliverableId: string): DeliverableFacts {
     workflow: describeWorkflow(data, result, d.id),
     stageName: stageDefinition(idx.pdlcRunsByDeliverable.get(d.id)?.currentStage ?? d.pdlcStage).name,
     pod,
+    coreTeam,
+    workStartedAt: started?.at ?? null,
     members: (pod?.memberIds ?? []).map((id) => idx.people.get(id)).filter((p): p is Person => p !== undefined),
     agents: (pod?.agentIdentityIds ?? []).map((id) => idx.agentIdentities.get(id)).filter((a): a is AgentIdentity => a !== undefined),
     workShare: { human: below.filter((w) => w.assigneeType === 'human').length, agent: below.filter((w) => w.assigneeType === 'agent').length },

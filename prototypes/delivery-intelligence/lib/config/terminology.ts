@@ -12,6 +12,7 @@ import type {
   ActivityRisk,
   AgentMode,
   AutonomyCeiling,
+  CoreRole,
   CriterionState,
   DeliveryRoute,
   DependencyStatus,
@@ -27,7 +28,6 @@ import type {
   RaidStatus,
   ReadinessState,
   ReviewState,
-  ReviewRoleId,
   RiskTier,
   Severity,
   SourceSystemId,
@@ -229,14 +229,28 @@ export const baseTerminology = {
     blocked: 'Blocked',
     delivered: 'Delivered',
   } satisfies Record<DependencyStatus, string>,
-  reviewRoles: {
-    'requirements-owner': 'Requirements owner',
-    'design-reviewer': 'Design reviewer',
-    'control-owner': 'Control owner',
-    'independent-validator': 'Independent validator',
-    'business-owner': 'Business owner',
-    'release-owner': 'Release owner',
-  } satisfies Record<ReviewRoleId, string>,
+  /** The Core Four pod roles (full labels). Every PDLC review is decided by one of them. */
+  coreRoles: {
+    'product-manager': 'Product Manager',
+    'tech-lead': 'Tech Lead',
+    'risk-lead': 'In-Business Risk Lead',
+    'ux-lead': 'UX Design Lead',
+  } satisfies Record<CoreRole, string>,
+  /** Short forms for chips and narrow columns. */
+  coreRolesShort: {
+    'product-manager': 'PM',
+    'tech-lead': 'Tech Lead',
+    'risk-lead': 'Risk Lead',
+    'ux-lead': 'UX Lead',
+  } satisfies Record<CoreRole, string>,
+  coreTeam: {
+    name: 'Core Four',
+    missing: 'Not named',
+    twoRoles: 'Holds two core roles',
+    joined: 'Joined',
+    joinedLate: 'Joined late',
+    inPlace: 'In place',
+  },
   agentModes: {
     'read-only': 'Read only',
     'propose-change': 'Propose change',

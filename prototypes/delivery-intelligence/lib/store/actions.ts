@@ -17,6 +17,7 @@ import {
   applyPatch,
   checkApproval,
   checkRejection,
+  checkReviewDecision,
   checkScope,
   getAgent,
   initialStatus,
@@ -29,7 +30,7 @@ import {
 } from '@/lib/agents';
 import { activeProvider } from '@/lib/agents/provider';
 import { AGENT_WORK_PRODUCT, checkSimulateWorkClosed, EVIDENCE_WORK_PRODUCT, latestEvidence, producingStage, setWorkProduct, updateStage } from '@/lib/agents/workflow';
-import { neighbourStage, stageDefinition } from '@/lib/config/pdlc';
+import { GATE_ROLE, neighbourStage, reviewConfirmation, stageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
 import { canMoveBack, canMoveForward } from '@/lib/engine';
 import type {
@@ -90,9 +91,14 @@ export interface DemoActions {
   // --- PDLC workflow ----------------------------------------------------------
   /** Runs the agent that assists the deliverable's stage (defaults to, and must be, its current stage). */
   runStageAgent(deliverableId: string, stageId?: PdlcStageId, startedById?: string): ActionResult<{ runId: string }>;
-  /** Approves one review of the current stage as the named reviewer, in order. Refused while the stage's evidence is failing. */
+  /**
+   * Approves one review of the current stage as the person holding that core role on the
+   * deliverable (G6): specialists confirm in the stage's order, then the Product Manager
+   * approves the gate. Refused for anyone else, for a person holding two core roles there,
+   * while an earlier review is outstanding ("Waiting on …"), and while the stage's evidence is failing.
+   */
   approveReview(deliverableId: string, stageId: PdlcStageId, roleId: ReviewRoleId, reviewerId: string): ActionResult;
-  /** Returns a review with a reason and moves the deliverable back one stage (when there is one). */
+  /** Returns a review with a reason, as its role holder, and moves the deliverable back one stage (when there is one). */
   returnReview(deliverableId: string, stageId: PdlcStageId, roleId: ReviewRoleId, reviewerId: string, reason: string): ActionResult;
   /** Records (or simulates) an evidence record. */
   recordEvidence(input: RecordEvidenceInput): ActionResult<{ evidenceId: string }>;
@@ -285,19 +291,9 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
     if (!who.ok) return blocked(who, reviewerId, subject);
     const stage = stageDefinition(stageId);
     if (run.currentStage !== stageId) return fail(`${d.ref} is in ${stageDefinition(run.currentStage).name}; only that stage's reviews can be decided now.`);
-    if (!stage.reviews.includes(roleId)) return fail(`${stage.name} has no ${terms.reviewRoles[roleId].toLowerCase()} review.`);
-    const review = run.stages[stageId].reviews.find((r) => r.roleId === roleId);
-    const named = d.reviewers[roleId] ?? review?.reviewerId ?? null;
-    if (named && named !== reviewerId) {
-      return blocked(
-        { ok: false, code: 'not-named-reviewer', reason: `The ${terms.reviewRoles[roleId].toLowerCase()} review of ${d.ref} is assigned to ${personName(named)}; ${personName(reviewerId)} cannot ${verb} it.` },
-        reviewerId,
-        subject,
-      );
-    }
-    const order = stage.reviews.indexOf(roleId);
-    const earlier = stage.reviews.slice(0, order).filter((r) => run.stages[stageId].reviews.find((x) => x.roleId === r)?.state !== 'approved');
-    if (earlier.length > 0) return fail(`The ${earlier.map((r) => terms.reviewRoles[r].toLowerCase()).join(' and ')} review must be approved first.`);
+    if (!stage.reviews.includes(roleId)) return fail(`${stage.name} has no ${terms.coreRoles[roleId]} review.`);
+    const allowed = checkReviewDecision(data(), deliverableId, stageId, roleId, reviewerId, verb);
+    if (!allowed.ok) return blocked(allowed, reviewerId, subject);
     return ok({ run });
   }
 
@@ -414,12 +410,12 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
       if (!checked.ok) return checked;
       const { run } = checked.value;
       const review = run.stages[stageId].reviews.find((r) => r.roleId === roleId);
-      if (review?.state === 'approved') return fail(`The ${terms.reviewRoles[roleId].toLowerCase()} review is already approved.`);
+      if (review?.state === 'approved') return fail(`The ${terms.coreRoles[roleId]} review is already approved.`);
       const failing = stageDefinition(stageId)
         .evidenceLeft.map((k) => latestEvidence(data(), deliverableId, k))
         .find((e): e is Evidence => e !== null && e.result === 'fail');
       if (failing) {
-        return fail(`The ${terms.reviewRoles[roleId].toLowerCase()} review cannot be approved while the ${terms.evidenceKinds[failing.kind].toLowerCase()} (${failing.sourceRef}) is failing.`);
+        return fail(`The ${terms.coreRoles[roleId]} review cannot be approved while the ${terms.evidenceKinds[failing.kind].toLowerCase()} (${failing.sourceRef}) is failing.`);
       }
       const at = store.now();
       const next = setReview(run, stageId, roleId, reviewerId, 'approved', null, at);
@@ -430,7 +426,10 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
         actor: { kind: 'human', personId: reviewerId },
         action: 'pdlc.review-approved',
         subject: { kind: 'pdlc-run', id: run.id },
-        summary: `${personName(reviewerId)} approved the ${terms.reviewRoles[roleId].toLowerCase()} review of ${stageDefinition(stageId).name}${stageDone ? '; the stage can move forward' : ''}.`,
+        summary:
+          roleId === GATE_ROLE
+            ? `${personName(reviewerId)}, ${terms.coreRoles[roleId]}, approved the ${stageDefinition(stageId).name} gate${stageDone ? '; the stage can move forward' : ''}.`
+            : `${personName(reviewerId)} confirmed as ${terms.coreRoles[roleId]}: ${reviewConfirmation(stageId, roleId).confirmed.toLowerCase()} (${stageDefinition(stageId).name}).`,
         refs: [{ kind: 'pdlc-run', id: run.id }, { kind: 'deliverable', id: deliverableId }],
         details: { stageId, roleId },
       });
@@ -446,12 +445,12 @@ export function createDemoActions(store: DemoStoreApi): DemoActions {
       let next = setReview(run, stageId, roleId, reviewerId, 'returned', reason.trim(), at);
       next = { ...next, updatedAt: at };
       const to = neighbourStage(stageId, 'back');
-      const why = `Returned by the ${terms.reviewRoles[roleId].toLowerCase()} review: ${reason.trim()}`;
+      const why = `Returned by the ${terms.coreRoles[roleId]} (${personName(reviewerId)}): ${reason.trim()}`;
       store.updateData((d) => {
         const withReview = withRun(d, next);
         return to ? performMove(withReview, next, to, 'back', { kind: 'human', personId: reviewerId }, why, at) : withReview;
       });
-      store.appendAudit({ at, actor: { kind: 'human', personId: reviewerId }, action: 'pdlc.review-returned', subject: { kind: 'pdlc-run', id: run.id }, summary: `${personName(reviewerId)} returned the ${terms.reviewRoles[roleId].toLowerCase()} review: ${reason.trim()}`, refs: [{ kind: 'pdlc-run', id: run.id }], details: { stageId, roleId, reason: reason.trim() } });
+      store.appendAudit({ at, actor: { kind: 'human', personId: reviewerId }, action: 'pdlc.review-returned', subject: { kind: 'pdlc-run', id: run.id }, summary: `${personName(reviewerId)} returned the ${terms.coreRoles[roleId]} review: ${reason.trim()}`, refs: [{ kind: 'pdlc-run', id: run.id }], details: { stageId, roleId, reason: reason.trim() } });
       if (to) {
         store.appendAudit({ at, actor: { kind: 'human', personId: reviewerId }, action: 'pdlc.moved-back', subject: { kind: 'pdlc-run', id: run.id }, summary: `Moved back to ${stageDefinition(to).name}. ${why}`, refs: [{ kind: 'pdlc-run', id: run.id }, { kind: 'deliverable', id: deliverableId }], details: { from: stageId, to, reason: why } });
       }

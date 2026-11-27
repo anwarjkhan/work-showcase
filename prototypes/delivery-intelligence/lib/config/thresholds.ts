@@ -1,4 +1,4 @@
-import type { RuleId, Severity } from '@/lib/types';
+import type { CoreRole, RiskTier, RuleId, Severity } from '@/lib/types';
 
 /**
  * Rule thresholds for the engine checks (design section 5). The engine (D3)
@@ -19,7 +19,18 @@ export const RULE_THRESHOLDS = {
   reconciliationDateToleranceDays: 0,
   /** Data older than this many days counts as stale for evidence-based RAG (Amber). */
   staleDataDays: 14,
+  /** R16: a join this many days or less after work started is tolerated (0 = any later join counts). */
+  coreTeamLateJoinToleranceDays: 0,
 } as const;
+
+/**
+ * R15 severity by gap. The rule's base severity (RULE_SEVERITY.R15) applies to any
+ * missing core role and to one person holding two; a missing role listed here is
+ * raised to the given severity on the listed risk tiers.
+ */
+export const CORE_TEAM_SEVERITY: { role: CoreRole; tiers: RiskTier[]; severity: Severity }[] = [
+  { role: 'risk-lead', tiers: ['T3', 'T4'], severity: 'high' },
+];
 
 /** Severity each rule raises. Critical findings make evidence-based RAG Red; High makes it Amber. */
 export const RULE_SEVERITY: Record<RuleId, Severity> = {
@@ -37,6 +48,9 @@ export const RULE_SEVERITY: Record<RuleId, Severity> = {
   R12: 'high',
   R13: 'critical',
   R14: 'high',
+  /** Base severity; raised by CORE_TEAM_SEVERITY (a missing In-Business Risk Lead on T3/T4 is high). */
+  R15: 'medium',
+  R16: 'medium',
 };
 
 /** One-line description of each rule, for tooltips and the About page. */
@@ -55,6 +69,8 @@ export const RULE_DESCRIPTIONS: Record<RuleId, string> = {
   R12: 'Evidence older than the latest change to the work it covers',
   R13: 'A required test result is failing',
   R14: 'Epic with no Deliverable ID, or a Deliverable ID that does not exist',
+  R15: 'Core Four incomplete: a core role has no named person, or one person holds two core roles',
+  R16: 'Work started before the Core Four was complete',
 };
 
 /** Evidence-based RAG rules (design section 5). */

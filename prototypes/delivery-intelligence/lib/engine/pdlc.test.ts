@@ -1,11 +1,42 @@
 import { describe, expect, it } from 'vitest';
-import { createPdlcRun } from '@/lib/config/pdlc';
-import type { PdlcRun, PdlcStageId } from '@/lib/types';
+import { createPdlcRun, PDLC_STAGES } from '@/lib/config/pdlc';
+import type { PdlcRun, PdlcStageId, TechDeliverable } from '@/lib/types';
 import { canMoveBack, canMoveForward, checkStageMove, computeAll, moveBackSuggestion, outstandingReviews } from './index';
 import { CLOCK, baseline, change } from './test-fixtures';
 
-const reviewers = { 'requirements-owner': 'p-owner', 'business-owner': 'p-accept', 'release-owner': 'p-owner' };
-const runAt = (stage: PdlcStageId): PdlcRun => createPdlcRun({ id: 'td-1', reviewers }, stage, '2027-01-04T09:00:00.000Z');
+// The UX Design Lead seat is left empty on purpose: the run still lists the review, with no named person.
+const coreTeam: TechDeliverable['coreTeam'] = {
+  'product-manager': { personId: 'p-accept', joinedAt: '2026-12-01' },
+  'tech-lead': { personId: 'p-owner', joinedAt: '2026-12-01' },
+  'risk-lead': { personId: 'p-risk', joinedAt: '2026-12-01' },
+};
+const runAt = (stage: PdlcStageId): PdlcRun => createPdlcRun({ id: 'td-1', coreTeam }, stage, '2027-01-04T09:00:00.000Z');
+
+describe('stage reviews (Core Four)', () => {
+  it('ends every stage with the Product Manager gate, after the specialist confirmations', () => {
+    expect(PDLC_STAGES.map((s) => s.reviews)).toEqual([
+      ['risk-lead', 'ux-lead', 'product-manager'],
+      ['tech-lead', 'ux-lead', 'product-manager'],
+      ['risk-lead', 'product-manager'],
+      ['tech-lead', 'product-manager'],
+      ['tech-lead', 'product-manager'],
+    ]);
+    for (const s of PDLC_STAGES) for (const r of s.reviews) expect(s.confirms[r]?.confirms, `${s.id} ${r}`).toBeTruthy();
+  });
+
+  it('seeds earlier stages approved by the role holders in order, PM last, and skips empty seats', () => {
+    const run = runAt('risk-control-compliance');
+    const ideation = run.stages['ideation-requirements'].reviews;
+    expect(ideation.map((r) => [r.roleId, r.state, r.reviewerId])).toEqual([
+      ['risk-lead', 'approved', 'p-risk'],
+      ['ux-lead', 'approved', null],
+      ['product-manager', 'approved', 'p-accept'],
+    ]);
+    expect(ideation[1]!.decisions).toEqual([]);
+    expect(ideation[2]!.decisions[0]).toMatchObject({ roleId: 'product-manager', reviewerId: 'p-accept', decision: 'approved' });
+    expect(run.stages['risk-control-compliance'].reviews.every((r) => r.state === 'not-requested')).toBe(true);
+  });
+});
 
 function approveAll(run: PdlcRun, stage: PdlcStageId): PdlcRun {
   const copy = structuredClone(run);
@@ -18,8 +49,14 @@ describe('moving forward', () => {
     const run = runAt('ideation-requirements');
     const check = canMoveForward(run);
     expect(check).toMatchObject({ allowed: false, code: 'review-not-approved', from: 'ideation-requirements', to: 'design-specifications' });
-    expect(check.reason).toBe('Moving to Design & Specifications needs the requirements owner review (not requested) approved first.');
-    expect(check.outstandingReviews).toEqual([{ roleId: 'requirements-owner', state: 'not-requested', reviewerId: 'p-owner' }]);
+    expect(check.reason).toBe(
+      'Moving to Design & Specifications needs the In-Business Risk Lead to name the obligations that apply (not requested), the UX Design Lead to confirm the user context (not requested) and the Product Manager to approve the stage gate (not requested).',
+    );
+    expect(check.outstandingReviews).toEqual([
+      { roleId: 'risk-lead', state: 'not-requested', reviewerId: 'p-risk' },
+      { roleId: 'ux-lead', state: 'not-requested', reviewerId: null },
+      { roleId: 'product-manager', state: 'not-requested', reviewerId: 'p-accept' },
+    ]);
   });
 
   it('is allowed once the review is approved', () => {
@@ -27,14 +64,15 @@ describe('moving forward', () => {
     expect(check).toMatchObject({ allowed: true, code: 'ok', to: 'design-specifications' });
   });
 
-  it('needs every review of a stage: Delivery & Launch has two (business owner, then release owner)', () => {
+  it('needs every review of a stage: Delivery & Launch has two (Tech Lead, then the Product Manager gate)', () => {
     const run = runAt('delivery-launch');
     run.stages['delivery-launch'].reviews[0]!.state = 'approved';
     run.stages['delivery-launch'].reviews[1]!.state = 'pending';
-    expect(outstandingReviews(run, 'delivery-launch')).toEqual([{ roleId: 'release-owner', state: 'pending', reviewerId: 'p-owner' }]);
+    expect(outstandingReviews(run, 'delivery-launch')).toEqual([{ roleId: 'product-manager', state: 'pending', reviewerId: 'p-accept' }]);
+    expect(canMoveForward(run).reason).toBe('Delivery & Launch is the last stage.');
     const atBuild = runAt('build-test-validate');
     atBuild.stages['build-test-validate'].reviews[0]!.state = 'returned';
-    expect(canMoveForward(atBuild).reason).toContain('independent validator review (returned)');
+    expect(canMoveForward(atBuild).reason).toContain('the Tech Lead to confirm the technical validation (returned)');
   });
 
   it('is refused from the last stage', () => {

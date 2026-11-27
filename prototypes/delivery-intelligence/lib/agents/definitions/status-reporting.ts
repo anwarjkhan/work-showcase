@@ -205,7 +205,7 @@ function deliverableStatus(kit: AgentKit, d: TechDeliverable): AgentRunOutput {
   if (run && reviews.length > 0) {
     next.push(
       kit.sentence(
-        `${stageName(d)} needs the ${listPhrases(reviews.map((r) => `${lowerFirst(terms.reviewRoles[r.roleId])} review${r.reviewerId ? ` by ${kit.person(r.reviewerId)}` : ''}`))} before it can move on.`,
+        `${stageName(d)} needs the ${listPhrases(reviews.map((r) => `${terms.coreRoles[r.roleId]} review${r.reviewerId ? ` by ${kit.person(r.reviewerId)}` : ''}`))} before it can move on.`,
         [ref.pdlcRun(run.id), ...reviews.flatMap((r) => (r.reviewerId ? [ref.person(r.reviewerId)] : []))],
       ),
     );

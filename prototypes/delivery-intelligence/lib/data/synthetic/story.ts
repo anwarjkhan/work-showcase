@@ -194,7 +194,7 @@ export function buildStoryRecords(ref: Reference): StoryRecords {
   const heroCriteria: AcceptanceCriterion[] = [
     crit(1, 1, 'The approved scenario set loads without manual edits', true),
     crit(1, 2, 'Shock vectors are validated against the scenario library', true),
-    crit(1, 3, 'Business owner confirms the scenario set for quarter-end', true),
+    crit(1, 3, 'Product Manager confirms the scenario set for quarter-end', true),
     crit(2, 1, 'Stressed exposures agree between the risk engine and the reporting layer within tolerance for all netting sets', false),
     crit(2, 2, 'Differences above tolerance are listed with the netting set and the cause', false),
     crit(2, 3, 'Reconciliation reruns reproduce the same result', false),

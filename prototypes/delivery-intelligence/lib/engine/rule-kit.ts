@@ -1,9 +1,9 @@
 /**
- * Shared shape for rules R1 to R14: each rule is a pure function of the engine
+ * Shared shape for rules R1 to R16: each rule is a pure function of the engine
  * context (and the measures where it needs them) returning findings with a
  * deterministic id, the configured severity and the records that prove it.
  */
-import type { EntityRef, Finding, RuleId } from '@/lib/types';
+import type { EntityRef, Finding, RuleId, Severity } from '@/lib/types';
 import { MAX_FINDING_REFS, RULE_SEVERITY } from './constants';
 import type { EngineContext } from './context';
 import type { MeasuresResult } from './measures';
@@ -23,6 +23,8 @@ export function finding(
   message: string,
   evidence: EntityRef[],
   idSuffix = '',
+  /** Overrides the rule's configured severity (rules whose severity depends on the case, e.g. R15). */
+  severity?: Severity,
 ): Finding {
   const seen = new Set<string>();
   const refs: EntityRef[] = [];
@@ -36,7 +38,7 @@ export function finding(
   return {
     id: `f-${ruleId}-${subject.kind}-${subject.id}${idSuffix ? `-${idSuffix}` : ''}`,
     ruleId,
-    severity: RULE_SEVERITY[ruleId],
+    severity: severity ?? RULE_SEVERITY[ruleId],
     subject,
     deliverableId,
     message,

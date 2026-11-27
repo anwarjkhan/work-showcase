@@ -10,5 +10,5 @@ export const HERO_DELIVERABLE_ID = 'td-1001';
 export const HERO_PROGRAMME_ID = 'pm-ccr';
 /** "Limit-monitoring dashboard filters", standalone, low risk, starts at Ideation & Requirements. */
 export const WORKFLOW_DELIVERABLE_ID = 'td-2001';
-/** The sample human the presenter acts as by default (approver of agent proposals). */
+/** The sample human the presenter acts as by default (approver of agent proposals; Product Manager of the hero and walk-through deliverables). */
 export const PRESENTER_PERSON_ID = 'p-presenter';

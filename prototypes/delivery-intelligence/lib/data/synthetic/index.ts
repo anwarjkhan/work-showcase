@@ -16,11 +16,13 @@
  *   evidence.ts   evidence records that follow each deliverable's PDLC stage
  *   raid.ts       RAID items, dependencies and milestones
  *   story.ts      the pinned hero and workflow-story records
+ *   core-team.ts  Core Four join dates and the deliberate gaps (rules R15, R16)
  *   runs.ts       PDLC runs
  */
 import { DEMO_CLOCK } from '@/lib/config/clock';
 import { HERO_DELIVERABLE_ID, WORKFLOW_DELIVERABLE_ID } from '@/lib/config/story';
 import type { PortfolioData } from '@/lib/types';
+import { settleCoreTeamDates } from './core-team';
 import { buildEvidence } from './evidence';
 import { buildHierarchy } from './hierarchy';
 import { buildOutcomes, finalizeAcceptance } from './outcomes';
@@ -42,6 +44,7 @@ export function createSyntheticPortfolio(seed: number = DEFAULT_SEED): Portfolio
   const generated = buildWorkItems(root, hierarchy, ref, outcomePlan);
   const acceptance = finalizeAcceptance(root, outcomePlan, hierarchy, generated.items);
   const workItems = [...story.workItems, ...generated.items];
+  settleCoreTeamDates(hierarchy.deliverables, workItems);
   const evidence = [...story.evidence, ...buildEvidence(root, hierarchy, outcomePlan, acceptance, generated.items)];
   const raidPlan = buildRaidAndDependencies(root, hierarchy, ref, outcomePlan, workItems);
   const raid = [...story.raid, ...raidPlan.raid];

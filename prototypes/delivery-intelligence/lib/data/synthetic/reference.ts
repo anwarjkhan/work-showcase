@@ -4,7 +4,7 @@
  * stream, except for a small hand-written cast the story is pinned to.
  */
 import { PRESENTER_PERSON_ID } from '@/lib/config/story';
-import type { AgentId, AgentIdentity, Hub, Person, PersonRole, Pod, ReviewRoleId, Sprint } from '@/lib/types';
+import type { AgentId, AgentIdentity, Hub, Person, PersonRole, Pod, Sprint } from '@/lib/types';
 import { addDays, SPRINT_COUNT, SPRINT_START, sprintIdForIndex } from './dates';
 import type { Rng } from './random';
 
@@ -152,8 +152,8 @@ const FIXED_PEOPLE: FixedPerson[] = [
   { id: 'p-owner-3', name: 'Aoife Brennan', title: 'Programme lead, finance ledger', roles: ['programme-lead', 'investment-owner'], hubId: 'hub-dub' },
   { id: 'p-owner-4', name: 'Jia Hui Koh', title: 'Programme lead, shared data platform', roles: ['programme-lead', 'investment-owner'], hubId: 'hub-sgp' },
   { id: 'p-owner-5', name: 'Camille Fontaine', title: 'Head of stress testing tooling', roles: ['investment-owner', 'business-owner'], hubId: 'hub-tor' },
-  { id: 'p-ctl-1', name: 'Jordan Ellis', title: 'Control owner', roles: ['control-owner', 'risk-manager'], hubId: 'hub-nyc' },
-  { id: 'p-val-1', name: 'Mei Lin Tan', title: 'Independent validator', roles: ['independent-validator'], hubId: 'hub-sgp' },
+  { id: 'p-ctl-1', name: 'Jordan Ellis', title: 'In-business risk lead', roles: ['control-owner', 'risk-manager'], hubId: 'hub-nyc' },
+  { id: 'p-val-1', name: 'Mei Lin Tan', title: 'Test lead', roles: ['independent-validator'], hubId: 'hub-sgp' },
 ];
 
 interface PoolSeat {
@@ -163,25 +163,29 @@ interface PoolSeat {
   roles: PersonRole[];
 }
 
-/** Role holders generated from the name pools; ids are stable, names are seeded. */
+/**
+ * Specialists generated from the name pools; ids are stable, names are seeded.
+ * Core Four seats are drawn from them (product managers `p-biz-*`, risk leads
+ * `p-ctl-*`, UX design leads `p-dsg-*`); tech leads come from the pods.
+ */
 const POOL_SEATS: PoolSeat[] = [
-  { id: 'p-req-1', hubId: 'hub-ldn', title: 'Requirements owner', roles: ['requirements-owner'] },
-  { id: 'p-req-2', hubId: 'hub-fra', title: 'Requirements owner', roles: ['requirements-owner'] },
-  { id: 'p-req-3', hubId: 'hub-sgp', title: 'Requirements owner', roles: ['requirements-owner', 'analyst'] },
-  { id: 'p-dsg-1', hubId: 'hub-ldn', title: 'Design reviewer', roles: ['design-reviewer'] },
-  { id: 'p-dsg-2', hubId: 'hub-dub', title: 'Design reviewer', roles: ['design-reviewer'] },
-  { id: 'p-dsg-3', hubId: 'hub-mum', title: 'Design reviewer', roles: ['design-reviewer'] },
-  { id: 'p-ctl-2', hubId: 'hub-war', title: 'Control owner', roles: ['control-owner'] },
-  { id: 'p-ctl-3', hubId: 'hub-sgp', title: 'Control owner', roles: ['control-owner', 'risk-manager'] },
-  { id: 'p-val-2', hubId: 'hub-blr', title: 'Independent validator', roles: ['independent-validator'] },
-  { id: 'p-val-3', hubId: 'hub-ldn', title: 'Independent validator', roles: ['independent-validator'] },
-  { id: 'p-biz-1', hubId: 'hub-ldn', title: 'Business owner, credit', roles: ['business-owner'] },
-  { id: 'p-biz-2', hubId: 'hub-nyc', title: 'Business owner, collateral', roles: ['business-owner'] },
-  { id: 'p-biz-3', hubId: 'hub-dub', title: 'Business owner, finance', roles: ['business-owner'] },
-  { id: 'p-biz-4', hubId: 'hub-fra', title: 'Business owner, market risk', roles: ['business-owner'] },
-  { id: 'p-rel-1', hubId: 'hub-ldn', title: 'Release owner', roles: ['release-owner'] },
-  { id: 'p-rel-2', hubId: 'hub-mum', title: 'Release owner', roles: ['release-owner'] },
-  { id: 'p-rel-3', hubId: 'hub-tor', title: 'Release owner', roles: ['release-owner'] },
+  { id: 'p-req-1', hubId: 'hub-ldn', title: 'Business analyst', roles: ['requirements-owner'] },
+  { id: 'p-req-2', hubId: 'hub-fra', title: 'Business analyst', roles: ['requirements-owner'] },
+  { id: 'p-req-3', hubId: 'hub-sgp', title: 'Business analyst', roles: ['requirements-owner', 'analyst'] },
+  { id: 'p-dsg-1', hubId: 'hub-ldn', title: 'UX design lead', roles: ['design-reviewer'] },
+  { id: 'p-dsg-2', hubId: 'hub-dub', title: 'UX design lead', roles: ['design-reviewer'] },
+  { id: 'p-dsg-3', hubId: 'hub-mum', title: 'UX design lead', roles: ['design-reviewer'] },
+  { id: 'p-ctl-2', hubId: 'hub-war', title: 'In-business risk lead', roles: ['control-owner'] },
+  { id: 'p-ctl-3', hubId: 'hub-sgp', title: 'In-business risk lead', roles: ['control-owner', 'risk-manager'] },
+  { id: 'p-val-2', hubId: 'hub-blr', title: 'Test lead', roles: ['independent-validator'] },
+  { id: 'p-val-3', hubId: 'hub-ldn', title: 'Test lead', roles: ['independent-validator'] },
+  { id: 'p-biz-1', hubId: 'hub-ldn', title: 'Product manager, credit', roles: ['business-owner'] },
+  { id: 'p-biz-2', hubId: 'hub-nyc', title: 'Product manager, collateral', roles: ['business-owner'] },
+  { id: 'p-biz-3', hubId: 'hub-dub', title: 'Product manager, finance', roles: ['business-owner'] },
+  { id: 'p-biz-4', hubId: 'hub-fra', title: 'Product manager, market risk', roles: ['business-owner'] },
+  { id: 'p-rel-1', hubId: 'hub-ldn', title: 'Release manager', roles: ['release-owner'] },
+  { id: 'p-rel-2', hubId: 'hub-mum', title: 'Release manager', roles: ['release-owner'] },
+  { id: 'p-rel-3', hubId: 'hub-tor', title: 'Release manager', roles: ['release-owner'] },
   { id: 'p-risk-1', hubId: 'hub-fra', title: 'Risk manager', roles: ['risk-manager'] },
   { id: 'p-risk-2', hubId: 'hub-ldn', title: 'Risk manager', roles: ['risk-manager'] },
 ];
@@ -194,12 +198,18 @@ const LOCAL_TITLES: Array<{ title: string; roles: PersonRole[] }> = [
   { title: 'Business analyst', roles: ['analyst'] },
 ];
 
+/** Specialist pools. `product`, `risk` and `ux` supply Core Four seats; the others are drawn but not seated. */
+export type SpecialistPool = 'analysis' | 'ux' | 'risk' | 'validation' | 'product' | 'release';
+
 export interface Cast {
   presenterId: string;
   /** Programme lead (owner of the investment request) per programme. */
   owners: Record<ProgrammeKey, string>;
-  /** Candidate holders per review role. */
-  pools: Record<ReviewRoleId, string[]>;
+  /**
+   * Candidate people per specialist pool. The deliverable builder draws from all six in a
+   * fixed order (see hierarchy.ts) so the seeded stream stays stable; three feed Core Four seats.
+   */
+  pools: Record<SpecialistPool, string[]>;
 }
 
 export interface Reference {
@@ -250,11 +260,11 @@ export function buildReference(root: Rng): Reference {
     const short = spec.id.slice(4);
     const memberIds: string[] = [];
 
-    // Four local people: the first is the pod's delivery lead.
+    // Four local people: the first leads the pod and is the tech lead on its deliverables.
     for (let i = 1; i <= 4; i += 1) {
       const id = `p-${short}-${i}`;
       const name = makeName(spec.hubId);
-      const seat = i === 1 ? { title: 'Delivery lead', roles: ['delivery-lead', 'engineer'] as PersonRole[] } : rng.pick(LOCAL_TITLES);
+      const seat = i === 1 ? { title: 'Tech lead', roles: ['delivery-lead', 'engineer'] as PersonRole[] } : rng.pick(LOCAL_TITLES);
       people.push({ id, name, title: seat.title, roles: seat.roles, hubId: spec.hubId, podId: spec.id, initials: initialsOf(name) });
       memberIds.push(id);
     }
@@ -293,12 +303,12 @@ export function buildReference(root: Rng): Reference {
     presenterId: PRESENTER_PERSON_ID,
     owners: { ccr: 'p-owner-1', frtb: 'p-owner-2', ledger: 'p-owner-3', data: 'p-owner-4', stress: 'p-owner-5', limits: PRESENTER_PERSON_ID },
     pools: {
-      'requirements-owner': ['p-req-1', 'p-req-2', 'p-req-3'],
-      'design-reviewer': ['p-dsg-1', 'p-dsg-2', 'p-dsg-3'],
-      'control-owner': ['p-ctl-1', 'p-ctl-2', 'p-ctl-3'],
-      'independent-validator': ['p-val-1', 'p-val-2', 'p-val-3'],
-      'business-owner': ['p-biz-1', 'p-biz-2', 'p-biz-3', 'p-biz-4'],
-      'release-owner': ['p-rel-1', 'p-rel-2', 'p-rel-3'],
+      analysis: ['p-req-1', 'p-req-2', 'p-req-3'],
+      ux: ['p-dsg-1', 'p-dsg-2', 'p-dsg-3'],
+      risk: ['p-ctl-1', 'p-ctl-2', 'p-ctl-3'],
+      validation: ['p-val-1', 'p-val-2', 'p-val-3'],
+      product: ['p-biz-1', 'p-biz-2', 'p-biz-3', 'p-biz-4'],
+      release: ['p-rel-1', 'p-rel-2', 'p-rel-3'],
     },
   };
 
