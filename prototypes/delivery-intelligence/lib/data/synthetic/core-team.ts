@@ -9,7 +9,7 @@
  *   - td-1014 (T3, Amber): no In-Business Risk Lead (R15 high: T3 needs one), while in
  *     Risk, Control & Compliance Reviews. Work has started, so R16 too (medium).
  *   - td-1019 (T2, Amber) and td-1007 (T4, Amber): no UX Design Lead (R15 medium; R16 medium).
- *   - td-1005 (T2, Amber): its Tech Lead (a senior pod member, not the pod lead, so nobody
+ *   - td-1005 (T2, Amber): its Tech Lead (a pod data engineer, not the pod lead, so nobody
  *     seated on the hero or the walk-through) also holds the UX Design Lead seat (R15 medium);
  *     that person may not decide reviews until the seat is given to someone else.
  *   - td-1009 (T3, Amber): the In-Business Risk Lead joined after work started (R16 medium).
@@ -27,7 +27,7 @@ export const CORE_TEAM_GAPS: {
   lateJoin: Record<string, CoreRole>;
 } = {
   missing: { 'td-1014': ['risk-lead'], 'td-1019': ['ux-lead'], 'td-1007': ['ux-lead'] },
-  shared: { 'td-1005': { role: 'ux-lead', heldBy: 'tech-lead', personId: 'p-xva-nyc-4' } },
+  shared: { 'td-1005': { role: 'ux-lead', heldBy: 'tech-lead', personId: 'p-xva-nyc-chi-1' } },
   lateJoin: { 'td-1009': 'risk-lead', 'td-2005': 'ux-lead' },
 };
 
