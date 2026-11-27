@@ -9,7 +9,7 @@ import { MoveBar } from './MoveBar';
 import { ReviewPanel } from './ReviewPanel';
 import { WorkProductChip } from './bits';
 
-/** The current stage: agent assists, a named human reviews, evidence recorded, then move. */
+/** The current stage: agent assists, the Core Four review, evidence recorded, then move. */
 export function StageWorkspace() {
   const { view, notice, clearNotice } = useWorkflow();
   const cur = view.stages.find((s) => s.current)!;

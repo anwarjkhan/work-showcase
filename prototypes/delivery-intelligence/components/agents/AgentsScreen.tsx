@@ -35,6 +35,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import { ProvenanceBadge } from '@/components/shell';
 import { DemoNote, Section, SectionHeading, StatTile, TabPanel, Tabs } from '@/components/ui';
 import { playbackAt, playbackDuration, type AgentRunScope } from '@/lib/agents';
+import { RULE_DESCRIPTIONS } from '@/lib/config/thresholds';
 import { PRESENTER_PERSON_ID } from '@/lib/config/story';
 import { useActingAs, useAgentRuns, useAuditTrail, useDemoActions, useDemoState, useDemoStore, useEngineResult, usePortfolioData, useProposals, useStatusDrafts } from '@/lib/store';
 import type { AgentId, AuditEvent, PortfolioData } from '@/lib/types';
@@ -297,7 +298,7 @@ export function AgentsScreen() {
           <StatTile
             label="Open findings across the portfolio"
             value={<span data-testid="headline-findings">{results.findings.length}</span>}
-            caption="Engine rules R1 to R14, recomputed after every approval"
+            caption={`Engine rules R1 to R${Object.keys(RULE_DESCRIPTIONS).length}, recomputed after every approval`}
             icon={<Scale />}
             provenance="computed"
           />

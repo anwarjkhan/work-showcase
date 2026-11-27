@@ -76,16 +76,18 @@ function RailStage({ stage, onOpen, personName }: { stage: StageView; onOpen: ()
   const { definition: def, state, current } = stage;
   const approved = state.status === 'approved';
   const returned = state.status === 'returned';
-  const decided = state.reviews.flatMap((r) => r.decisions).filter((d) => d.decision === 'approved');
-  const lastApproval = decided.at(-1);
+  const approvedReviews = stage.reviews.filter((r) => r.state === 'approved');
+  const gateDecision = stage.reviews.find((r) => r.gate)?.decisions.filter((d) => d.decision === 'approved').at(-1);
+  const lastApproval = gateDecision ?? state.reviews.flatMap((r) => r.decisions).filter((d) => d.decision === 'approved').at(-1);
   const held = stage.evidence.filter((e) => e.latest);
-  const pendingReviews = stage.reviews.filter((r) => r.state !== 'approved').length;
+  const total = stage.reviews.length;
+  const nextOpen = stage.reviews.find((r) => r.next);
 
   let line: string;
   if (current) {
-    line = pendingReviews === 0 ? 'Current · reviews approved' : `Current · ${pendingReviews === stage.reviews.length && stage.reviews.every((r) => r.state === 'not-requested') ? 'review not requested' : `${pendingReviews} review${pendingReviews === 1 ? '' : 's'} open`}`;
+    line = nextOpen ? `Current · ${approvedReviews.length} of ${total} done · ${nextOpen.gate ? 'gate' : nextOpen.roleShort} next` : `Current · all ${total} done`;
   } else if (approved) {
-    line = `${lastApproval ? `Approved by ${personName(lastApproval.reviewerId).split(' ')[0]}` : 'Approved'} · ${held.length} record${held.length === 1 ? '' : 's'}`;
+    line = `${lastApproval ? `Gate: ${personName(lastApproval.reviewerId).split(' ')[0]}` : 'Approved'} · ${total} of ${total} · ${held.length} record${held.length === 1 ? '' : 's'}`;
   } else if (returned) {
     line = 'Returned for rework';
   } else {
@@ -119,11 +121,18 @@ function RailStage({ stage, onOpen, personName }: { stage: StageView; onOpen: ()
         <span className={cx('truncate text-[12.5px] font-semibold', current ? 'text-title' : 'text-fg')}>{def.shortName}</span>
         <span className="flex min-w-0 items-center gap-1 truncate text-[11px] text-fg-muted">
           {approved && !current && lastApproval ? <Avatar size="xs" initials={person(lastApproval.reviewerId)?.initials ?? '?'} name={personName(lastApproval.reviewerId)} className="!size-4 !text-[8px]" /> : null}
-          <span className="truncate">{line}</span>
+          <span className="truncate" title={stage.reviews.map((r) => `${r.roleShort}: ${r.state === 'approved' ? 'done' : 'open'}`).join(' · ')}>{line}</span>
         </span>
+        {(current || approved) && total > 1 ? (
+          <span aria-hidden className="mt-0.5 flex gap-0.5" data-testid={`rail-dots-${def.id}`}>
+            {stage.reviews.map((r) => (
+              <span key={r.roleId} className={cx('h-1 min-w-0 flex-1 rounded-pill', r.state === 'approved' ? 'bg-status-green' : r.next && current ? 'bg-accent' : 'bg-line-strong')} />
+            ))}
+          </span>
+        ) : null}
       </span>
       <span className="sr-only">
-        {current ? ' (current stage)' : ''}. Evidence: {stage.evidence.map((e) => `${terms.evidenceKinds[e.kind]} ${e.result}`).join(', ')}
+        {current ? ' (current stage)' : ''}. Reviews: {stage.reviews.map((r) => `${r.roleLabel} ${r.state}`).join(', ')}. Evidence: {stage.evidence.map((e) => `${terms.evidenceKinds[e.kind]} ${e.result}`).join(', ')}
       </span>
     </button>
   );

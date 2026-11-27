@@ -10,6 +10,7 @@ import {
   Network,
   Presentation,
   Route,
+  UsersRound,
   Workflow,
   type LucideIcon,
 } from 'lucide-react';
@@ -23,6 +24,7 @@ export const NAV_ICONS: Record<RouteIcon, LucideIcon> = {
   global: Earth,
   lifecycle: Workflow,
   workflow: Route,
+  roles: UsersRound,
   agents: Bot,
   blueprint: LayoutTemplate,
   evidence: FlaskConical,

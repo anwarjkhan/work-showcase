@@ -64,7 +64,7 @@ export function MoveBar() {
           </Button>
         )}
         {!backOpen ? (
-          <p className={cx('ml-auto min-w-0 truncate text-right text-[12px]', fwd.allowed ? 'text-status-green-fg' : 'text-fg-muted')} data-testid="forward-reason" title={fwd.reason}>
+          <p className={cx('ml-auto min-w-0 max-w-[60%] line-clamp-2 text-right text-[12px]', fwd.allowed ? 'text-status-green-fg' : 'text-fg-muted')} data-testid="forward-reason" title={fwd.reason}>
             {fwd.reason}
           </p>
         ) : null}

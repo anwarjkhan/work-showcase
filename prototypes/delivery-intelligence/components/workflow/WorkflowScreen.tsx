@@ -44,9 +44,31 @@ function useResetEpoch(): number {
   return epoch;
 }
 
+/** Persona preselected by a link such as `/lifecycle/<id>/#act-as=<personId>` (the By role screen uses it). */
+export function parseActAsHash(hash: string): string | null {
+  const m = /(?:^#|&)act-as=([^&]+)/.exec(hash);
+  return m ? decodeURIComponent(m[1]!) : null;
+}
+
+function useActAsHash(): void {
+  const actions = useDemoActions();
+  const store = useDemoStore();
+  useEffect(() => {
+    // On arrival and on a hash change only, so a persona chosen by hand afterwards is not overridden.
+    const apply = () => {
+      const pid = parseActAsHash(window.location.hash);
+      if (pid && store.getState().data.people.some((p) => p.id === pid)) actions.setActingAs(pid);
+    };
+    apply();
+    window.addEventListener('hashchange', apply);
+    return () => window.removeEventListener('hashchange', apply);
+  }, [actions, store]);
+}
+
 /** PDLC workflow for one deliverable (`/lifecycle/[id]`). */
 export function WorkflowScreen({ id }: { id: string }) {
   const epoch = useResetEpoch();
+  useActAsHash();
   return <WorkflowBody key={`${id}:${epoch}`} id={id} />;
 }
 
@@ -61,7 +83,7 @@ function WorkflowBody({ id }: { id: string }) {
   const reducedMotion = Boolean(useReducedMotion());
 
   const deliverable = idx.deliverables.get(id);
-  const view = useMemo(() => describeWorkflow(data, results, id), [data, results, id]);
+  const view = useMemo(() => describeWorkflow(data, results, id, actingAs), [data, results, id, actingAs]);
   const measures = results.deliverables[id];
   const proposals = useMemo(() => allProposals.filter((p) => p.deliverableId === id), [allProposals, id]);
   const outcomes = useMemo(() => idx.outcomesByDeliverable.get(id) ?? [], [idx, id]);
@@ -101,6 +123,17 @@ function WorkflowBody({ id }: { id: string }) {
     [view, measures, proposals, outcomes, idx, evidence, actingAs, personName, walkthrough, playing],
   );
 
+  const actorFor = useCallback(
+    (target: string) => {
+      if (next && next.target === target && next.actAs && next.actAs !== actingAs) {
+        actions.setActingAs(next.actAs);
+        return next.actAs;
+      }
+      return actingAs;
+    },
+    [next, actingAs, actions],
+  );
+
   // The orchestrated moment: all three measures complete, reached during this session.
   const complete =
     !!measures &&
@@ -133,6 +166,7 @@ function WorkflowBody({ id }: { id: string }) {
             personName,
             next,
             actions,
+            actorFor,
             act,
             notice,
             clearNotice: () => setNotice(null),
@@ -142,7 +176,7 @@ function WorkflowBody({ id }: { id: string }) {
             reducedMotion,
           }
         : null,
-    [deliverable, view, measures, id, outcomes, evidence, actingAs, person, personName, next, actions, act, notice, playing, reducedMotion],
+    [deliverable, view, measures, id, outcomes, evidence, actingAs, person, personName, next, actions, actorFor, act, notice, playing, reducedMotion],
   );
 
   if (!deliverable || !ctx) {

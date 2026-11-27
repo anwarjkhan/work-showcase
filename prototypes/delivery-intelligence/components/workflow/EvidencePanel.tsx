@@ -202,7 +202,7 @@ function AcceptanceBlock() {
 }
 
 function OutcomeAcceptanceCard({ outcome: o }: { outcome: Outcome }) {
-  const { id, measures, actions, act, actingAs, personName, evidence } = useWorkflow();
+  const { id, measures, actions, act, actorFor, personName, evidence } = useWorkflow();
   const idx = usePortfolioIndex();
   const criteria = idx.criteriaByOutcome.get(o.id) ?? [];
   const mandatory = criteria.filter((c) => c.mandatory);
@@ -244,7 +244,7 @@ function OutcomeAcceptanceCard({ outcome: o }: { outcome: Outcome }) {
           disabledReason={open.length > 0 ? `Accept the ${open.length} open mandatory criteri${open.length === 1 ? 'on' : 'a'} of ${o.ref} before recording business acceptance.` : undefined}
           onClick={() =>
             act(() =>
-              actions.recordEvidence({ deliverableId: id, kind: 'business-acceptance', result: 'pass', title: `${o.ref} accepted by ${personName(o.acceptanceOwnerId)}`, outcomeId: o.id, recordedById: actingAs, simulated: false }),
+              actions.recordEvidence({ deliverableId: id, kind: 'business-acceptance', result: 'pass', title: `${o.ref} accepted by ${personName(o.acceptanceOwnerId)}`, outcomeId: o.id, recordedById: actorFor(`record-acceptance:${o.id}`), simulated: false }),
             )
           }
           {...recordT}
@@ -264,7 +264,7 @@ function OutcomeAcceptanceCard({ outcome: o }: { outcome: Outcome }) {
 }
 
 function CriterionRow({ criterionId }: { criterionId: string }) {
-  const { actions, act, actingAs, personName } = useWorkflow();
+  const { actions, act, actorFor, actingAs, personName } = useWorkflow();
   const idx = usePortfolioIndex();
   const c = idx.criteria.get(criterionId)!;
   const [rejecting, setRejecting] = useState(false);
@@ -281,7 +281,7 @@ function CriterionRow({ criterionId }: { criterionId: string }) {
         ) : (
           <span className="flex shrink-0 items-center gap-1">
             {c.state === 'rejected' ? <Badge size="sm" tone="red" icon={<X />}>{terms.criterionStates.rejected}</Badge> : null}
-            <Button size="sm" variant="secondary" icon={<Check />} onClick={() => act(() => actions.acceptCriterion(c.id, actingAs))} {...acceptT}>
+            <Button size="sm" variant="secondary" icon={<Check />} onClick={() => act(() => actions.acceptCriterion(c.id, actorFor(`accept-criterion:${c.id}`)))} {...acceptT}>
               Accept
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setRejecting((v) => !v)} aria-expanded={rejecting}>

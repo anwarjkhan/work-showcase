@@ -8,6 +8,7 @@ export type RouteId =
   | 'global'
   | 'lifecycle'
   | 'workflow'
+  | 'roles'
   | 'agents'
   | 'deliverable'
   | 'blueprint'
@@ -25,6 +26,7 @@ export type RouteIcon =
   | 'global'
   | 'lifecycle'
   | 'workflow'
+  | 'roles'
   | 'agents'
   | 'deliverable'
   | 'blueprint'
@@ -142,6 +144,18 @@ export const ROUTES: readonly RouteDefinition[] = [
     icon: 'workflow',
     provenance: ['scripted-agent', 'simulated', 'computed'],
     builtBy: 'D16',
+  },
+  {
+    id: 'roles',
+    pattern: '/roles',
+    navHref: '/roles',
+    title: 'By role',
+    navLabel: 'By role',
+    description: 'What each of the Core Four has waiting, what is coming up, and where a seat is empty or held twice.',
+    group: 'delivery',
+    icon: 'roles',
+    provenance: ['computed', 'sample'],
+    builtBy: 'D17',
   },
   {
     id: 'agents',

@@ -16,7 +16,7 @@ The prototype shows what it looks like when those three are computed separately 
 
 ## 2. Approach
 
-**What it is.** A static Next.js application with a synthetic portfolio, a rules engine, a set of scripted agents and eleven screens. It is meant to be imported into another environment and continued.
+**What it is.** A static Next.js application with a synthetic portfolio, a rules engine, a set of scripted agents and thirteen routes. It is meant to be imported into another environment and continued.
 
 **What it is not.**
 
@@ -30,8 +30,8 @@ The prototype shows what it looks like when those three are computed separately 
 
 1. *A simplified delivery hierarchy with a book-of-record boundary.* Investment Request, then Initiative, Programme or Project (moderate and high activity-risk requests only; low risk takes the standalone route), then Technology Deliverable, then Outcome. The portfolio system is the book of record down to and including Outcome, and owns reported RAG at deliverable level and above. Jira holds the work below: Epic, story-level items and sub-tasks.
 2. *One deliverable to many Epics.* Each Epic carries a Deliverable ID and belongs to exactly one deliverable. Story-level items carry an Outcome ID, and an outcome can draw work from several Epics of the same deliverable.
-3. *Five lifecycle stages.* Ideation and Requirements; Design and Specifications; Risk, Control and Compliance Reviews; Build, Test and Validate; Delivery and Launch. Moves are allowed forward and back between neighbours. Each stage has an agent assist, a named human review and evidence it should leave behind. The reviews are illustrative and set in `lib/config/pdlc.ts`; they are not presented as any organisation's official gates.
-4. *Three separate measures.* Work completion (closed points over total points), accepted outcomes (every mandatory acceptance criterion accepted by a named human, plus a business acceptance evidence record) and delivery readiness (`ready`, `not ready` or `unknown`, never a percentage). None is derived from another: 100% work completion does not make an outcome accepted, and accepted outcomes do not make a deliverable ready. Evidence-based RAG is computed from fourteen rules and is always shown beside the reported RAG, never in place of it.
+3. *Five lifecycle stages.* Ideation and Requirements; Design and Specifications; Risk, Control and Compliance Reviews; Build, Test and Validate; Delivery and Launch. Moves are allowed forward and back between neighbours. Each stage has an agent assist, reviews by the deliverable's Core Four (Product Manager, Tech Lead, In-Business Risk Lead, UX Design Lead: the specialists confirm first, the Product Manager decides the gate last, and only the role holder can decide) and evidence it should leave behind. The reviews are illustrative and set in `lib/config/pdlc.ts`; they are not presented as any organisation's official gates.
+4. *Three separate measures.* Work completion (closed points over total points), accepted outcomes (every mandatory acceptance criterion accepted by a named human, plus a business acceptance evidence record) and delivery readiness (`ready`, `not ready` or `unknown`, never a percentage). None is derived from another: 100% work completion does not make an outcome accepted, and accepted outcomes do not make a deliverable ready. Evidence-based RAG is computed from sixteen rules and is always shown beside the reported RAG, never in place of it.
 5. *Governed agents.* An agent can never approve, accept an outcome or set readiness. Approval needs a named human who is not the item's assignee. The autonomy ceiling follows the work item's risk tier (T1 may auto-apply specifically allowed changes, T2 and T3 propose only, T4 is advisory only). Every run, proposal, approval and refusal is written to the audit trail. Reported RAG can never be changed by an agent or an approval.
 
 **Architecture.**
@@ -63,8 +63,8 @@ The story is carried by two synthetic deliverables:
 | 3 | Deliverable detail | `/deliverables/td-1001` | TD-1001 is reported Green with 82% of the work done, yet 1 of 4 outcomes is accepted and it is not ready to release. |
 | 4 | Global | `/global#hero` | The market-data dependency for TD-1001 comes from a hub on another continent and is nine days late. |
 | 5 | Plan | `/plan` | The late dependency pushes the forecast for TD-1001 past what the quarter has committed to. |
-| 6 | Lifecycle | `/lifecycle` | The same portfolio sits across five lifecycle stages, with an agent assist and a named human review at each one. |
-| 7 | PDLC workflow | `/lifecycle/td-2001` | TD-2001 moves forward only when a named person approves each review, and a failed test sends it back. |
+| 6 | Lifecycle | `/lifecycle` | The same portfolio sits across five lifecycle stages, with an agent assist at each one and the Core Four confirming before the Product Manager decides the gate. |
+| 7 | PDLC workflow | `/lifecycle/td-2001` | TD-2001 moves forward only when each Core Four role holder has confirmed and the Product Manager approves the gate, and a failed test sends it back. |
 | 8 | Agent centre | `/agents#run-raid-quality` | The agent only proposes; a named person approves, and the findings count drops everywhere the moment they do. |
 | 9 | Deliverable detail | `/deliverables/td-1001#status` | The weekly status for TD-1001 is drafted from the records, and every sentence carries a citation you can open. |
 | 10 | Blueprint | `/blueprint` | The target template makes the model repeatable: a Deliverable ID on every Epic and an Outcome ID on every story. |
@@ -80,11 +80,12 @@ Keyboard in the guided demo: Right, Page Down or N for next; Left, Page Up or P 
 |---|---|---|
 | `/` | Portfolio | Counts by hierarchy level, the three measures as portfolio figures, reported against evidence-based RAG, the list of status disagreements (each opens its deliverable), health by programme, stage distribution and data freshness. |
 | `/hierarchy` | Hierarchy explorer | An expandable tree from Investment Request to story, a band marking the book-of-record boundary, standalone deliverables shown as a distinct route, activity risk per request. Full keyboard support. |
-| `/deliverables/[id]` | Deliverable detail | Every deliverable has a page. The three measures side by side with the reasons behind readiness; Epics, outcomes with acceptance criteria and who accepted them, work by outcome, the evidence register, RAID, dependencies, findings, pod, and a drafted weekly status whose citations open the cited record. Hashes: `#status`, `#evidence`, `#outcomes`, `#work`, `#raid`, `#milestones`, `#pod`, `#why`. |
+| `/deliverables/[id]` | Deliverable detail | Every deliverable has a page. The three measures side by side with the reasons behind readiness; Epics, outcomes with acceptance criteria and who accepted them, work by outcome, the evidence register, RAID, dependencies, findings, the pod (led by a Core Four panel: four seats, each In place, Not named, Holds two roles or Joined late), and a drafted weekly status whose citations open the cited record. Hashes: `#status`, `#evidence`, `#outcomes`, `#work`, `#raid`, `#milestones`, `#pod`, `#why`. |
 | `/plan` | Plan | A timeline following the hierarchy with year, quarter, month and sprint zoom, today line, milestones (regulatory ones distinct), forecast against plan and the knock-on effect of late dependencies. A side panel opens a deliverable. |
 | `/global` | Global | A world map of 18 delivery hubs on six continents sized and coloured from the data, dependency arcs (late ones distinct), a hub panel, and a list view with the same information. `#hero` opens the focused dependency view. |
-| `/lifecycle` | Lifecycle | The five stages as columns with two-way connectors, deliverables placed by stage, agents available per stage, review points, and the human and agent share of work per stage. |
-| `/lifecycle/[id]` | PDLC workflow | One deliverable's run through the stages: run the stage agent, approve or return the review, simulate evidence arriving, accept criteria, move forward or back. Forward is disabled with the reason shown until the review is approved. The three measures update live. |
+| `/lifecycle` | Lifecycle | The five stages as columns with two-way connectors, deliverables placed by stage, agents available per stage, which Core Four roles confirm at each stage (the Product Manager decides the gate), a "Waiting on Risk Lead" or "Gate pending" line and a gap marker on each card, and the human and agent share of work per stage. |
+| `/roles` | By role | Pick a Core Four role (and optionally a person in it): what is waiting on that role, what is coming up, and the seat gaps, with an "Open workflow as" button that lands on the workflow with the persona preselected. Counts per role in a header strip. Supports `#role=risk-lead` and `#person=<id>`. |
+| `/lifecycle/[id]` | PDLC workflow | One deliverable's run through the stages: run the stage agent, take the Core Four through their confirmations (one row per role, the Product Manager's gate last; the highlighted control switches persona and acts in one click; an empty seat or a person in two seats is shown plainly), simulate evidence arriving, accept criteria, move forward or back. Forward is disabled with the reason shown until every review is approved. Open with `#act-as=<personId>` to preselect the persona. The three measures update live. |
 | `/agents` | Agent centre | A catalogue of nine scripted agents with stage, mode and autonomy ceiling; a run console that plays each step; an approval queue with before and after; governance refusals; an audit trail. Hashes such as `#run-raid-quality`, `#status-hero`, `#audit` preselect without running. |
 | `/blueprint` | Template blueprint | The current templates beside the target template, issue types mapped to the hierarchy, the new fields, the many-Epics-to-one-deliverable pattern and rollout across the project estate. |
 | `/evidence` | Pilot evidence | Baseline against assisted effort, exception counts and draft acceptance. Every figure is marked as a placeholder until measured. The pilot ask. |
@@ -131,7 +132,8 @@ With labels off these are hidden completely, not shrunk: provenance badges (Scri
 - The main storyline (Green reported, Red by evidence, 82%, 1 of 4, Not ready) and a weekly status in which every sentence is cited, with a citation opening its record.
 - Agent centre: run, approve, refusal as the item's assignee, and reset restoring the findings count, an empty queue and an empty audit trail.
 - An approval in the Agent centre clearing a finding on a named deliverable's page, and reset bringing it back.
-- The workflow walk-through to Ready, including the failing test and the move back, then reset.
+- The workflow walk-through to Ready by following the highlighted control (Core Four confirmations then the Product Manager's gate at every stage, a gate attempt refused while a confirmation is outstanding, the failing test and the move back), then reset; an empty Core Four seat shown plainly; the `#act-as` persona link.
+- By role: each role tab, counts and lists against the workflow logic, the Open workflow as button, the `#role` and `#person` hashes, seat gaps.
 - Plan zooms and side panel, the focused dependency view and list view on Global, and the three Epics under the main storyline deliverable on Hierarchy.
 - Slides: the TD-1001 pack, the basket (three slides from three screens, reorder, export, Reset clears it), the builder by hash and search, and pack dialogs, each checked by opening the downloaded file.
 
@@ -185,7 +187,7 @@ components/demo/        guided demo: top-bar control, docked overlay, state in s
 lib/config/             terminology.ts, story.ts, pdlc.ts, risk-tiers.ts, thresholds.ts, estate.ts,
                         blueprint.ts, routes.ts, clock.ts, demo-script.ts
 lib/data/               source.ts (DataSource), synthetic/ (seeded generator)
-lib/engine/             measures, readiness, rules R1 to R14, evidence-based RAG, plan maths
+lib/engine/             measures, readiness, rules R1 to R16, evidence-based RAG, plan maths
 lib/agents/             nine scripted agents, governance, playback, ModelProvider (see its README)
 lib/store/              store, selector hooks, actions, indexes
 e2e/                    Playwright browser tests

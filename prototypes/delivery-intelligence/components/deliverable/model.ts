@@ -6,10 +6,11 @@
 import { daysBetween } from '@/lib/config/clock';
 import { terms } from '@/lib/config/terminology';
 import { RULE_THRESHOLDS } from '@/lib/config/thresholds';
-import { buildContext, dependencyKnockOn, dependencyLateDays, evidenceStaleness, isClosed, type EngineContext, type KnockOn } from '@/lib/engine';
+import { buildContext, coreTeamSeats, workStartedAt, dependencyKnockOn, dependencyLateDays, evidenceStaleness, isClosed, type EngineContext, type KnockOn } from '@/lib/engine';
 import { currentEvidenceByKind, recordState } from '@/lib/engine/evidence';
 import { indexPortfolio } from '@/lib/store/indexes';
 import type {
+  CoreRole,
   AcceptanceCriterion,
   AgentIdentity,
   DemoClock,
@@ -131,6 +132,24 @@ export interface MemberRow {
   isOwner: boolean;
 }
 
+export type CoreSeatStatus = 'in-place' | 'not-named' | 'two-roles' | 'joined-late';
+
+export interface CoreSeatRow {
+  roleId: CoreRole;
+  person: Person | undefined;
+  joinedAt: string | null;
+  /** Every status that applies, worst first; `['in-place']` when none does. */
+  statuses: CoreSeatStatus[];
+}
+
+export interface CoreFourModel {
+  seats: CoreSeatRow[];
+  /** When work provably started (rule R16), if it has. */
+  workStartedAt: string | null;
+  workStartedKey: string | null;
+  gaps: number;
+}
+
 export interface AgentRow {
   identity: AgentIdentity;
   assigned: number;
@@ -156,6 +175,7 @@ export interface DeliverableModel {
   milestones: MilestoneRow[];
   findings: Finding[];
   members: MemberRow[];
+  coreFour: CoreFourModel;
   agents: AgentRow[];
   share: WorkShareRow;
   verdict: Verdict;
@@ -420,6 +440,17 @@ export function buildDeliverableModel(data: PortfolioData, result: EngineResult,
     .filter((a): a is AgentIdentity => Boolean(a))
     .map((identity) => ({ identity, assigned: stories.filter((s) => s.assigneeType === 'agent' && s.assigneeId === identity.id).length }));
 
+  const lateIds = new Set(findings.filter((f) => f.ruleId === 'R16').flatMap((f) => f.evidence.filter((e) => e.kind === 'person').map((e) => e.id)));
+  const started = workStartedAt(stories);
+  const seats: CoreSeatRow[] = coreTeamSeats(d).map((seat) => {
+    const statuses: CoreSeatStatus[] = [];
+    if (!seat.personId) statuses.push('not-named');
+    if (seat.shared) statuses.push('two-roles');
+    if (seat.personId && lateIds.has(seat.personId) && seat.joinedAt && started && seat.joinedAt > started.at.slice(0, 10)) statuses.push('joined-late');
+    return { roleId: seat.roleId, person: seat.personId ? idx.people.get(seat.personId) : undefined, joinedAt: seat.joinedAt, statuses: statuses.length > 0 ? statuses : ['in-place'] };
+  });
+  const coreFour: CoreFourModel = { seats, workStartedAt: started?.at ?? null, workStartedKey: started?.key ?? null, gaps: seats.filter((x) => !x.statuses.includes('in-place')).length };
+
   const programmePath = programmePathOf(data, d);
   const planned = plannedPercentOf(d, today);
 
@@ -443,6 +474,7 @@ export function buildDeliverableModel(data: PortfolioData, result: EngineResult,
     milestones,
     findings,
     members,
+    coreFour,
     agents,
     share,
     verdict: buildVerdict(data, ctx, d, rag, measures, findings, clock),

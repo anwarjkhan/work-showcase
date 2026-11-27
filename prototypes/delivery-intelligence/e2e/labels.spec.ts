@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { expectClean, FLOW, HERO, horizontalOverflow, LABELS_KEY, open, resetDemo, watch } from './helpers';
 
-// The twelve routes; the two dynamic ones are opened for both story deliverables.
+// The thirteen routes; the two dynamic ones are opened for both story deliverables.
 const ROUTES: Array<{ name: string; path: string }> = [
   { name: 'portfolio', path: '/' },
   { name: 'hierarchy', path: '/hierarchy/' },
@@ -12,6 +12,7 @@ const ROUTES: Array<{ name: string; path: string }> = [
   { name: 'lifecycle', path: '/lifecycle/' },
   { name: 'workflow (workflow story)', path: `/lifecycle/${FLOW}/` },
   { name: 'workflow (main storyline)', path: `/lifecycle/${HERO}/` },
+  { name: 'by role', path: '/roles/' },
   { name: 'agents', path: '/agents/' },
   { name: 'blueprint', path: '/blueprint/' },
   { name: 'evidence', path: '/evidence/' },

@@ -4,12 +4,14 @@ import { AGENT_CATALOGUE } from '@/lib/agents/catalogue';
 import { stageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
 import { ProvenanceBadge } from '@/components/shell';
-import { AvatarLabel, Badge, Drawer } from '@/components/ui';
+import { AvatarLabel, Badge, cx, Drawer } from '@/components/ui';
 import { useAgentRuns } from '@/lib/store';
 import type { PdlcStageId } from '@/lib/types';
 import { useWorkflow } from './context';
 import { formatStamp } from './model';
 import { ResultBadge, ReviewStateBadge, WorkProductChip } from './bits';
+
+const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 /** Collapsed summary of any stage: work products, agent runs, review decisions, evidence and moves. */
 export function StageDrawer({ stageId, onClose }: { stageId: PdlcStageId; onClose: () => void }) {
@@ -61,14 +63,20 @@ export function StageDrawer({ stageId, onClose }: { stageId: PdlcStageId; onClos
         </section>
 
         <section className="flex flex-col gap-2">
-          <h3 className="di-eyebrow">A named human reviews</h3>
+          <h3 className="di-eyebrow">The Core Four review</h3>
           <ul className="flex flex-col gap-3">
             {stage.reviews.map((r) => {
-              const p = person(r.reviewerId);
+              const p = person(r.personId);
               return (
-                <li key={r.roleId} className="flex flex-col gap-1.5">
+                <li key={r.roleId} className={cx('flex flex-col gap-1.5', r.gate && 'rounded-md border border-accent-line bg-accent-soft p-2')}>
                   <div className="flex items-center justify-between gap-2">
-                    {p ? <AvatarLabel initials={p.initials} name={p.name} detail={terms.reviewRoles[r.roleId]} size="sm" /> : <span>{terms.reviewRoles[r.roleId]}: no named reviewer</span>}
+                    {p ? (
+                      <AvatarLabel initials={p.initials} name={p.name} detail={r.gate ? `Gate · ${r.roleLabel}` : `${r.roleLabel}: ${lower(r.confirmed)}`} size="sm" />
+                    ) : (
+                      <span>
+                        {r.roleLabel}: {terms.coreTeam.missing.toLowerCase()}
+                      </span>
+                    )}
                     <ReviewStateBadge state={r.state} />
                   </div>
                   {r.decisions.map((d) => (

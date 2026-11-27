@@ -3,9 +3,12 @@
  * current PDLC stage, plus per-stage figures. Everything comes from the store's data
  * and engine result; nothing is hard-coded.
  */
-import { PDLC_STAGES } from '@/lib/config/pdlc';
+import { GATE_ROLE, PDLC_STAGES } from '@/lib/config/pdlc';
+import { terms } from '@/lib/config/terminology';
+import { missingCoreRoles, sharedCoreSeats } from '@/lib/engine/core-team';
 import type { PortfolioIndex } from '@/lib/store/indexes';
 import type {
+  CoreRole,
   EngineResult,
   PdlcRun,
   PdlcStageId,
@@ -26,6 +29,10 @@ export interface CardModel {
   programme: string | null;
   programmeId: string | null;
   review: StageReviewSummary;
+  /** Which review decides next in this stage (first not approved), and how many are done. */
+  reviewProgress: { waitingOn: CoreRole | null; done: number; total: number; text: string };
+  /** Core Four gaps on the deliverable: empty seats, people in two seats, or a late join (R16). */
+  coreGap: { missing: CoreRole[]; shared: { personId: string; roles: CoreRole[] }[]; lateJoin: boolean } | null;
   /** Set when the deliverable's latest move was back into this stage. */
   movedBack: { reason: string; fromStage: PdlcStageId } | null;
 }
@@ -56,6 +63,15 @@ function summariseReviews(run: PdlcRun | undefined, stage: PdlcStageId): StageRe
   return 'not-requested';
 }
 
+/** "Waiting on Risk Lead", "Gate pending", "Reviews done" for the stage's Core Four reviews. */
+function progressOf(run: PdlcRun | undefined, stage: PdlcStageId): CardModel['reviewProgress'] {
+  const reviews = run?.stages[stage]?.reviews ?? [];
+  const done = reviews.filter((r) => r.state === 'approved').length;
+  const next = reviews.find((r) => r.state !== 'approved');
+  const text = !next ? 'Reviews done' : next.roleId === GATE_ROLE ? 'Gate pending' : `Waiting on ${terms.coreRolesShort[next.roleId]}`;
+  return { waitingOn: next?.roleId ?? null, done, total: reviews.length, text };
+}
+
 function programmeOf(node: PmNode | undefined, nodes: Map<string, PmNode>): PmNode | null {
   let current = node;
   let top: PmNode | null = node ?? null;
@@ -72,7 +88,11 @@ function programmeOf(node: PmNode | undefined, nodes: Map<string, PmNode>): PmNo
 export function buildLifecycleView(data: PortfolioData, index: PortfolioIndex, results: EngineResult): StageView[] {
   const byStage = new Map<PdlcStageId, CardModel[]>(PDLC_STAGES.map((s) => [s.id, []]));
 
+  const lateJoin = new Set(results.findings.filter((f) => f.ruleId === 'R16').map((f) => f.deliverableId));
   for (const d of data.deliverables) {
+    const missing = missingCoreRoles(d);
+    const shared = sharedCoreSeats(d);
+    const late = lateJoin.has(d.id);
     const run = index.pdlcRunsByDeliverable.get(d.id);
     const stage = run?.currentStage ?? d.pdlcStage;
     const node = d.pmNodeId ? programmeOf(index.pmNodes.get(d.pmNodeId), index.pmNodes) : null;
@@ -88,6 +108,8 @@ export function buildLifecycleView(data: PortfolioData, index: PortfolioIndex, r
       programme: node?.title ?? null,
       programmeId: node?.id ?? null,
       review: summariseReviews(run, stage),
+      reviewProgress: progressOf(run, stage),
+      coreGap: missing.length > 0 || shared.length > 0 || late ? { missing, shared, lateJoin: late } : null,
       movedBack,
     });
   }

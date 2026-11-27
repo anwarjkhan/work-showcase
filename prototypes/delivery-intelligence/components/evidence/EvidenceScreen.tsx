@@ -97,7 +97,7 @@ export function EvidenceScreen() {
         actions={<ProvenanceBadge kind="computed" />}
       >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <StatTile label="Findings" value={findings.length} provenance="computed" caption="Across all 14 rules" />
+          <StatTile label="Findings" value={findings.length} provenance="computed" caption={`Across all ${RULES.length} rules`} />
           <StatTile label="Deliverables affected" value={deliverablesAffected} provenance="computed" caption={`of ${result.portfolio.counts.deliverables}`} />
           <StatTile label="Critical" value={bySeverity.critical} provenance="computed" caption={`${bySeverity.high} high`} />
           <StatTile label="Medium and low" value={bySeverity.medium + bySeverity.low} provenance="computed" />

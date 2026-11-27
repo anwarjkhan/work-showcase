@@ -5,6 +5,7 @@
  *
  * This is the proposed target template. It is planned, not built.
  */
+import { CORE_ROLES, PDLC_STAGES } from './pdlc';
 import { terms } from './terminology';
 import type { RiskTier, TemplateId, WorkItemType } from '@/lib/types';
 
@@ -95,6 +96,12 @@ export const CAPABILITIES: CapabilityRow[] = [
     label: 'Acceptance and evidence references',
     detail: 'Links to who accepted and what evidence is held.',
     support: { rapid: 'no', advanced: 'no', target: 'yes' },
+  },
+  {
+    id: 'core-four',
+    label: 'Core Four named on every deliverable',
+    detail: `${terms.coreRoles['product-manager']}, ${terms.coreRoles['tech-lead']}, ${terms.coreRoles['risk-lead']} and ${terms.coreRoles['ux-lead']}, each a different person with a joined date.`,
+    support: { rapid: 'no', advanced: 'partial', target: 'yes' },
   },
   {
     id: 'pod-assignee',
@@ -202,7 +209,7 @@ export const NEW_FIELDS: NewField[] = [
     purpose: 'Names the team of people and agents that own the work.',
     fieldType: 'Select',
     carriedBy: ['Epic', 'Story level'],
-    maintainedBy: 'Delivery lead',
+    maintainedBy: terms.coreRoles['tech-lead'],
   },
   {
     id: 'assignee-type',
@@ -226,7 +233,7 @@ export const NEW_FIELDS: NewField[] = [
     purpose: 'The named person accountable for an agent-assigned item.',
     fieldType: 'User',
     carriedBy: ['Story level', 'Sub-task'],
-    maintainedBy: 'Delivery lead; required when assignee type is agent',
+    maintainedBy: `${terms.coreRoles['tech-lead']}; required when assignee type is agent`,
   },
   {
     id: 'risk-tier',
@@ -235,6 +242,45 @@ export const NEW_FIELDS: NewField[] = [
     fieldType: 'Select: T1 to T4',
     carriedBy: ['Epic', 'Story level'],
     maintainedBy: 'Inherited from the deliverable; changed by a risk owner',
+  },
+  ...CORE_ROLES.map((roleId): NewField => ({
+    id: `core-${roleId}`,
+    name: terms.coreRoles[roleId],
+    purpose:
+      roleId === 'product-manager'
+        ? 'Owns the process and decides the go / no-go at every stage gate, always last.'
+        : roleId === 'tech-lead'
+          ? 'Confirms the architecture, the technical validation and the release checklist.'
+          : roleId === 'risk-lead'
+            ? 'Names the obligations and confirms risk and controls for the second line.'
+            : 'Confirms the user context and reviews the prototype.',
+    fieldType: 'User picker, with the date they joined',
+    carriedBy: ['Epic', 'Tech Deliverable'],
+    maintainedBy: `${terms.coreRoles['product-manager']}; a different person in each seat`,
+  })),
+  {
+    id: 'governance-mode',
+    name: 'Governance mode',
+    purpose: 'How closely the deliverable is governed, so the reviews and evidence it needs follow from it.',
+    fieldType: 'Select (single choice)',
+    carriedBy: ['Epic', 'Tech Deliverable'],
+    maintainedBy: `Set by the ${terms.coreRoles['product-manager']}, advised by the ${terms.coreRoles['risk-lead']}`,
+  },
+  {
+    id: 'requirements-validation',
+    name: 'Requirements validation result',
+    purpose: 'The outcome of validating the requirements before design starts.',
+    fieldType: 'Select: Pass, Conditional pass or Fail',
+    carriedBy: ['Epic', 'Tech Deliverable'],
+    maintainedBy: `Recorded at the first stage gate; the ${terms.coreRoles['product-manager']} decides after the confirmations`,
+  },
+  {
+    id: 'risk-sign-off',
+    name: 'Risk sign-off reference',
+    purpose: 'Who confirmed risk and controls for the second line, and when.',
+    fieldType: 'Link, with the name and date of the person',
+    carriedBy: ['Epic', 'Tech Deliverable'],
+    maintainedBy: `${terms.coreRoles['risk-lead']} (a named person); never typed by an agent`,
   },
 ];
 
@@ -288,6 +334,7 @@ export const AUTOMATION_RULES: AutomationRule[] = [
   { id: 'invalidate-evidence', when: 'Code or scope changes after evidence was recorded', then: 'Mark the readiness evidence as stale until it is refreshed.' },
   { id: 'reviewer-required', when: 'Assignee type is set to agent', then: 'Require a named human reviewer and an agent identifier.' },
   { id: 'outcome-required', when: 'A story-level item moves to In progress', then: `Require an ${terms.hierarchy.outcomeIdField}, or raise a data-quality flag.` },
+  { id: 'core-four-gate', when: `A deliverable is moved past ${PDLC_STAGES[0]!.name}`, then: `Block the move until all four ${terms.coreTeam.name} seats are filled, each by a different person.` },
   { id: 'tier-ceiling', when: 'An item has a risk tier', then: 'Apply the agent autonomy ceiling for that tier; at T4 agents may advise only.' },
 ];
 

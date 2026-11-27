@@ -24,6 +24,12 @@ export interface WorkflowContextValue {
   personName: (id: string | null | undefined) => string;
   next: NextStep | null;
   actions: DemoActions;
+  /**
+   * Who acts for a control. For the highlighted next step that asks for another person
+   * (`next.actAs`), this switches the persona to them first, so one click does both.
+   * For any other control it is the person acting now.
+   */
+  actorFor: (target: string) => string;
   /** Runs an action; shows its refusal sentence when it is refused. */
   act: <T>(fn: () => ActionResult<T>) => ActionResult<T>;
   notice: Notice | null;

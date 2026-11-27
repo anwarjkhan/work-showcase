@@ -44,8 +44,8 @@ describe('demo store', () => {
 });
 
 describe('routes', () => {
-  it('lists the twelve routes (the eleven of the design plus the slide builder) and matches paths with or without a trailing slash', () => {
-    expect(ROUTES).toHaveLength(12);
+  it('lists the thirteen routes (the eleven of the design plus the slide builder and the role view) and matches paths with or without a trailing slash', () => {
+    expect(ROUTES).toHaveLength(13);
     expect(routeForPath('/')?.id).toBe('portfolio');
     expect(routeForPath('/plan/')?.id).toBe('plan');
     expect(routeForPath('/lifecycle')?.id).toBe('lifecycle');

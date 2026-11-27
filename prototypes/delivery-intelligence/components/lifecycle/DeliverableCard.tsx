@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, CircleDashed, Hourglass, Undo2, Undo, GitBranch, GitCompareArrows } from 'lucide-react';
+import { CheckCircle2, CircleDashed, Hourglass, Undo2, Undo, GitBranch, GitCompareArrows, UserRoundX } from 'lucide-react';
 import Link from 'next/link';
 import { hrefs } from '@/lib/config/routes';
 import { stageDefinition } from '@/lib/config/pdlc';
@@ -10,25 +10,33 @@ import { FOCUS_RING } from '@/components/ui/cx';
 import { useDeliverableMeasures, useDeliverableRag } from '@/lib/store';
 import type { CardModel, StageReviewSummary } from './stage-model';
 
-const REVIEW_LABEL: Record<StageReviewSummary, string> = {
-  pending: 'Review pending',
-  approved: 'Review approved',
-  returned: 'Review returned',
-  'not-requested': 'Review not requested',
-};
-
-function ReviewBadge({ state }: { state: StageReviewSummary }) {
-  const common = { size: 'sm' as const };
+function ReviewBadge({ state, progress }: { state: StageReviewSummary; progress: CardModel['reviewProgress'] }) {
+  const common = { size: 'sm' as const, title: `${progress.done} of ${progress.total} reviews done in this stage` };
+  const text = state === 'returned' ? 'Review returned' : progress.text;
   switch (state) {
     case 'pending':
-      return <Badge {...common} tone="amber" icon={<Hourglass />}>{REVIEW_LABEL[state]}</Badge>;
+      return <Badge {...common} tone="amber" icon={<Hourglass />}>{text}</Badge>;
     case 'approved':
-      return <Badge {...common} tone="green" icon={<CheckCircle2 />}>{REVIEW_LABEL[state]}</Badge>;
+      return <Badge {...common} tone="green" icon={<CheckCircle2 />}>{text}</Badge>;
     case 'returned':
-      return <Badge {...common} tone="red" icon={<Undo2 />}>{REVIEW_LABEL[state]}</Badge>;
+      return <Badge {...common} tone="red" icon={<Undo2 />}>{text}</Badge>;
     default:
-      return <Badge {...common} tone="neutral" icon={<CircleDashed />}>{REVIEW_LABEL[state]}</Badge>;
+      return <Badge {...common} tone="neutral" icon={<CircleDashed />}>{text}</Badge>;
   }
+}
+
+/** Small marker for a deliverable whose Core Four has a gap (data-testid `core-gap`). */
+function GapMarker({ gap }: { gap: NonNullable<CardModel['coreGap']> }) {
+  const parts: string[] = [];
+  if (gap.missing.length > 0) parts.push(`${gap.missing.map((r) => terms.coreRoles[r]).join(' and ')} not named`);
+  if (gap.shared.length > 0) parts.push('one person holds two roles');
+  if (gap.lateJoin) parts.push('a seat was filled after work started');
+  const short = gap.missing.length > 0 ? `${terms.coreTeam.name} gap` : gap.shared.length > 0 ? `${terms.coreTeam.name}: two roles` : `${terms.coreTeam.name} joined late`;
+  return (
+    <Badge size="sm" tone="amber" icon={<UserRoundX />} title={`${terms.coreTeam.name}: ${parts.join('; ')}`} data-testid="core-gap">
+      {short}
+    </Badge>
+  );
 }
 
 export function DeliverableCard({ model, compact }: { model: CardModel; compact: boolean }) {
@@ -95,7 +103,8 @@ export function DeliverableCard({ model, compact }: { model: CardModel; compact:
       ) : null}
 
       <div className="flex flex-wrap items-center gap-1.5">
-        <ReviewBadge state={model.review} />
+        <ReviewBadge state={model.review} progress={model.reviewProgress} />
+        {model.coreGap ? <GapMarker gap={model.coreGap} /> : null}
       </div>
 
       {model.movedBack ? (

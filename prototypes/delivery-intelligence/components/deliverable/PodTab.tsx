@@ -1,18 +1,95 @@
 'use client';
 
+import { CheckCircle2, UserRoundX, UsersRound, Clock3 } from 'lucide-react';
 import { DemoNote, Avatar, Badge, Card, EmptyState } from '@/components/ui';
+import { formatDate } from '@/lib/config/clock';
+import { CORE_ROLE_SUMMARY, GATE_ROLE } from '@/lib/config/pdlc';
 import { StackedBar, chartColor } from '@/components/charts';
 import { terms } from '@/lib/config/terminology';
 import { AGENT_CATALOGUE } from '@/lib/agents';
-import type { DeliverableModel } from './model';
+import type { CoreSeatRow, CoreSeatStatus, DeliverableModel } from './model';
 import { RecordChip } from './records';
+
+const STATUS: Record<CoreSeatStatus, { label: string; tone: 'green' | 'amber' | 'red'; icon: React.ReactNode }> = {
+  'in-place': { label: terms.coreTeam.inPlace, tone: 'green', icon: <CheckCircle2 /> },
+  'not-named': { label: terms.coreTeam.missing, tone: 'red', icon: <UserRoundX /> },
+  'two-roles': { label: 'Holds two roles', tone: 'amber', icon: <UsersRound /> },
+  'joined-late': { label: terms.coreTeam.joinedLate, tone: 'amber', icon: <Clock3 /> },
+};
+
+function CoreSeat({ seat }: { seat: CoreSeatRow }) {
+  const gate = seat.roleId === GATE_ROLE;
+  return (
+    <li
+      className={`flex min-w-0 flex-col gap-2 rounded-md border p-3 ${gate ? 'border-accent-line bg-accent-soft' : 'border-line bg-surface'}`}
+      data-testid={`core-seat-${seat.roleId}`}
+      title={CORE_ROLE_SUMMARY[seat.roleId]}
+    >
+      <span className="di-eyebrow">{gate ? `${terms.coreRoles[seat.roleId]} · decides the gate` : terms.coreRoles[seat.roleId]}</span>
+      <span className="flex min-w-0 items-center gap-2.5">
+        {seat.person ? (
+          <Avatar initials={seat.person.initials} name={seat.person.name} size="md" />
+        ) : (
+          <span aria-hidden className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-dashed border-status-red-line bg-status-red-soft text-status-red-fg">
+            <UserRoundX className="size-4" />
+          </span>
+        )}
+        <span className="flex min-w-0 flex-col leading-tight">
+          <span className={`truncate text-[13px] font-medium ${seat.person ? 'text-fg' : 'text-status-red-fg'}`} data-testid={`core-seat-name-${seat.roleId}`}>
+            {seat.person?.name ?? terms.coreTeam.missing}
+          </span>
+          <span className="truncate text-xs text-fg-subtle">{seat.person ? `${terms.coreTeam.joined} ${seat.joinedAt ? formatDate(seat.joinedAt) : 'date not recorded'}` : 'Nobody can decide this role’s reviews'}</span>
+        </span>
+      </span>
+      <span className="flex flex-wrap gap-1.5" data-testid={`core-seat-status-${seat.roleId}`}>
+        {seat.statuses.map((st) => (
+          <Badge key={st} size="sm" tone={STATUS[st].tone} icon={STATUS[st].icon}>
+            {STATUS[st].label}
+          </Badge>
+        ))}
+      </span>
+    </li>
+  );
+}
+
+function CoreFourPanel({ model }: { model: DeliverableModel }) {
+  const { coreFour } = model;
+  return (
+    <Card
+      level={4}
+      padding="sm"
+      eyebrow="Named on this deliverable"
+      title={`${terms.coreTeam.name}${coreFour.gaps > 0 ? `: ${coreFour.gaps} ${coreFour.gaps === 1 ? 'seat needs' : 'seats need'} attention` : ''}`}
+      description={`Each stage's reviews are decided by these four people: the specialists confirm first, then the ${terms.coreRoles[GATE_ROLE]} decides the gate. Each role needs a different person, in place before work starts.`}
+    >
+      <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 xl:grid-cols-4" data-testid="core-four">
+        {coreFour.seats.map((seat) => (
+          <CoreSeat key={seat.roleId} seat={seat} />
+        ))}
+      </ul>
+      {coreFour.workStartedAt ? (
+        <p className="mt-2.5 text-xs text-fg-muted">
+          Work had started by {formatDate(coreFour.workStartedAt.slice(0, 10))}
+          {coreFour.workStartedKey ? ` (${coreFour.workStartedKey} left ${terms.statusCategories['to-do'].toLowerCase()})` : ''}.
+        </p>
+      ) : null}
+    </Card>
+  );
+}
 
 export function PodTab({ model }: { model: DeliverableModel }) {
   const { pod, members, agents, share } = model;
-  if (!pod) return <EmptyState title="No pod is assigned" description="Pod members and agent identities appear here once a pod is set for this deliverable." />;
+  if (!pod)
+    return (
+      <div className="flex flex-col gap-4">
+        <CoreFourPanel model={model} />
+        <EmptyState title="No pod is assigned" description="Pod members and agent identities appear here once a pod is set for this deliverable." />
+      </div>
+    );
   const total = share.human + share.agent;
   return (
     <div className="flex flex-col gap-4">
+      <CoreFourPanel model={model} />
       <Card
         level={4}
         padding="sm"

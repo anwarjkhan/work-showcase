@@ -104,7 +104,7 @@ export function BlueprintScreen() {
         <MappingDiagram />
       </Section>
 
-      <Section title="New fields" description="Nine fields, with their purpose, which issue types carry them and who or what keeps them current.">
+      <Section title="New fields" description={`${NEW_FIELDS.length} fields, with their purpose, which issue types carry them and who or what keeps them current. The first nine join and trace the work; the rest name the ${terms.coreTeam.name} and record their decisions.`}>
         <DataTable<NewField>
           ariaLabel="New fields in the target template"
           rows={NEW_FIELDS}

@@ -7,23 +7,24 @@
 import { AGENT_CATALOGUE } from '@/lib/agents/catalogue';
 import type { WorkflowView } from '@/lib/agents/workflow';
 import { formatDate } from '@/lib/config/clock';
-import { PDLC_STAGES, stageDefinition } from '@/lib/config/pdlc';
+import { GATE_ROLE, PDLC_STAGES, reviewConfirmation, stageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
 import type {
   AcceptanceCriterion,
   Actor,
   AgentId,
   AuditEvent,
+  CoreRole,
   DeliverableMeasures,
   Evidence,
   EvidenceHeldState,
   EvidenceKind,
   Outcome,
   PdlcRun,
+  PdlcStageId,
   PortfolioData,
   ProposedChange,
   Provenance,
-  ReviewRoleId,
 } from '@/lib/types';
 
 // ---------------------------------------------------------------------------
@@ -35,8 +36,8 @@ export type NextTarget =
   | 'skip-playback'
   | 'run-agent'
   | `approve-proposal:${string}`
-  | `act-as:${string}`
   | `approve-review:${string}`
+  | 'core-four-gap'
   | `record:${string}`
   | `simulate:${string}:${'pass' | 'fail'}`
   | 'simulate-work:half'
@@ -54,14 +55,12 @@ export interface NextStep {
   /** Why, in a few words (optional). */
   detail?: string;
   tone: 'action' | 'warn' | 'done' | 'wait';
+  /**
+   * When set and different from the acting person, the highlighted control switches the
+   * persona to this person first and then acts, in one click (see `actorFor` in the workflow context).
+   */
+  actAs?: string;
 }
-
-/** Evidence a review needs held and passing before it is decided (the reviewer reviews it). */
-export const EVIDENCE_BEFORE_REVIEW: Partial<Record<ReviewRoleId, EvidenceKind>> = {
-  'independent-validator': 'test-result',
-  'business-owner': 'business-acceptance',
-  'release-owner': 'release-checklist',
-};
 
 /** Evidence kinds that arrive from a system (simulated in the demo) rather than being recorded by a person. */
 export const SYSTEM_FED_KINDS: EvidenceKind[] = ['test-result'];
@@ -119,13 +118,17 @@ export function agentName(id: AgentId | null): string {
 }
 
 export function deriveNextStep(input: NextStepInput): NextStep | null {
-  const { view, measures, actingAs, personName } = input;
+  const { view, measures } = input;
   if (input.playing) return { target: 'skip-playback', label: 'The agent is working: watch its steps, or skip to the result', tone: 'wait' };
   const cur = view.stages.find((s) => s.current);
   if (!cur) return null;
   const stage = cur.definition;
   const required = measures.readiness.requiredEvidence;
   const lastStage = stage.order === PDLC_STAGES.length;
+
+  // 0. A Core Four gap (an empty seat, or one person in two seats) stops the next review whoever acts, so say so first.
+  const gap = view.nextReview?.blocked ? view.nextReview : null;
+  if (gap?.blocked) return { target: 'core-four-gap', label: `The ${gap.roleLabel} review is blocked`, detail: gap.blocked, tone: 'warn' };
 
   // 1. The stage's agent assists first.
   const stageDone = cur.reviews.length > 0 && cur.reviews.every((r) => r.state === 'approved');
@@ -160,30 +163,27 @@ export function deriveNextStep(input: NextStepInput): NextStep | null {
       : { target: 'simulate-work:rest', label: 'Simulate the rest of the work closed', detail: 'Labelled simulated. Work completion reaches its end; the other two measures still have not moved.', tone: 'action' };
   }
 
-  // 5. The next review, with the evidence it reviews in place first.
+  // 5. The next review (the Core Four, in order), with the evidence it reviews in place first.
   const next = cur.reviews.find((r) => r.next);
   if (next) {
-    const before = EVIDENCE_BEFORE_REVIEW[next.roleId];
+    const before = next.evidenceBefore;
     if (before && stage.evidenceLeft.includes(before) && required.includes(before) && heldState(measures, before) !== 'passing') {
       const step = evidenceStep(before, input, failing);
       if (step) return step;
     }
-    const reviewer = next.reviewerId;
-    const roleLabel = lower(terms.reviewRoles[next.roleId]);
-    if (reviewer && reviewer !== actingAs) {
-      return { target: `act-as:${reviewer}`, label: `Act as ${personName(reviewer)}, the named ${roleLabel}`, detail: `Only the named ${roleLabel} can decide this review.`, tone: 'action' };
-    }
+    const nr = view.nextReview;
     return {
       target: `approve-review:${next.roleId}`,
-      label: `Approve the ${lower(stage.shortName)} review as ${roleLabel}`,
-      detail: stage.reviews.length > 1 ? `Review ${stage.reviews.indexOf(next.roleId) + 1} of ${stage.reviews.length} in this stage.` : undefined,
+      label: next.actionLabel,
+      detail: view.nextReview?.detail ?? `${stage.reviews.indexOf(next.roleId) + 1} of ${stage.reviews.length} in this stage.`,
       tone: 'action',
+      ...(nr?.needsActAs && nr.personId ? { actAs: nr.personId } : {}),
     };
   }
 
   // 6. Evidence the approved stage should leave behind.
   for (const kind of stage.evidenceLeft) {
-    if (Object.values(EVIDENCE_BEFORE_REVIEW).includes(kind)) continue;
+    if (Object.values(stage.evidenceBefore).includes(kind)) continue;
     if (!required.includes(kind) || heldState(measures, kind) === 'passing') continue;
     return { target: `record:${kind}`, label: `Record the ${lower(terms.evidenceKinds[kind])}`, detail: `Evidence this stage leaves behind; ${terms.riskTiers[measures.readiness.riskTier]} requires it for readiness.`, tone: 'action' };
   }
@@ -219,22 +219,23 @@ function evidenceStep(kind: EvidenceKind, input: NextStepInput, failing: Evidenc
     for (const o of input.outcomes) {
       if (acc.find((a) => a.outcomeId === o.id)?.accepted) continue;
       const open = (input.criteriaByOutcome.get(o.id) ?? []).filter((c) => c.mandatory && c.state !== 'accepted');
-      if (o.acceptanceOwnerId !== actingAs) {
-        return { target: `act-as:${o.acceptanceOwnerId}`, label: `Act as ${personName(o.acceptanceOwnerId)}, acceptance owner of ${o.ref}`, detail: 'Only the named acceptance owner can accept criteria and record business acceptance.', tone: 'action' };
-      }
+      const owner = o.acceptanceOwnerId;
+      const as = owner !== actingAs ? { actAs: owner } : {};
+      const by = owner !== actingAs ? ` as ${personName(owner)}, the ${terms.coreRoles['product-manager']}` : '';
       if (open.length > 0) {
         const all = (input.criteriaByOutcome.get(o.id) ?? []).filter((c) => c.mandatory);
         return {
           target: `accept-criterion:${open[0]!.id}`,
-          label: `Accept the outcome's criteria`,
-          detail: `${o.ref}: ${all.length - open.length} of ${all.length} mandatory criteria accepted. Accepting them alone does not accept the outcome.`,
+          label: `Accept the outcome's criteria${by}`,
+          detail: `${o.ref}: ${all.length - open.length} of ${all.length} mandatory criteria accepted. Only the acceptance owner can accept; accepting them alone does not accept the outcome.`,
           tone: 'action',
+          ...as,
         };
       }
-      return { target: `record-acceptance:${o.id}`, label: 'Record business acceptance', detail: `${o.ref} is accepted only with a business acceptance record from its owner.`, tone: 'action' };
+      return { target: `record-acceptance:${o.id}`, label: `Record business acceptance${by}`, detail: `${o.ref} is accepted only with a business acceptance record from its owner.`, tone: 'action', ...as };
     }
     const first = input.outcomes[0];
-    return first ? { target: `record-acceptance:${first.id}`, label: 'Record business acceptance', tone: 'action' } : null;
+    return first ? { target: `record-acceptance:${first.id}`, label: 'Record business acceptance', tone: 'action', ...(first.acceptanceOwnerId !== actingAs ? { actAs: first.acceptanceOwnerId } : {}) } : null;
   }
   if (kind === 'release-checklist') return { target: 'record:release-checklist', label: 'Record the release checklist', detail: 'The last record readiness needs.', tone: 'action' };
   return { target: `record:${kind}`, label: `Record the ${lower(terms.evidenceKinds[kind])}`, tone: 'action' };
@@ -267,6 +268,14 @@ interface HistoryContext {
   proposals: ProposedChange[];
 }
 
+/** "Confirmed as In-Business Risk Lead: obligations named (Requirements)" / "Approved the stage gate as Product Manager (Requirements)". */
+function reviewTitle(roleId: CoreRole, decision: 'approved' | 'returned', stageId: PdlcStageId, shortName: string): string {
+  const role = terms.coreRoles[roleId];
+  if (decision === 'returned') return `Returned the ${role} review (${shortName})`;
+  if (roleId === GATE_ROLE) return `Approved the stage gate as ${role} (${shortName})`;
+  return `Confirmed as ${role}: ${lower(reviewConfirmation(stageId, roleId).confirmed)} (${shortName})`;
+}
+
 export function buildHistory({ data, deliverableId, run, audit, proposals }: HistoryContext): HistoryItem[] {
   const people = new Map(data.people.map((p) => [p.id, p]));
   const person = (id: string | null | undefined): HistoryActor => {
@@ -297,7 +306,7 @@ export function buildHistory({ data, deliverableId, run, audit, proposals }: His
             at: d.decidedAt,
             kind: d.decision === 'approved' ? 'review-approved' : 'review-returned',
             actor: person(d.reviewerId),
-            title: `${d.decision === 'approved' ? 'Approved' : 'Returned'} the ${lower(terms.reviewRoles[d.roleId])} review (${def.shortName})`,
+            title: reviewTitle(d.roleId, d.decision, def.id, def.shortName),
             detail: d.reason ?? undefined,
             tone: d.decision === 'approved' ? 'green' : 'red',
           });

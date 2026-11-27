@@ -54,7 +54,7 @@ export function LifecycleScreen() {
     <div className="flex flex-col gap-8">
       <Section
         title={terms.app.lifecycleModel}
-        description="Agents assist, a named human reviews, evidence is recorded. Work moves forward and back between neighbouring stages; it is iterative, not a waterfall."
+        description="Agents assist, the Core Four review (the Product Manager decides each gate), evidence is recorded. Work moves forward and back between neighbouring stages; it is iterative, not a waterfall."
         actions={
           <>
             <AddToSlides kind="portfolio-stages" scope={{ kind: 'portfolio' }} label="the lifecycle board" />
@@ -76,7 +76,7 @@ export function LifecycleScreen() {
               <span>
                 <span className="block font-display text-[15px] font-semibold">Walk a deliverable through the lifecycle</span>
                 <span className="block text-[12.5px] text-fg-muted">
-                  Run the stage agent, approve or return a review, record evidence and move between stages.
+                  Run the stage agent, take the Core Four through their confirmations, record evidence and move between stages.
                 </span>
               </span>
             </span>
@@ -133,7 +133,7 @@ export function LifecycleScreen() {
           footer={
             <span className="flex flex-wrap items-center gap-2">
               <Badge size="sm" tone="neutral" icon={<Info />}>Illustrative</Badge>
-              Stages, review roles and evidence per stage are set in <code className="font-mono">lib/config/pdlc.ts</code>; the required
+              Stages, the Core Four confirmations and evidence per stage are set in <code className="font-mono">lib/config/pdlc.ts</code>; the required
               evidence per risk tier in <code className="font-mono">lib/config/risk-tiers.ts</code>.
             </span>
           }

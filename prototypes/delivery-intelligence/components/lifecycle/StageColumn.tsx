@@ -3,7 +3,7 @@
 import { Bot, FileCheck2, UserCheck } from 'lucide-react';
 import { Avatar, Badge, cx, EmptyState } from '@/components/ui';
 import { agentsForStage } from '@/lib/agents/catalogue';
-import type { PdlcStageDefinition } from '@/lib/config/pdlc';
+import { GATE_ROLE, type PdlcStageDefinition } from '@/lib/config/pdlc';
 import { terms } from '@/lib/config/terminology';
 import { DeliverableCard } from './DeliverableCard';
 import type { CardModel, StageView } from './stage-model';
@@ -66,14 +66,19 @@ export function StageColumn({
         </div>
 
         <div className="flex flex-col gap-1">
-          <Label icon={<UserCheck aria-hidden />}>A named human reviews</Label>
-          <ul className="text-[12px] text-fg">
-            {def.reviews.map((r, i) => (
-              <li key={r}>
-                {i > 0 ? 'Then ' : ''}
-                {i > 0 ? terms.reviewRoles[r].toLowerCase() : terms.reviewRoles[r]}
-              </li>
-            ))}
+          <Label icon={<UserCheck aria-hidden />}>The Core Four review</Label>
+          <ul className="text-[12px] text-fg" data-testid={`stage-reviews-${def.id}`}>
+            {def.reviews.map((r) =>
+              r === GATE_ROLE ? (
+                <li key={r} className="mt-0.5 font-medium text-title">
+                  Then the {terms.coreRoles[r]} decides the gate
+                </li>
+              ) : (
+                <li key={r}>
+                  <span className="font-medium">{terms.coreRolesShort[r]}:</span> <span className="text-fg-muted">{def.confirms[r]?.confirmed.toLowerCase()}</span>
+                </li>
+              ),
+            )}
           </ul>
         </div>
 
